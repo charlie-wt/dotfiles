@@ -23,11 +23,6 @@ call plug#end()
 syntax on
 " line numbers - absolute in insert mode/not focused, hybrid otherise.
 set number relativenumber
-" augroup numbertoggle
-" 	autocmd!
-" 	autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
-" 	autocmd BufLeave,FocusLost,InsertEnter * set norelativenumber
-" augroup END
 " tab size
 set tabstop=4
 set softtabstop=4
@@ -59,7 +54,7 @@ set wildmode=list:longest,full
 set autoread
 " don't fold by default
 set nofoldenable
-" don't add empty newlines to the end of files
+" don't add newlines to the end of files
 set binary
 set noeol
 " set character encoding - utf-8 without BOM (Byte Order Marker)
@@ -103,7 +98,7 @@ nnoremap <C-l> <C-w>l
 " H/L to go to start/end of line
 nnoremap H ^
 nnoremap L $
-" Y yanks to end of line, consistent w/ D & C
+" Y yanks to end of line, consistent with D & C
 nnoremap Y y$
 " copy/paste from system clipboard (NOTE: needs xsel package installed)
 vnoremap <C-c> :w !xsel -i -b<CR><CR>
@@ -128,9 +123,6 @@ let g:airline_powerline_fonts=1
 autocmd VimEnter ~/Programming/* NERDTree
 autocmd BufEnter ~/Programming/* NERDTreeMirror
 autocmd VimEnter ~/Programming/* wincmd w
-
-" SimpylFold - preview docstrings
-"let g:SimpylFold_docstring_preview = 1
 
 " == Other
 " manually set indentation stuff for typescript, since polyglot doesn't do it.
