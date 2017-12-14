@@ -14,6 +14,8 @@ Plug 'tpope/vim-sleuth'
 Plug 'ap/vim-css-color'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-speeddating'
+Plug 'tpope/vim-repeat'
 
 call plug#end()
 
@@ -21,7 +23,7 @@ call plug#end()
 " == General
 " syntax highlighting
 syntax on
-" line numbers - absolute in insert mode/not focused, hybrid otherise.
+" line numbers - hybrid mode (current line absolute, all others relative)
 set number relativenumber
 " tab size
 set tabstop=4
@@ -73,8 +75,8 @@ set noerrorbells
 if &term =~ '256color'
 	set t_ut=
 endif
-" use OS clipboard - doesn't seem to work
-set clipboard=unnamedplus
+" use OS clipboard - only works if :echo has('clipboard') outputs 1
+" set clipboard=unnamedplus
 
 
 " == Whitespace characters
@@ -90,7 +92,7 @@ nnoremap \ :noh<CR>:<backspace>
 " also clear search highlighting by going into insert mode.
 autocmd InsertEnter * :set nohlsearch
 autocmd InsertLeave * :set hlsearch
-" Ctrl+HJKL to go between windows
+" Ctrl+HJKL to go between splits
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
@@ -98,6 +100,8 @@ nnoremap <C-l> <C-w>l
 " H/L to go to start/end of line
 nnoremap H ^
 nnoremap L $
+vnoremap H ^
+vnoremap L $
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
 " copy/paste from system clipboard (NOTE: needs xsel package installed)
