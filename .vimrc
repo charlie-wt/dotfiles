@@ -16,6 +16,8 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-repeat'
+Plug 'andymass/vim-matchup'
+Plug 'majutsushi/tagbar'
 
 call plug#end()
 
@@ -107,7 +109,12 @@ nnoremap Y y$
 " copy/paste from system clipboard (NOTE: needs xsel package installed)
 vnoremap <C-c> :w !xsel -i -b<CR><CR>
 noremap <C-p> :r !xsel -o -b<CR><CR>
-
+" F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
+noremap <F8> :TagbarToggle<CR>
+" F3 to toggle NERDTree
+noremap <F3> :NERDTreeToggle<CR>
+" F5 when writing markdown to convert to PDF
+au FileType markdown noremap <F5> :!mdpdf % <CR><CR>
 
 " == Disabled commands
 " Q -> Ex mode
