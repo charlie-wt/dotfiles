@@ -113,8 +113,9 @@ noremap <C-p> :r !xsel -o -b<CR><CR>
 noremap <F8> :TagbarToggle<CR>
 " F3 to toggle NERDTree
 noremap <F3> :NERDTreeToggle<CR>
-" F5 when writing markdown to convert to PDF
+" F5 to 'compile' certain files (markdown, latex)
 au FileType markdown noremap <F5> :!mdpdf % <CR><CR>
+au FileType tex noremap <F5> :!xelatex % <CR><CR>
 
 " == Disabled commands
 " Q -> Ex mode
