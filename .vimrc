@@ -18,6 +18,7 @@ Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-repeat'
 Plug 'andymass/vim-matchup'
 Plug 'majutsushi/tagbar'
+Plug 'vim-scripts/aj.vim'
 
 call plug#end()
 
@@ -39,7 +40,13 @@ set is
 set ignorecase
 set smartcase
 " Highlight trailing whitespace
-match ErrorMsg '\s\+$'
+" match ErrorMsg '\s\+$'
+" highlight ExtraWhitespace ctermbg=red guibg=red
+match ErrorMsg /\s\+$/
+autocmd BufWinEnter * match ErrorMsg /\s\+$/
+autocmd InsertEnter * match ErrorMsg /\s\+\%#\@<!$/
+autocmd InsertLeave * match ErrorMsg /\s\+$/
+autocmd BufWinLeave * call clearmatches()
 " Copy indentation level from previous line
 set copyindent
 " Colour scheme
@@ -114,8 +121,10 @@ noremap <F8> :TagbarToggle<CR>
 " F3 to toggle NERDTree
 noremap <F3> :NERDTreeToggle<CR>
 " F5 to 'compile' certain files (markdown, latex)
-au FileType markdown noremap <F5> :!mdpdf % <CR><CR>
-au FileType tex noremap <F5> :!xelatex % <CR><CR>
+au FileType markdown noremap <F5> :!mdpdf "%" <CR><CR>
+au FileType tex noremap <F5> :!xelatex "%" <CR><CR>
+" F6 to turn markdown into beamer slides (instead of normal latex doc)
+au FileType markdown noremap <F6> :!mdsl "%" <CR><CR>
 
 " == Disabled commands
 " Q -> Ex mode
