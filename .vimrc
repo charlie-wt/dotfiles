@@ -6,7 +6,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'morhetz/gruvbox'
 Plug 'vim-scripts/Smart-Tabs'
-Plug 'sheerun/vim-polyglot'
+" Plug 'sheerun/vim-polyglot'
 Plug 'tmhedberg/SimpylFold'
 Plug 'docunext/closetag.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
@@ -111,6 +111,11 @@ nnoremap H ^
 nnoremap L $
 vnoremap H ^
 vnoremap L $
+" if editing prose, j/k navigate screen-lines, not file-lines
+" TODO: is this good? lose the ability to utilise relative line numbers
+au FileType markdown,tex,latex noremap j gj
+au FileType markdown,tex,latex noremap k gk
+au FileType markdown,tex,latex set norelativenumber
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
 " copy/paste from system clipboard (NOTE: needs xsel package installed)
@@ -125,6 +130,8 @@ au FileType markdown noremap <F5> :!mdpdf "%" <CR><CR>
 au FileType tex noremap <F5> :!xelatex "%" <CR><CR>
 " F6 to turn markdown into beamer slides (instead of normal latex doc)
 au FileType markdown noremap <F6> :!mdsl "%" <CR><CR>
+" F7 to turn markdown into report
+au FileType markdown noremap <F6> :!mdrep "%" <CR><CR>
 
 " == Disabled commands
 " Q -> Ex mode
