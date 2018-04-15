@@ -131,7 +131,7 @@ au FileType tex noremap <F5> :!xelatex "%" <CR><CR>
 " F6 to turn markdown into beamer slides (instead of normal latex doc)
 au FileType markdown noremap <F6> :!mdsl "%" <CR><CR>
 " F7 to turn markdown into report
-au FileType markdown noremap <F6> :!mdrep "%" <CR><CR>
+au FileType markdown noremap <F7> :!mdrep "%" <CR><CR>
 
 " == Disabled commands
 " Q -> Ex mode
