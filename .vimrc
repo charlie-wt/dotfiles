@@ -19,6 +19,8 @@ Plug 'tpope/vim-repeat'
 Plug 'andymass/vim-matchup'
 Plug 'majutsushi/tagbar'
 Plug 'vim-scripts/aj.vim'
+Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'vim-pandoc/vim-pandoc'
 
 call plug#end()
 
