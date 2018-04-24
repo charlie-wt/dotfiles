@@ -6,7 +6,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'morhetz/gruvbox'
 Plug 'vim-scripts/Smart-Tabs'
-" Plug 'sheerun/vim-polyglot'
+Plug 'sheerun/vim-polyglot'
 Plug 'tmhedberg/SimpylFold'
 Plug 'docunext/closetag.vim'
 Plug 'ConradIrwin/vim-bracketed-paste'
@@ -142,6 +142,9 @@ nnoremap Q <nop>
 nnoremap K <nop>
 " Ctrl+Z -> background the vim process
 nnoremap <C-z> <nop>
+" Ctrl+\ -> evaluate expression, replace the whole command line with the result
+"           (I currently use this as my tmux prefix)
+nnoremap <C-\> <nop>
 
 
 " == Plugin config
