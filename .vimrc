@@ -128,12 +128,12 @@ noremap <F8> :TagbarToggle<CR>
 " F3 to toggle NERDTree
 noremap <F3> :NERDTreeToggle<CR>
 " F5 to 'compile' certain files (markdown, latex)
-au FileType markdown noremap <F5> :!mdpdf "%" <CR><CR>
-au FileType tex noremap <F5> :!xelatex "%" <CR><CR>
+au FileType markdown noremap <F5> :!mdpdf "%" & disown<CR><CR>
+au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
 " F6 to turn markdown into beamer slides (instead of normal latex doc)
-au FileType markdown noremap <F6> :!mdsl "%" <CR><CR>
+au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
 " F7 to turn markdown into report
-au FileType markdown noremap <F7> :!mdrep "%" <CR><CR>
+au FileType markdown noremap <F7> :!mdrep "%" & disown<CR><CR>
 
 " == Disabled commands
 " Q -> Ex mode
