@@ -153,9 +153,9 @@ set laststatus=2
 let g:airline_powerline_fonts=1
 
 " Automatic NERDTree - only in ~/Programming/...
-autocmd VimEnter ~/Programming/* NERDTree
-autocmd BufEnter ~/Programming/* NERDTreeMirror
-autocmd VimEnter ~/Programming/* wincmd w
+" autocmd VimEnter ~/Programming/* NERDTree
+" autocmd BufEnter ~/Programming/* NERDTreeMirror
+" autocmd VimEnter ~/Programming/* wincmd w
 
 " == Other
 " manually set indentation stuff for typescript, since polyglot doesn't do it.
