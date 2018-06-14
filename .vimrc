@@ -21,6 +21,7 @@ Plug 'majutsushi/tagbar'
 Plug 'vim-scripts/aj.vim'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-pandoc'
+Plug 'wellle/targets.vim'
 
 call plug#end()
 
@@ -86,8 +87,6 @@ set noerrorbells
 if &term =~ '256color'
 	set t_ut=
 endif
-" use OS clipboard - only works if :echo has('clipboard') outputs 1
-" set clipboard=unnamedplus
 
 
 " == Whitespace characters
@@ -133,7 +132,8 @@ au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
 " F6 to turn markdown into beamer slides (instead of normal latex doc)
 au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
 " F7 to turn markdown into report
-au FileType markdown noremap <F7> :!mdrep "%" & disown<CR><CR>
+" au FileType markdown noremap <F7> :!mdrep "%" & disown<CR><CR>
+au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
 
 " == Disabled commands
 " Q -> Ex mode
