@@ -119,9 +119,16 @@ au FileType markdown,tex,latex noremap k gk
 au FileType markdown,tex,latex set norelativenumber
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
-" copy/paste from system clipboard (NOTE: needs xsel package installed)
-vnoremap <C-c> :w !xsel -i -b<CR><CR>
-noremap <C-p> :r !xsel -o -b<CR><CR>
+" system clipboard access with Ctrl+C/P:
+if has("clipboard")
+	" if vim has system clipboard support, use it
+	vnoremap <C-c> "+y
+	noremap <C-p> "+p
+else
+	" otherwise, use the (external) xsel package (can only copy whole lines)
+	vnoremap <C-c> :w !xsel -i -b<CR><CR>
+	noremap <C-p> :r !xsel -o -b<CR><CR>
+endif
 " F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
 noremap <F8> :TagbarToggle<CR>
 " F3 to toggle NERDTree
@@ -132,7 +139,6 @@ au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
 " F6 to turn markdown into beamer slides (instead of normal latex doc)
 au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
 " F7 to turn markdown into report
-" au FileType markdown noremap <F7> :!mdrep "%" & disown<CR><CR>
 au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
 
 " == Disabled commands
