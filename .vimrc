@@ -2,10 +2,10 @@ set nocompatible
 " == Plugins
 call plug#begin('~/.vim/bundle')
 
+Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree'
 Plug 'vim-airline/vim-airline'
-Plug 'morhetz/gruvbox'
-Plug 'vim-scripts/Smart-Tabs'
+" Plug 'vim-scripts/Smart-Tabs'
 Plug 'sheerun/vim-polyglot'
 Plug 'tmhedberg/SimpylFold'
 Plug 'docunext/closetag.vim'
@@ -22,6 +22,7 @@ Plug 'vim-scripts/aj.vim'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'wellle/targets.vim'
+Plug 'christoomey/vim-tmux-navigator'
 
 call plug#end()
 
@@ -130,9 +131,9 @@ else
 	noremap <C-p> :r !xsel -o -b<CR><CR>
 endif
 " F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
-noremap <F8> :TagbarToggle<CR>
+noremap <silent> <F8> :TagbarToggle<CR>
 " F3 to toggle NERDTree
-noremap <F3> :NERDTreeToggle<CR>
+noremap <silent> <F3> :NERDTreeToggle<CR>
 " F5 to 'compile' certain files (markdown, latex)
 au FileType markdown noremap <F5> :!mdpdf "%" & disown<CR><CR>
 au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
