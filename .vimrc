@@ -23,7 +23,7 @@ Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'wellle/targets.vim'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'vim-syntastic/syntastic'
+Plug 'w0rp/ale'
 
 call plug#end()
 
@@ -133,8 +133,8 @@ else
 endif
 " :Diff to view a diff of unsaved changes
 command Diff execute 'w !git diff --no-index % -'
-" F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
-noremap <silent> <F8> :TagbarToggle<CR>
+" F2 to toggle ALE
+noremap <silent> <F2> :ALEToggleBuffer<CR>
 " F3 to toggle NERDTree
 noremap <silent> <F3> :NERDTreeToggle<CR>
 " F5 to 'compile' certain files (markdown, latex)
@@ -144,15 +144,8 @@ au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
 au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
 " F7 to turn markdown into report
 au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
-" F2 to 'toggle' syntastic signs
-function! ToggleSyntastic()
-	if empty(g:SyntasticSignsNotifier._bufSignIds())
-		SyntasticCheck
-	else
-		SyntasticReset
-	endif
-endfunction
-noremap <silent> <F2> :call ToggleSyntastic()<CR>
+" F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
+noremap <silent> <F8> :TagbarToggle<CR>
 " set leader: spacebar
 let mapleader = " "
 " leader+gd: set current directory (all windows) to directory of current file
@@ -196,13 +189,15 @@ let g:airline_powerline_fonts=1
 " autocmd VimEnter ~/Programming/* NERDTree
 " autocmd BufEnter ~/Programming/* NERDTreeMirror
 " autocmd VimEnter ~/Programming/* wincmd w
-" syntastic
-let g:syntastic_always_populate_loc_list=1
-let g:syntastic_auto_loc_list=0
-let g:syntastic_check_on_open=1
-let g:syntastic_check_on_wq=0
-let g:syntastic_auto_jump=0
-let g:syntastic_mode_map={ "mode": "passive" }
+
+" ale
+let g:ale_python_pylint_executable='pylint3'
+" a bug in ubuntu 18.04's vim version hides the cursor on lines with messages if
+" this (below) is set to 1 (default). however, since I have ale disabled on
+" start I only really 'drop in' to use it if I want to look at messages, so
+" better to have than not.
+" let g:ale_echo_cursor=0
+let g:ale_lint_on_enter=0
 
 " == Other
 " manually set indentation stuff for typescript, since polyglot doesn't do it.
