@@ -185,11 +185,6 @@ nnoremap <C-\> <nop>
 set laststatus=2
 let g:airline_powerline_fonts=1
 
-" Automatic NERDTree - only in ~/Programming/...
-" autocmd VimEnter ~/Programming/* NERDTree
-" autocmd BufEnter ~/Programming/* NERDTreeMirror
-" autocmd VimEnter ~/Programming/* wincmd w
-
 " ale
 let g:ale_python_pylint_executable='pylint3'
 " a bug in ubuntu 18.04's vim version hides the cursor on lines with messages if
