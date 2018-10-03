@@ -198,6 +198,8 @@ let g:ale_python_pylint_executable='pylint3'
 " better to have than not.
 " let g:ale_echo_cursor=0
 let g:ale_lint_on_enter=0
+let g:ale_lint_on_save=0
+let g:ale_lint_on_filetype_changed=0
 
 " == Other
 " manually set indentation stuff for typescript, since polyglot doesn't do it.
