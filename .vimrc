@@ -23,6 +23,7 @@ Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'wellle/targets.vim'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'vim-syntastic/syntastic'
 
 call plug#end()
 
@@ -143,6 +144,15 @@ au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
 au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
 " F7 to turn markdown into report
 au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
+" F2 to 'toggle' syntastic signs
+function! ToggleSyntastic()
+	if empty(g:SyntasticSignsNotifier._bufSignIds())
+		SyntasticCheck
+	else
+		SyntasticReset
+	endif
+endfunction
+noremap <silent> <F2> :call ToggleSyntastic()<CR>
 " set leader: spacebar
 let mapleader = " "
 " leader+gd: set current directory (all windows) to directory of current file
@@ -186,6 +196,13 @@ let g:airline_powerline_fonts=1
 " autocmd VimEnter ~/Programming/* NERDTree
 " autocmd BufEnter ~/Programming/* NERDTreeMirror
 " autocmd VimEnter ~/Programming/* wincmd w
+" syntastic
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_auto_loc_list=0
+let g:syntastic_check_on_open=1
+let g:syntastic_check_on_wq=0
+let g:syntastic_auto_jump=0
+let g:syntastic_mode_map={ "mode": "passive" }
 
 " == Other
 " manually set indentation stuff for typescript, since polyglot doesn't do it.
