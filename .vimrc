@@ -130,6 +130,8 @@ else
 	vnoremap <C-c> :w !xsel -i -b<CR><CR>
 	noremap <C-p> :r !xsel -o -b<CR><CR>
 endif
+" :Diff to view a diff of unsaved changes
+command Diff execute 'w !git diff --no-index % -'
 " F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
 noremap <silent> <F8> :TagbarToggle<CR>
 " F3 to toggle NERDTree
