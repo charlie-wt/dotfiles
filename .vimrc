@@ -141,6 +141,10 @@ au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
 au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
 " F7 to turn markdown into report
 au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
+" set leader: spacebar
+let mapleader = " "
+" leader+gd: set current directory (all windows) to directory of current file
+nnoremap <Leader>gd :cd %:p:h<CR>:<backspace>
 
 " == Disabled commands
 " Q -> Ex mode
