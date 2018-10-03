@@ -147,6 +147,23 @@ au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
 let mapleader = " "
 " leader+gd: set current directory (all windows) to directory of current file
 nnoremap <Leader>gd :cd %:p:h<CR>:<backspace>
+" leader+t_ commands to add todo comments with various tags above the current
+" line.
+function Todo(tag)
+	exec "normal O"
+	exec "normal CTODO #".a:tag
+	exec "normal \<Plug>CommentaryLine"
+endfunction
+autocmd VimEnter * nnoremap <Leader>ttm :call Todo("temp")<CR>
+autocmd VimEnter * nnoremap <Leader>trf :call Todo("refactor")<CR>
+autocmd VimEnter * nnoremap <Leader>trm :call Todo("remove")<CR>
+autocmd VimEnter * nnoremap <Leader>tft :call Todo("feature")<CR>
+autocmd VimEnter * nnoremap <Leader>ten :call Todo("enhancement")<CR>
+autocmd VimEnter * nnoremap <Leader>tcr :call Todo("correctness")<CR>
+autocmd VimEnter * nnoremap <Leader>tsp :call Todo("speed")<CR>
+autocmd VimEnter * nnoremap <Leader>tvf :call Todo("verify")<CR>
+autocmd VimEnter * nnoremap <Leader>tts :call Todo("test")<CR>
+autocmd VimEnter * nnoremap <Leader>tbg :call Todo("bug")<CR>
 
 " == Disabled commands
 " Q -> Ex mode
