@@ -3,12 +3,12 @@ set nocompatible
 call plug#begin('~/.vim/bundle')
 
 Plug 'morhetz/gruvbox'
-Plug 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'vim-airline/vim-airline'
 " Plug 'vim-scripts/Smart-Tabs'
 Plug 'sheerun/vim-polyglot'
-Plug 'tmhedberg/SimpylFold'
-Plug 'docunext/closetag.vim'
+Plug 'tmhedberg/SimpylFold', { 'for': 'python' }
+Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'tpope/vim-sleuth'
 Plug 'ap/vim-css-color'
@@ -18,12 +18,11 @@ Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-repeat'
 Plug 'andymass/vim-matchup'
 Plug 'majutsushi/tagbar'
-Plug 'vim-scripts/aj.vim'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'wellle/targets.vim'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'w0rp/ale'
+Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
 
 call plug#end()
 
