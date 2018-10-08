@@ -3,8 +3,18 @@ set nocompatible
 call plug#begin('~/.vim/bundle')
 
 Plug 'morhetz/gruvbox'
+Plug 'romainl/Apprentice', { 'branch': 'fancylines-and-neovim' }
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'junegunn/seoul256.vim'
+Plug 'sjl/badwolf'
+Plug 'chriskempson/base16-vim'
+Plug 'jacoborus/tender.vim'
+Plug 'fcpg/vim-fahrenheit'
+Plug 'cocopon/iceberg.vim'
+
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 " Plug 'vim-scripts/Smart-Tabs'
 Plug 'sheerun/vim-polyglot'
 Plug 'tmhedberg/SimpylFold', { 'for': 'python' }
@@ -44,19 +54,13 @@ set is
 set ignorecase
 set smartcase
 " highlight trailing whitespace
-" match ErrorMsg '\s\+$'
-" highlight ExtraWhitespace ctermbg=red guibg=red
-match ErrorMsg /\s\+$/
-autocmd BufWinEnter * match ErrorMsg /\s\+$/
-autocmd InsertEnter * match ErrorMsg /\s\+\%#\@<!$/
-autocmd InsertLeave * match ErrorMsg /\s\+$/
-autocmd BufWinLeave * call clearmatches()
+match ErrorMsg '\s\+$'
 " copy indentation level from previous line
 set copyindent
 " colours
 set termguicolors
 set background=dark
-colorscheme gruvbox
+colo base16-default-dark
 " full mouse support
 set mouse=a
 " show command as it's being typed
