@@ -44,7 +44,7 @@ set is
 " ignore case in searches unless we type a capital letter
 set ignorecase
 set smartcase
-" Highlight trailing whitespace
+" highlight trailing whitespace
 " match ErrorMsg '\s\+$'
 " highlight ExtraWhitespace ctermbg=red guibg=red
 match ErrorMsg /\s\+$/
@@ -52,9 +52,10 @@ autocmd BufWinEnter * match ErrorMsg /\s\+$/
 autocmd InsertEnter * match ErrorMsg /\s\+\%#\@<!$/
 autocmd InsertLeave * match ErrorMsg /\s\+$/
 autocmd BufWinLeave * call clearmatches()
-" Copy indentation level from previous line
+" copy indentation level from previous line
 set copyindent
-" Colour scheme
+" colours
+set termguicolors
 set background=dark
 colorscheme gruvbox
 " full mouse support
@@ -85,7 +86,7 @@ endif
 set backupskip=/tmp/*,/private/tmp/*
 " disable error bells
 set noerrorbells
-" Fix for bg col changing when scrolling
+" fix for bg col changing when scrolling
 if &term =~ '256color'
 	set t_ut=
 endif
