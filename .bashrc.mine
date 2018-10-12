@@ -1,0 +1,33 @@
+# if there's an automatically generated bashrc with stuff in it
+if [ -f ~/dotfiles/.bashrc.auto ]; then
+    . ~/dotfiles/.bashrc.auto
+fi
+
+### MY STUFF ###
+## aliases:
+# rf -> rifle (open file with suitable program)
+alias rf=rifle
+# quick name for ranger (and when it exits, bash gets put into what ranger's directory was)
+alias rgr='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+# why is python 2 the default anywhere any more
+alias python=/usr/bin/python3
+alias pip=/usr/bin/pip3
+# shorter clear
+alias c=clear
+
+## my scripts:
+export PATH=$PATH:~/.bin
+# pip stuff
+export PATH=$PATH:~/.local/bin
+
+## functions:
+mkcd () { mkdir "$@" && cd "$@"; }
+
+## environment variables:
+# cuda
+export PATH=/usr/local/cuda-9.0/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-9.0/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-9.0/extras/CUPTI/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+COLORTERM=truecolor
+# making vim the default text editor
+VISUAL=vim; export VISUAL EDITOR=vim; export EDITOR

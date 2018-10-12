@@ -2,6 +2,7 @@ set nocompatible
 " == Plugins
 call plug#begin('~/.vim/bundle')
 
+" appearance
 Plug 'morhetz/gruvbox'
 Plug 'romainl/Apprentice', { 'branch': 'fancylines-and-neovim' }
 Plug 'NLKNguyen/papercolor-theme'
@@ -11,28 +12,31 @@ Plug 'chriskempson/base16-vim'
 Plug 'jacoborus/tender.vim'
 Plug 'fcpg/vim-fahrenheit'
 Plug 'cocopon/iceberg.vim'
-
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-" Plug 'vim-scripts/Smart-Tabs'
+" languages
 Plug 'sheerun/vim-polyglot'
 Plug 'tmhedberg/SimpylFold', { 'for': 'python' }
-Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
-Plug 'ConradIrwin/vim-bracketed-paste'
-Plug 'tpope/vim-sleuth'
 Plug 'ap/vim-css-color'
+Plug 'vim-pandoc/vim-pandoc-syntax', { 'for': ['markdown', 'pandoc'] }
+Plug 'vim-pandoc/vim-pandoc', { 'for': ['markdown', 'pandoc'] }
+" commands
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-speeddating'
+" ide
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'majutsushi/tagbar'
+Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
+" background
+" Plug 'vim-scripts/Smart-Tabs'
+Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
+Plug 'ConradIrwin/vim-bracketed-paste'
+Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-repeat'
 Plug 'andymass/vim-matchup'
-Plug 'majutsushi/tagbar'
-Plug 'vim-pandoc/vim-pandoc-syntax'
-Plug 'vim-pandoc/vim-pandoc'
 Plug 'wellle/targets.vim'
 Plug 'christoomey/vim-tmux-navigator'
-Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
 
 call plug#end()
 
