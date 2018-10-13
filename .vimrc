@@ -12,6 +12,7 @@ Plug 'chriskempson/base16-vim'
 Plug 'jacoborus/tender.vim'
 Plug 'fcpg/vim-fahrenheit'
 Plug 'cocopon/iceberg.vim'
+
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 " languages
@@ -64,7 +65,7 @@ set copyindent
 " colours
 set termguicolors
 set background=dark
-colo base16-default-dark
+colo gruvbox
 " full mouse support
 set mouse=a
 " show command as it's being typed
