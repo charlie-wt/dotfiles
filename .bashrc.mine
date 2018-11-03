@@ -14,6 +14,10 @@ alias python=/usr/bin/python3
 alias pip=/usr/bin/pip3
 # shorter clear
 alias c=clear
+# qmake
+alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
+# xclip into system (ctrl+c/v) clipboard
+alias xcl='xclip -sel clip'
 
 ## my scripts:
 export PATH=$PATH:~/.bin

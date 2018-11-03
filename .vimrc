@@ -19,8 +19,8 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'sheerun/vim-polyglot'
 Plug 'tmhedberg/SimpylFold', { 'for': 'python' }
 Plug 'ap/vim-css-color'
-Plug 'vim-pandoc/vim-pandoc-syntax', { 'for': ['markdown', 'pandoc'] }
-Plug 'vim-pandoc/vim-pandoc', { 'for': ['markdown', 'pandoc'] }
+Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'vim-pandoc/vim-pandoc'
 " commands
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
