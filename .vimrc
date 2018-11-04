@@ -166,16 +166,17 @@ function Todo(tag)
 	exec "normal CTODO #".a:tag
 	exec "normal \<Plug>CommentaryLine"
 endfunction
-autocmd VimEnter * nnoremap <Leader>ttm :call Todo("temp")<CR>
+autocmd VimEnter * nnoremap <Leader>tbg :call Todo("bug")<CR>
+autocmd VimEnter * nnoremap <Leader>tcr :call Todo("correctness")<CR>
+autocmd VimEnter * nnoremap <Leader>ten :call Todo("enhancement")<CR>
+autocmd VimEnter * nnoremap <Leader>tft :call Todo("feature")<CR>
+autocmd VimEnter * nnoremap <Leader>tfn :call Todo("finish")<CR>
 autocmd VimEnter * nnoremap <Leader>trf :call Todo("refactor")<CR>
 autocmd VimEnter * nnoremap <Leader>trm :call Todo("remove")<CR>
-autocmd VimEnter * nnoremap <Leader>tft :call Todo("feature")<CR>
-autocmd VimEnter * nnoremap <Leader>ten :call Todo("enhancement")<CR>
-autocmd VimEnter * nnoremap <Leader>tcr :call Todo("correctness")<CR>
 autocmd VimEnter * nnoremap <Leader>tsp :call Todo("speed")<CR>
-autocmd VimEnter * nnoremap <Leader>tvf :call Todo("verify")<CR>
+autocmd VimEnter * nnoremap <Leader>ttm :call Todo("temp")<CR>
 autocmd VimEnter * nnoremap <Leader>tts :call Todo("test")<CR>
-autocmd VimEnter * nnoremap <Leader>tbg :call Todo("bug")<CR>
+autocmd VimEnter * nnoremap <Leader>tvf :call Todo("verify")<CR>
 
 " == Disabled commands
 " Q -> Ex mode
