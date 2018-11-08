@@ -49,7 +49,10 @@ extract () {
 }
 
 # Move 'up' so many directories instead of using several cd ../../, etc.
-up() { cd $(eval printf '../'%.0s {1..$1}); }
+up () { cd $(eval printf '../'%.0s {1..$1}); }
+
+# basically an alias
+gip () { get-iplayer --modes=best --pid=$1; }
 
 ## environment variables:
 # cuda

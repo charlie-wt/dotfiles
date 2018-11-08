@@ -7,7 +7,6 @@ Plug 'morhetz/gruvbox'
 Plug 'romainl/Apprentice', { 'branch': 'fancylines-and-neovim' }
 Plug 'NLKNguyen/papercolor-theme'
 Plug 'junegunn/seoul256.vim'
-Plug 'sjl/badwolf'
 Plug 'chriskempson/base16-vim'
 Plug 'jacoborus/tender.vim'
 Plug 'fcpg/vim-fahrenheit'
@@ -98,11 +97,13 @@ set noerrorbells
 if &term =~ '256color'
 	set t_ut=
 endif
-
-
-" == Whitespace characters
+" whitespace characters
 set list
 set lcs=tab:\|\ ,extends:▶,precedes:◀
+" start continuations of broken lines on current indent level
+if exists('&breakindent')
+	set breakindent
+endif
 
 
 " == Custom commands
@@ -125,8 +126,11 @@ vnoremap H ^
 vnoremap L $
 " if editing prose, j/k navigate screen-lines, not file-lines
 " TODO: is this good? lose the ability to utilise relative line numbers
-au FileType markdown,tex,latex noremap j gj
-au FileType markdown,tex,latex noremap k gk
+au FileType markdown,tex,latex,pandoc noremap j gj
+au FileType markdown,tex,latex,pandoc noremap k gk
+au FileType markdown,tex,latex,pandoc noremap 0 g0
+au FileType markdown,tex,latex,pandoc noremap H g^
+au FileType markdown,tex,latex,pandoc noremap L g$
 au FileType markdown,tex,latex set norelativenumber
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
@@ -167,7 +171,9 @@ function Todo(tag)
 	exec "normal \<Plug>CommentaryLine"
 endfunction
 autocmd VimEnter * nnoremap <Leader>tbg :call Todo("bug")<CR>
+autocmd VimEnter * nnoremap <Leader>tcl :call Todo("cleanup")<CR>
 autocmd VimEnter * nnoremap <Leader>tcr :call Todo("correctness")<CR>
+autocmd VimEnter * nnoremap <Leader>tdc :call Todo("documentation")<CR>
 autocmd VimEnter * nnoremap <Leader>ten :call Todo("enhancement")<CR>
 autocmd VimEnter * nnoremap <Leader>tft :call Todo("feature")<CR>
 autocmd VimEnter * nnoremap <Leader>tfn :call Todo("finish")<CR>
@@ -177,6 +183,20 @@ autocmd VimEnter * nnoremap <Leader>tsp :call Todo("speed")<CR>
 autocmd VimEnter * nnoremap <Leader>ttm :call Todo("temp")<CR>
 autocmd VimEnter * nnoremap <Leader>tts :call Todo("test")<CR>
 autocmd VimEnter * nnoremap <Leader>tvf :call Todo("verify")<CR>
+" toggle the location list
+function! ToggleLocList()
+	" 'close' the location list, then see of the number of windows changed.
+	try
+		let old_last_winnr = winnr('$')
+		lclose
+		if old_last_winnr == winnr('$')
+			lopen
+		endif
+	catch
+	endtry
+endfunction
+command Errors :call ToggleLocList()
+noremap <silent> <leader>er :call ToggleLocList()<CR>
 
 " == Disabled commands
 " Q -> Ex mode
@@ -196,6 +216,7 @@ set laststatus=2
 let g:airline_powerline_fonts=1
 
 " ale
+let g:ale_enabled=1
 let g:ale_python_pylint_executable='pylint3'
 " a bug in ubuntu 18.04's vim version hides the cursor on lines with messages if
 " this (below) is set to 1 (default). however, since I have ale disabled on
@@ -205,6 +226,9 @@ let g:ale_python_pylint_executable='pylint3'
 let g:ale_lint_on_enter=0
 let g:ale_lint_on_save=0
 let g:ale_lint_on_filetype_changed=0
+let g:ale_sign_error = '✘'
+let g:ale_sign_warning = '⚠'
+let g:ale_echo_msg_format = '[%linter%] %s'
 
 " == Other
 " manually set indentation stuff for typescript, since polyglot doesn't do it.
