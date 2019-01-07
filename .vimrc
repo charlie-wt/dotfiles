@@ -166,6 +166,8 @@ noremap <silent> <F8> :TagbarToggle<CR>
 let mapleader = " "
 " leader+gd: set current directory (all windows) to directory of current file
 nnoremap <Leader>gd :cd %:p:h<CR>:<backspace>
+" leader+s: replace all instances of the keyword under the cursor.
+nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<left><left>
 " leader+t_ commands to add todo comments with various tags above the current
 " line.
 function Todo(tag)
