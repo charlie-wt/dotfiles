@@ -165,9 +165,9 @@ noremap <silent> <F8> :TagbarToggle<CR>
 " set leader: spacebar
 let mapleader = " "
 " leader+gd: set current directory (all windows) to directory of current file
-nnoremap <Leader>gd :cd %:p:h<CR>:<backspace>
+nnoremap <leader>gd :cd %:p:h<CR>:<backspace>
 " leader+s: replace all instances of the keyword under the cursor.
-nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<left><left>
+nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<left><left>
 " leader+t_ commands to add todo comments with various tags above the current
 " line.
 function Todo(tag)
@@ -175,19 +175,19 @@ function Todo(tag)
 	exec "normal CTODO #".a:tag
 	exec "normal \<Plug>CommentaryLine"
 endfunction
-autocmd VimEnter * nnoremap <Leader>tbg :call Todo("bug")<CR>
-autocmd VimEnter * nnoremap <Leader>tcl :call Todo("cleanup")<CR>
-autocmd VimEnter * nnoremap <Leader>tcr :call Todo("correctness")<CR>
-autocmd VimEnter * nnoremap <Leader>tdc :call Todo("documentation")<CR>
-autocmd VimEnter * nnoremap <Leader>ten :call Todo("enhancement")<CR>
-autocmd VimEnter * nnoremap <Leader>tft :call Todo("feature")<CR>
-autocmd VimEnter * nnoremap <Leader>tfn :call Todo("finish")<CR>
-autocmd VimEnter * nnoremap <Leader>trf :call Todo("refactor")<CR>
-autocmd VimEnter * nnoremap <Leader>trm :call Todo("remove")<CR>
-autocmd VimEnter * nnoremap <Leader>tsp :call Todo("speed")<CR>
-autocmd VimEnter * nnoremap <Leader>ttm :call Todo("temp")<CR>
-autocmd VimEnter * nnoremap <Leader>tts :call Todo("test")<CR>
-autocmd VimEnter * nnoremap <Leader>tvf :call Todo("verify")<CR>
+autocmd VimEnter * nnoremap <leader>tbg :call Todo("bug")<CR>
+autocmd VimEnter * nnoremap <leader>tcl :call Todo("cleanup")<CR>
+autocmd VimEnter * nnoremap <leader>tcr :call Todo("correctness")<CR>
+autocmd VimEnter * nnoremap <leader>tdc :call Todo("documentation")<CR>
+autocmd VimEnter * nnoremap <leader>ten :call Todo("enhancement")<CR>
+autocmd VimEnter * nnoremap <leader>tft :call Todo("feature")<CR>
+autocmd VimEnter * nnoremap <leader>tfn :call Todo("finish")<CR>
+autocmd VimEnter * nnoremap <leader>trf :call Todo("refactor")<CR>
+autocmd VimEnter * nnoremap <leader>trm :call Todo("remove")<CR>
+autocmd VimEnter * nnoremap <leader>tsp :call Todo("speed")<CR>
+autocmd VimEnter * nnoremap <leader>ttm :call Todo("temp")<CR>
+autocmd VimEnter * nnoremap <leader>tts :call Todo("test")<CR>
+autocmd VimEnter * nnoremap <leader>tvf :call Todo("verify")<CR>
 " toggle the location list
 function! ToggleLocList()
 	" 'close' the location list, then see of the number of windows changed.
