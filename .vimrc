@@ -124,6 +124,9 @@ nnoremap H ^
 nnoremap L $
 vnoremap H ^
 vnoremap L $
+" swap ; and :
+noremap : ;
+noremap ; :
 " if editing prose, j/k navigate screen-lines, not file-lines
 " TODO: is this good? lose the ability to utilise relative line numbers
 au FileType markdown,tex,latex,pandoc noremap j gj

@@ -14,10 +14,14 @@ alias python=/usr/bin/python3
 alias pip=/usr/bin/pip3
 # shorter clear
 alias c=clear
+# clear & ls
+alias cl='clear && ls'
 # qmake
 alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 # xclip into system (ctrl+c/v) clipboard
 alias xcl='xclip -sel clip'
+# nicer git log (shows branches etc.)
+alias gll="git log --graph --oneline --abbrev-commit --decorate --all"
 
 ## my scripts:
 export PATH=$PATH:~/.bin
@@ -46,6 +50,19 @@ extract () {
    else
        echo "'$1' is not a valid file!"
    fi
+}
+
+# Quick way to do simple compilations & run, for small bits of (normally) test code.
+mkrn () {
+   case ${1##*.} in
+      c)   gcc -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+      cc)  g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+      cpp) g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+      C)   g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+      py)  python $1                            ;;
+      js)  node $1                              ;;
+      *)   echo "unknown filetype '${1##*.}'." ;;
+   esac
 }
 
 # Move 'up' so many directories instead of using several cd ../../, etc.
@@ -78,3 +95,5 @@ if [ -f /usr/share/vcstool-completion/vcs.bash ]; then
 elif [ -f /usr/local/share/vcstool-completion/vcs.bash ]; then
     source /usr/local/share/vcstool-completion/vcs.bash
 fi
+# tmuxinator
+source ~/.bin/tmuxinator.bash
