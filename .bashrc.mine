@@ -22,6 +22,10 @@ alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 alias xcl='xclip -sel clip'
 # nicer git log (shows branches etc.)
 alias gll="git log --graph --oneline --abbrev-commit --decorate --all"
+# vim
+alias v=vim
+# quickly list tagged todo comments as made by the corresponding vimrc functions
+alias todos='grep -EInr "\s*(#|//|/\*|\")\sTODO\s*#"'
 
 ## my scripts:
 export PATH=$PATH:~/.bin
