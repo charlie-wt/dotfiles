@@ -24,9 +24,14 @@ alias xcl='xclip -sel clip'
 alias gll="git log --graph --oneline --abbrev-commit --decorate --all"
 # vim
 alias v=vim
+# git
+alias g=git
 # quickly list tagged todo comments as made by the corresponding vimrc functions
 alias todos='grep -EInr "\s*(#|//|/\*|\")\sTODO\s*#"'
-
+# edit the shelf
+alias shelf='vim ~/Documents/shelf.md'
+# edit this month's goals
+alias goals='vim ~/$(date +%Y)/$(date +%B | tr A-Z a-z).md'
 ## my scripts:
 export PATH=$PATH:~/.bin
 # pip stuff
@@ -74,6 +79,22 @@ up () { cd $(eval printf '../'%.0s {1..$1}); }
 
 # basically an alias
 gip () { get-iplayer --modes=best --pid=$1; }
+
+# get folder size of current directory (and size of constituent directories)
+# by default lists 25 constituent directories. can give it a number argument
+# to list that many directories (including the total), or 'all', to list every
+# constituent directory.
+size () {
+   size=26
+   if [ $# -ge 1 ] ; then
+      size=$1
+   fi
+   if [ $size == "all" ] ; then
+      du -ahd1 | sort -hr
+   else
+      du -ahd1 | sort -hr | head -n $size
+   fi
+}
 
 ## environment variables:
 # cuda

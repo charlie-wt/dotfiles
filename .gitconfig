@@ -1,0 +1,11 @@
+[user]
+	name = charlie-wt
+	email = cwt1g14@soton.ac.uk
+[alias]
+	c = commit -am
+	d = diff
+	s = status
+	br = branch
+	ci = commit
+	co = checkout
+	mg = merge

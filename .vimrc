@@ -1,5 +1,7 @@
 set nocompatible
-" == Plugins
+
+
+" === Plugins ==================================================================
 call plug#begin('~/.vim/bundle')
 
 " appearance
@@ -11,7 +13,6 @@ Plug 'chriskempson/base16-vim'
 Plug 'jacoborus/tender.vim'
 Plug 'fcpg/vim-fahrenheit'
 Plug 'cocopon/iceberg.vim'
-
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 " languages
@@ -41,7 +42,7 @@ Plug 'christoomey/vim-tmux-navigator'
 call plug#end()
 
 
-" == General
+" === General ==================================================================
 " syntax highlighting
 syntax on
 " line numbers - hybrid mode (current line absolute, all others relative)
@@ -110,51 +111,53 @@ if exists('&breakindent')
 endif
 
 
-" == Custom commands
+" === Custom commands ==========================================================
+" set leader: spacebar
+let mapleader = " "
+
+" == Basic maps
 " clear search highlighting with \
-" NOTE - setting this to <esc> will cause using the mouse to input a bunch of
-" random commands.
-nnoremap \ :noh<CR>:<backspace>
+nnoremap \ :noh<cr>:<backspace>
 " Ctrl+HJKL to go between splits
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-h> <C-w>h
-nnoremap <C-l> <C-w>l
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-h> <c-w>h
+nnoremap <c-l> <c-w>l
 " H/L to go to start/end of line
-nnoremap H ^
-nnoremap L $
-vnoremap H ^
-vnoremap L $
+noremap H ^
+noremap L $
 " swap ; and :
 noremap : ;
 noremap ; :
-" if editing prose, j/k navigate screen-lines, not file-lines
-" TODO: is this good? lose the ability to utilise relative line numbers
-au FileType markdown,tex,latex,pandoc noremap j gj
-au FileType markdown,tex,latex,pandoc noremap k gk
-au FileType markdown,tex,latex,pandoc noremap 0 g0
-au FileType markdown,tex,latex,pandoc noremap H g^
-au FileType markdown,tex,latex,pandoc noremap L g$
-au FileType markdown,tex,latex set norelativenumber
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
+
+" == New commands
 " system clipboard access with Ctrl+C/P:
 if has("clipboard")
 	" if vim has system clipboard support, use it
-	vnoremap <C-c> "+y
-	noremap <C-p> "+p
+	vnoremap <c-c> "+y
+	noremap <c-p> "+p
 else
 	" otherwise, use the (external) xsel package (can only copy whole lines)
-	vnoremap <C-c> :w !xsel -i -b<CR><CR>
-	noremap <C-p> :r !xsel -o -b<CR><CR>
+	vnoremap <c-c> :w !xsel -i -b<cr><cr>
+	noremap <c-p> :r !xsel -o -b<cr><cr>
 endif
+" leader+gd: set current directory (all windows) to directory of current file
+nnoremap <leader>gd :cd %:p:h<cr>:<backspace>
 " :Diff to view a diff of unsaved changes
 command Diff execute 'w !git diff --no-index % -'
+" leader+s: replace all instances of the keyword under the cursor.
+nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
+" leader+w: strip trailing whitespace
+nnoremap <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
+
+" == Function keys
 " F2 to toggle ALE
 noremap <silent> <F2> :ALEToggleBuffer<CR>
 " F3 to toggle NERDTree
 noremap <silent> <F3> :NERDTreeToggle<CR>
-" F5 to 'compile' certain files (markdown, latex)
+" F5 to 'compile' certain files (markdown, latex) TODO use :make
 au FileType markdown noremap <F5> :!mdpdf "%" & disown<CR><CR>
 au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
 " F6 to turn markdown into beamer slides (instead of normal latex doc)
@@ -163,12 +166,8 @@ au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
 au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
 " F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
 noremap <silent> <F8> :TagbarToggle<CR>
-" set leader: spacebar
-let mapleader = " "
-" leader+gd: set current directory (all windows) to directory of current file
-nnoremap <leader>gd :cd %:p:h<CR>:<backspace>
-" leader+s: replace all instances of the keyword under the cursor.
-nnoremap <leader>s :%s/\<<C-r><C-w>\>//g<left><left>
+
+" == Functions
 " leader+t_ commands to add todo comments with various tags above the current
 " line.
 function Todo(tag)
@@ -189,6 +188,7 @@ autocmd VimEnter * nnoremap <leader>tsp :call Todo("speed")<CR>
 autocmd VimEnter * nnoremap <leader>ttm :call Todo("temp")<CR>
 autocmd VimEnter * nnoremap <leader>tts :call Todo("test")<CR>
 autocmd VimEnter * nnoremap <leader>tvf :call Todo("verify")<CR>
+
 " toggle the location list
 function! ToggleLocList()
 	" 'close' the location list, then see of the number of windows changed.
@@ -216,7 +216,21 @@ nnoremap <C-z> <nop>
 nnoremap <C-\> <nop>
 
 
-" == Plugin config
+" === Filetypes ================================================================
+" c++
+au filetype cpp set tw=88 cc=+1
+" prose
+au filetype markdown,tex,latex,pandoc noremap j gj
+au filetype markdown,tex,latex,pandoc noremap k gk
+au filetype markdown,tex,latex,pandoc noremap 0 g0
+au filetype markdown,tex,latex,pandoc noremap H g^
+au filetype markdown,tex,latex,pandoc noremap L g$
+au filetype markdown,tex,latex set norelativenumber
+" typescript
+au FileType typescript setlocal sw=2 sts=2 et
+
+
+" === Plugin config ============================================================
 " airline
 set laststatus=2
 let g:airline_powerline_fonts=1
@@ -232,10 +246,10 @@ let g:ale_python_pylint_executable='pylint3'
 let g:ale_lint_on_enter=0
 let g:ale_lint_on_save=0
 let g:ale_lint_on_filetype_changed=0
-let g:ale_sign_error = '✘'
-let g:ale_sign_warning = '⚠'
-let g:ale_echo_msg_format = '[%linter%] %s'
+let g:ale_sign_error='✘'
+let g:ale_sign_warning='⚠'
+let g:ale_echo_msg_format='[%linter%] %s'
+let g:ale_c_parse_makefile=1
 
 " == Other
 " manually set indentation stuff for typescript, since polyglot doesn't do it.
-au FileType typescript setlocal sw=2 sts=2 et
