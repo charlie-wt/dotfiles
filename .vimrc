@@ -109,10 +109,11 @@ set lcs=tab:\|\ ,extends:▶,precedes:◀
 if exists('&breakindent')
 	set breakindent
 endif
+" formatting options, for gq
+set formatoptions=croqnj
 
 
 " === Custom commands ==========================================================
-" set leader: spacebar
 let mapleader = " "
 
 " == Basic maps
@@ -131,6 +132,8 @@ noremap : ;
 noremap ; :
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
+" an easier-to-reach way of moving to the previous tabpage
+noremap gy gT
 
 " == New commands
 " system clipboard access with Ctrl+C/P:
@@ -203,6 +206,18 @@ function! ToggleLocList()
 endfunction
 command Errors :call ToggleLocList()
 noremap <silent> <leader>er :call ToggleLocList()<CR>
+
+" if in a markdown or tex file, open the corresponding pdf easily
+function OpenPDF()
+	let pdfname = expand('%:p:r') . '.pdf'
+	if !filereadable(pdfname)
+		echo 'PDF ' . pdfname . ' not found'
+		return
+	endif
+	exec ':silent !gio open ' . pdfname . ' > /dev/null &'
+	exec ':redraw!'
+endfunction
+au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
 
 " == Disabled commands
 " Q -> Ex mode
