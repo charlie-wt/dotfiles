@@ -158,9 +158,6 @@ command Diff execute 'w !git diff --no-index % -'
 nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
 " leader+w: strip trailing whitespace
 nnoremap <silent> <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
-" fswitch  for switching between header/source files
-au filetype cpp noremap <silent> <leader>of :FSHere<cr>
-au filetype cpp noremap <silent> <leader>ol :FSSplitRight<cr>
 " fzf, for finding files
 noremap <leader>f :FZF<cr>
 " repeat the last macro
@@ -169,8 +166,12 @@ nnoremap Q @@
 " goes down 10 'true' lines
 nnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
 nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
+" F3 to toggle NERDTree
+noremap <silent> <F3> :NERDTreeToggle<CR>
+" F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
+noremap <silent> <F8> :TagbarToggle<CR>
 
-" == Function keys
+" == Functions
 " F2 to toggle ALE -- even if it's not initially loaded
 function ToggleALE()
     if !exists(':ALEToggleBuffer')
@@ -181,19 +182,7 @@ function ToggleALE()
     exec ':ALEToggleBuffer'
 endfunction
 noremap <silent> <F2> :call ToggleALE()<cr>
-" F3 to toggle NERDTree
-noremap <silent> <F3> :NERDTreeToggle<CR>
-" F5 to 'compile' certain files (markdown, latex) TODO use :make
-au FileType markdown noremap <F5> :!mdpdf "%" & disown<CR><CR>
-au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
-" F6 to turn markdown into beamer slides (instead of normal latex doc)
-au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
-" F7 to turn markdown into report
-au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
-" F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
-noremap <silent> <F8> :TagbarToggle<CR>
 
-" == Functions
 " <leader>t__: insert TODO comments above the current line, with tags defined
 " by __. NOTE: relies on the commentary plugin
 function Todo(tag)
@@ -232,7 +221,6 @@ function OpenPDF()
     exec ':silent !gio open ' . pdfname . ' > /dev/null &'
     exec ':redraw!'
 endfunction
-au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
 
 function TodoTick()
     let line = getline('.')
@@ -247,9 +235,7 @@ endfunction
 noremap <silent> <leader>x :call TodoTick()<cr>
 
 " == Disabled commands
-" Q -> Ex mode
-nnoremap Q <nop>
-" K -> run a program to lookup keyword under the cursor
+" K -> run a program to look up keyword under the cursor
 nnoremap K <nop>
 " Ctrl+Z -> background the vim process
 nnoremap <C-z> <nop>
@@ -262,48 +248,55 @@ nnoremap <C-\> <nop>
 " apparently it's faster to group all your autocommands together in a group,
 " that clears itself before adding its commands.
 augroup todo_autocmd
-    autocmd!
+    au!
 
     " temporarily clear search highlighting when in insert mode.
-    autocmd InsertEnter * :set nohlsearch
-    autocmd InsertLeave * :set hlsearch
+    au insertenter * :set nohlsearch
+    au insertleave * :set hlsearch
 
     " highlight trailing whitespace
-    autocmd BufEnter * :match ErrorMsg '\s\+$'
-    autocmd WinEnter * :match ErrorMsg '\s\+$'
+    au bufenter * :match ErrorMsg '\s\+$'
+    au winenter * :match ErrorMsg '\s\+$'
 
     " quickly add TODO comments (see Todo function above)
-    autocmd VimEnter * nnoremap <leader>tbg :call Todo("bug")<CR>
-    autocmd VimEnter * nnoremap <leader>tcl :call Todo("cleanup")<CR>
-    autocmd VimEnter * nnoremap <leader>tcr :call Todo("correctness")<CR>
-    autocmd VimEnter * nnoremap <leader>tdc :call Todo("documentation")<CR>
-    autocmd VimEnter * nnoremap <leader>ten :call Todo("enhancement")<CR>
-    autocmd VimEnter * nnoremap <leader>tft :call Todo("feature")<CR>
-    autocmd VimEnter * nnoremap <leader>tfn :call Todo("finish")<CR>
-    autocmd VimEnter * nnoremap <leader>trf :call Todo("refactor")<CR>
-    autocmd VimEnter * nnoremap <leader>trm :call Todo("remove")<CR>
-    autocmd VimEnter * nnoremap <leader>tsp :call Todo("speed")<CR>
-    autocmd VimEnter * nnoremap <leader>ttm :call Todo("temp")<CR>
-    autocmd VimEnter * nnoremap <leader>tts :call Todo("test")<CR>
-    autocmd VimEnter * nnoremap <leader>tvf :call Todo("verify")<CR>
+    au vimenter * nnoremap <leader>tbg :call Todo("bug")<CR>
+    au vimenter * nnoremap <leader>tcl :call Todo("cleanup")<CR>
+    au vimenter * nnoremap <leader>tcr :call Todo("correctness")<CR>
+    au vimenter * nnoremap <leader>tdc :call Todo("documentation")<CR>
+    au vimenter * nnoremap <leader>ten :call Todo("enhancement")<CR>
+    au vimenter * nnoremap <leader>tft :call Todo("feature")<CR>
+    au vimenter * nnoremap <leader>tfn :call Todo("finish")<CR>
+    au vimenter * nnoremap <leader>trf :call Todo("refactor")<CR>
+    au vimenter * nnoremap <leader>trm :call Todo("remove")<CR>
+    au vimenter * nnoremap <leader>tsp :call Todo("speed")<CR>
+    au vimenter * nnoremap <leader>ttm :call Todo("temp")<CR>
+    au vimenter * nnoremap <leader>tts :call Todo("test")<CR>
+    au vimenter * nnoremap <leader>tvf :call Todo("verify")<CR>
 
     " set some filetypes
-    autocmd BufEnter *.p8 set filetype=lua
-    autocmd WinEnter *.p8 set filetype=lua
+    au bufenter *.p8 set filetype=lua
+    au winenter *.p8 set filetype=lua
+
+    " filetype-specific options
+    au filetype cpp setlocal tw=88 cc=+1 noet cinoptions=(0,u0,U0 comments^=:///
+    au filetype typescript setlocal sw=2 sts=2 et
+    au filetype haskell setlocal ts=4 sw=4 sts=4 et
+    au filetype qmake setlocal commentstring=#%s
+
+    " filetype-specific maps
+    " fswitch  for switching between header/source files
+    au filetype cpp noremap <silent> <leader>of :FSHere<cr>
+    au filetype cpp noremap <silent> <leader>ol :FSSplitRight<cr>
+    " F5 to 'compile' certain files (markdown, latex) TODO use :make
+    au FileType markdown noremap <F5> :!mdpdf "%" & disown<CR><CR>
+    au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
+    " F6 to turn markdown into beamer slides (instead of normal latex doc)
+    au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
+    " F7 to turn markdown into report
+    au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
+    " leader+o to open the corresponding pdf to this file
+    au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
 augroup END
-
-
-
-" === Filetypes ================================================================
-" manually set indentation
-au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
-au filetype typescript setlocal sw=2 sts=2 et
-au filetype haskell setlocal ts=4 sw=4 sts=4 et
-" highlight 'last' column appropriately for appropriate filetypes
-au filetype cpp setlocal tw=88 cc=+1
-" at end of the block
-" qmake .pro files -- comments are '# '
-au filetype qmake setlocal commentstring =#%s
 
 
 " === Plugin config ============================================================
