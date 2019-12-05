@@ -4,11 +4,14 @@ if [ -f ~/dotfiles/.bashrc.auto ]; then
 fi
 
 ### MY STUFF ###
+# when terminal is frozen by ^s, allow unfreezing with any key.
+stty ixany
+
 ## aliases:
 # rf -> rifle (open file with suitable program)
 alias rf=rifle
 # quick name for ranger (and when it exits, bash gets put into what ranger's directory was)
-alias rgr='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+alias ra='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
 # why is python 2 the default anywhere any more
 alias python=/usr/bin/python3
 alias pip=/usr/bin/pip3
@@ -32,6 +35,10 @@ alias todos='grep -EInr "\s*(#|//|/\*|\")\sTODO\s*#"'
 alias shelf='vim ~/Documents/shelf.md'
 # edit this month's goals
 alias goals='vim ~/$(date +%Y)/$(date +%B | tr A-Z a-z).md'
+# make a note
+alias note='vim "+set filetype=pandoc nospell" "+Goyo"'
+# there's already a fd on ubuntu
+alias fd='fdfind'
 ## my scripts:
 export PATH=$PATH:~/.bin
 # pip stuff
@@ -41,37 +48,40 @@ export PATH=$PATH:~/.local/bin
 mkcd () { mkdir "$@" && cd "$@"; }
 # Easy way to extract archives
 extract () {
-   if [ -f $1 ] ; then
-       case $1 in
-           *.tar.bz2)   tar xvjf $1    ;;
-           *.tar.gz)    tar xvzf $1    ;;
-           *.bz2)       bunzip2 $1     ;;
-           *.rar)       unrar x $1     ;;
-           *.gz)        gunzip $1      ;;
-           *.tar)       tar xvf $1     ;;
-           *.tbz2)      tar xvjf $1    ;;
-           *.tgz)       tar xvzf $1    ;;
-           *.zip)       unzip $1       ;;
-           *.Z)         uncompress $1  ;;
-           *.7z)        7z x $1        ;;
-           *)           echo "don't know how to extract '$1'..." ;;
-       esac
-   else
-       echo "'$1' is not a valid file!"
-   fi
+    if [ ! -f $1 ] ; then
+        echo "'$1' is not a valid file!"
+        return 1
+    fi
+
+    case $1 in
+        *.tar.bz2)   tar xvjf $1    ;;
+        *.tar.gz)    tar xvzf $1    ;;
+        *.bz2)       bunzip2 $1     ;;
+        *.rar)       unrar x $1     ;;
+        *.gz)        gunzip $1      ;;
+        *.tar)       tar xvf $1     ;;
+        *.tbz2)      tar xvjf $1    ;;
+        *.tgz)       tar xvzf $1    ;;
+        *.zip)       unzip $1       ;;
+        *.Z)         uncompress $1  ;;
+        *.7z)        7z x $1        ;;
+        *)           echo "don't know how to extract '$1'..." ;;
+    esac
 }
 
 # Quick way to do simple compilations & run, for small bits of (normally) test code.
 mkrn () {
-   case ${1##*.} in
-      c)   gcc -Wall -o ${1%.*} $1 && ./${1%.*} ;;
-      cc)  g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
-      cpp) g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
-      C)   g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
-      py)  python $1                            ;;
-      js)  node $1                              ;;
-      *)   echo "unknown filetype '${1##*.}'." ;;
-   esac
+    case ${1##*.} in
+       C)   g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+       c)   gcc -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+       cc)  g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+       cpp) g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+       cxx) g++ -Wall -o ${1%.*} $1 && ./${1%.*} ;;
+       hs)  ghc --make ${1%.*} && ./${1%.*}      ;;
+       js)  node $1                              ;;
+       py)  python $1                            ;;
+       *)   echo "unknown filetype '${1##*.}'." ;;
+    esac
 }
 
 # Move 'up' so many directories instead of using several cd ../../, etc.
@@ -80,20 +90,20 @@ up () { cd $(eval printf '../'%.0s {1..$1}); }
 # basically an alias
 gip () { get-iplayer --modes=best --pid=$1; }
 
-# get folder size of current directory (and size of constituent directories)
-# by default lists 25 constituent directories. can give it a number argument
-# to list that many directories (including the total), or 'all', to list every
-# constituent directory.
+# get size of current directory (and size of constituent directories).
+# by default also lists the top 25 constituent directories. can give it a number
+# argument to list that many directories, or 'all', to list every constituent
+# directory.
 size () {
-   size=26
-   if [ $# -ge 1 ] ; then
-      size=$1
-   fi
-   if [ $size == "all" ] ; then
-      du -ahd1 | sort -hr
-   else
-      du -ahd1 | sort -hr | head -n $size
-   fi
+    size=25
+    if [ $# -ge 1 ] ; then
+        size=$1
+    fi
+    if [ $size == "all" ] ; then
+        du -ahd1 | sort -hr
+    else
+        du -ahd1 | sort -hr | head -n $((size+1))
+    fi
 }
 
 ## environment variables:
@@ -122,3 +132,5 @@ elif [ -f /usr/local/share/vcstool-completion/vcs.bash ]; then
 fi
 # tmuxinator
 source ~/.bin/tmuxinator.bash
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
