@@ -34,7 +34,32 @@ alias todos='grep -EInr "\s*(#|//|/\*|\")\sTODO\s*#"'
 # edit the shelf
 alias shelf='vim ~/Documents/shelf.md'
 # edit this month's goals
-alias goals='vim ~/$(date +%Y)/$(date +%B | tr A-Z a-z).md'
+goals () {
+    dirname=~/goals
+    fulldirname=~/Documents/goals/$(date +%Y)
+
+    if [ ! -L $dirname ] ; then
+        if [ ! -d $fulldirname ] ; then
+            mkdir $fulldirname
+            [ -d ~/Documents/goals/year ] && cp ~/Documents/goals/year/* $fulldirname
+        fi
+
+        ln -s $fulldirname $dirname
+    elif [ ! "$(readlink $dirname)" -ef "$fulldirname" ] ; then
+        rm $dirname && ln -s $fulldirname $dirname
+    fi
+
+    fname=$dirname/$(date +%B | tr A-Z a-z).md
+    template_name=$dirname/_month.md
+
+    if [ ! -f $fname ] ; then
+        if [ -f $template_name ] ; then
+            cp $template_name $fname
+        fi
+    fi
+
+    vim $fname
+}
 # make a note
 alias note='vim "+set filetype=pandoc nospell" "+Goyo"'
 # there's already a fd on ubuntu
