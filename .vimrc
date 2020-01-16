@@ -17,6 +17,7 @@ Plug 'tmhedberg/SimpylFold', { 'for': 'python' }
 Plug 'ap/vim-css-color'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-pandoc'
+Plug 'OmniSharp/omnisharp-vim', { 'for': 'cs' }
 " commands
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
@@ -24,6 +25,7 @@ Plug 'tpope/vim-speeddating'
 Plug 'machakann/vim-swap'
 " ide
 Plug 'junegunn/fzf', { 'dir': '~/src/fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'majutsushi/tagbar'
 Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
@@ -150,8 +152,8 @@ else
     vnoremap <c-c> :w !xsel -i -b<cr><cr>
     noremap <c-p> :r !xsel -o -b<cr><cr>
 endif
-" leader+gd: set current directory (all windows) to directory of current file
-nnoremap <silent> <leader>gd :cd %:p:h<cr>
+" leader+cd: set current directory (all windows) to directory of current file
+nnoremap <silent> <leader>cd :cd %:p:h<cr>
 " :Diff to view a diff of unsaved changes
 command Diff execute 'w !git diff --no-index % -'
 " leader+s: replace all instances of the keyword under the cursor.
@@ -159,7 +161,8 @@ nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
 " leader+w: strip trailing whitespace
 nnoremap <silent> <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
 " fzf, for finding files
-noremap <leader>f :FZF<cr>
+noremap <leader>f :Files<cr>
+noremap <leader>r :Rg<cr>
 " repeat the last macro
 nnoremap Q @@
 " make j & k move by wrapped lines, unless given a count -- aka. 10j still
@@ -247,7 +250,7 @@ nnoremap <C-\> <nop>
 " === Autocommands =============================================================
 " apparently it's faster to group all your autocommands together in a group,
 " that clears itself before adding its commands.
-augroup todo_autocmd
+augroup my_autocmds
     au!
 
     " temporarily clear search highlighting when in insert mode.
@@ -317,6 +320,63 @@ let g:ale_echo_msg_format='[%linter%] %s'
 let g:ale_c_parse_makefile=1
 let g:ale_cpp_cppcheck_options = '--enable=style --language=c++'
 let g:ale_sign_column_always = 1
+let g:ale_linters = {
+\ 'cs': ['OmniSharp']
+\}
 
 " goyo
 let g:goyo_width = 81
+
+" omnisharp
+let g:OmniSharp_server_stdio = 1
+let g:OmniSharp_selector_ui = 'fzf'
+let g:OmniSharp_highlight_types = 3
+" completion stuff -- not specific to omnisharp but use omnisharp to test it
+set completeopt=longest,menuone,preview
+set previewheight=5
+
+augroup omnisharp_commands
+    autocmd!
+
+    " Show type information automatically when the cursor stops moving
+    autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
+
+    " The following commands are contextual, based on the cursor position.
+    autocmd FileType cs nnoremap <buffer> gd :OmniSharpGotoDefinition<cr>
+    autocmd FileType cs nnoremap <buffer> <leader>fi :OmniSharpFindImplementations<cr>
+    autocmd FileType cs nnoremap <buffer> <leader>fs :OmniSharpFindSymbol<cr>
+    autocmd FileType cs nnoremap <buffer> <leader>fu :OmniSharpFindUsages<cr>
+
+    " Finds members in the current buffer
+    autocmd FileType cs nnoremap <buffer> <leader>fm :OmniSharpFindMembers<cr>
+
+    autocmd FileType cs nnoremap <buffer> <leader>fx :OmniSharpFixUsings<cr>
+    autocmd FileType cs nnoremap <buffer> <leader>tt :OmniSharpTypeLookup<cr>
+    autocmd FileType cs nnoremap <buffer> <leader>dc :OmniSharpDocumentation<cr>
+    autocmd FileType cs nnoremap <buffer> <C-\> :OmniSharpSignatureHelp<cr>
+    autocmd FileType cs inoremap <buffer> <C-\> <C-o>:OmniSharpSignatureHelp<cr>
+
+    " Navigate up and down by method/property/field
+    " autocmd FileType cs nnoremap <buffer> <C-k> :OmniSharpNavigateUp<cr>
+    " autocmd FileType cs nnoremap <buffer> <C-j> :OmniSharpNavigateDown<cr>
+
+    " Find all code errors/warnings for the current solution and populate the quickfix window
+    autocmd FileType cs nnoremap <buffer> <leader>cc :OmniSharpGlobalCodeCheck<cr>
+augroup END
+
+" Contextual code actions (uses fzf, CtrlP or unite.vim when available)
+nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
+" Run code actions with text selected in visual mode to extract method
+xnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
+
+" Rename with dialog
+nnoremap <leader>nm :OmniSharpRename<cr>
+nnoremap <F2> :OmniSharpRename<cr>
+" Rename without dialog - with cursor on the symbol to rename: `:Rename newname`
+command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
+
+nnoremap <leader>cf :OmniSharpCodeFormat<cr>
+
+" Start the omnisharp server for the current solution
+nnoremap <leader>ss :OmniSharpStartServer<cr>
+nnoremap <leader>sp :OmniSharpStopServer<cr>
