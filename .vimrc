@@ -7,33 +7,27 @@ call plug#begin('~/.vim/bundle')
 " appearance
 Plug 'gruvbox-community/gruvbox'
 Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
-" Plug 'rbong/vim-crystalline/'
 " languages
 Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
 Plug 'derekwyatt/vim-fswitch'
 Plug 'sheerun/vim-polyglot'
-Plug 'tmhedberg/SimpylFold', { 'for': 'python' }
 Plug 'ap/vim-css-color'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'vim-pandoc/vim-pandoc'
-Plug 'OmniSharp/omnisharp-vim', { 'for': 'cs' }
 " commands
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-speeddating'
 Plug 'machakann/vim-swap'
 " ide
 Plug 'junegunn/fzf', { 'dir': '~/src/fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'majutsushi/tagbar'
 Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
 Plug 'junegunn/goyo.vim'
+Plug 'natebosch/vim-lsc'
+Plug 'ajh17/VimCompletesMe'
 " background
-" Plug 'vim-scripts/Smart-Tabs'
 Plug 'ConradIrwin/vim-bracketed-paste'
-" Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-repeat'
 Plug 'andymass/vim-matchup'
 Plug 'wellle/targets.vim'
@@ -117,6 +111,12 @@ if exists('+termguicolors')
 endif
 " highlight visual selections with only a slightly lighter background
 hi Visual term=none cterm=none gui=none ctermbg=239
+" Default text width
+set textwidth=88
+" Highlight the column after the maximum text width
+set colorcolumn=+1
+" config for autocompletion
+set completeopt=menu,menuone,noinsert,noselect
 
 
 " === Custom commands ==========================================================
@@ -237,9 +237,25 @@ function TodoTick()
 endfunction
 noremap <silent> <leader>x :call TodoTick()<cr>
 
+" custom function for styling folds
+function! CustomFoldText()
+    " adapted from https://dhruvasagar.com/2013/03/28/vim-better-foldtext
+    let indent = repeat(' '.indent(v:foldstart))
+    let line = ' ' . substitute(getline(v:foldstart), '^\s*"\?\s*\|\s*"\?\s*{{' . '{\d*\s*', '', 'g') . ' '
+    let lines_count = v:foldend - v:foldstart + 1
+    " let lines_count_text = '| ' . printf("%10s", lines_count . ' lines') . ' |'
+    let lines_count_text = '-' . printf("%10s", lines_count . ' lines') . ' '
+    let foldchar = matchstr(&fillchars, 'fold:\zs.')
+    let foldtextstart = strpart('+' . repeat(foldchar, v:foldlevel*2) . line, 0, (winwidth(0)*2)/3)
+    let foldtextend = lines_count_text . repeat(foldchar, 8)
+    let foldtextlength = strlen(substitute(foldtextstart . foldtextend, '.', 'x', 'g')) + &foldcolumn
+    return indent . foldtextstart . repeat(foldchar, winwidth(0)-foldtextlength) . foldtextend
+endfunction
+set foldtext=CustomFoldText()
+
 " == Disabled commands
 " K -> run a program to look up keyword under the cursor
-nnoremap K <nop>
+" nnoremap K <nop>
 " Ctrl+Z -> background the vim process
 nnoremap <C-z> <nop>
 " Ctrl+\ -> evaluate expression, replace the whole command line with the result
@@ -299,6 +315,10 @@ augroup my_autocmds
     au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
     " leader+o to open the corresponding pdf to this file
     au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
+
+    " extra syntax highlighting
+    " normal aliases to primitive numeric types
+    au Syntax c,cpp syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64 f32 f64
 augroup END
 
 
@@ -307,6 +327,9 @@ augroup END
 set laststatus=2
 " let g:airline_powerline_fonts=1
 " let g:crystalline_theme = 'gruvbox'
+
+" vim-pandoc
+let g:pandoc#modules#disabled = ["folding"]
 
 " ale
 let g:ale_enabled=1
@@ -319,64 +342,29 @@ let g:ale_sign_warning='⚠'
 let g:ale_echo_msg_format='[%linter%] %s'
 let g:ale_c_parse_makefile=1
 let g:ale_cpp_cppcheck_options = '--enable=style --language=c++'
+let g:ale_cpp_gcc_options = '--std=c++17' " TODO set based on makefile
 let g:ale_sign_column_always = 1
-let g:ale_linters = {
-\ 'cs': ['OmniSharp']
-\}
 
 " goyo
 let g:goyo_width = 81
 
-" omnisharp
-let g:OmniSharp_server_stdio = 1
-let g:OmniSharp_selector_ui = 'fzf'
-let g:OmniSharp_highlight_types = 3
-" completion stuff -- not specific to omnisharp but use omnisharp to test it
-set completeopt=longest,menuone,preview
-set previewheight=5
-
-augroup omnisharp_commands
-    autocmd!
-
-    " Show type information automatically when the cursor stops moving
-    autocmd CursorHold *.cs call OmniSharp#TypeLookupWithoutDocumentation()
-
-    " The following commands are contextual, based on the cursor position.
-    autocmd FileType cs nnoremap <buffer> gd :OmniSharpGotoDefinition<cr>
-    autocmd FileType cs nnoremap <buffer> <leader>fi :OmniSharpFindImplementations<cr>
-    autocmd FileType cs nnoremap <buffer> <leader>fs :OmniSharpFindSymbol<cr>
-    autocmd FileType cs nnoremap <buffer> <leader>fu :OmniSharpFindUsages<cr>
-
-    " Finds members in the current buffer
-    autocmd FileType cs nnoremap <buffer> <leader>fm :OmniSharpFindMembers<cr>
-
-    autocmd FileType cs nnoremap <buffer> <leader>fx :OmniSharpFixUsings<cr>
-    autocmd FileType cs nnoremap <buffer> <leader>tt :OmniSharpTypeLookup<cr>
-    autocmd FileType cs nnoremap <buffer> <leader>dc :OmniSharpDocumentation<cr>
-    autocmd FileType cs nnoremap <buffer> <C-\> :OmniSharpSignatureHelp<cr>
-    autocmd FileType cs inoremap <buffer> <C-\> <C-o>:OmniSharpSignatureHelp<cr>
-
-    " Navigate up and down by method/property/field
-    " autocmd FileType cs nnoremap <buffer> <C-k> :OmniSharpNavigateUp<cr>
-    " autocmd FileType cs nnoremap <buffer> <C-j> :OmniSharpNavigateDown<cr>
-
-    " Find all code errors/warnings for the current solution and populate the quickfix window
-    autocmd FileType cs nnoremap <buffer> <leader>cc :OmniSharpGlobalCodeCheck<cr>
-augroup END
-
-" Contextual code actions (uses fzf, CtrlP or unite.vim when available)
-nnoremap <leader><space> :OmniSharpGetCodeActions<cr>
-" Run code actions with text selected in visual mode to extract method
-xnoremap <leader><space> :call OmniSharp#GetCodeActions('visual')<cr>
-
-" Rename with dialog
-nnoremap <leader>nm :OmniSharpRename<cr>
-nnoremap <F2> :OmniSharpRename<cr>
-" Rename without dialog - with cursor on the symbol to rename: `:Rename newname`
-command! -nargs=1 Rename :call OmniSharp#RenameTo("<args>")
-
-nnoremap <leader>cf :OmniSharpCodeFormat<cr>
-
-" Start the omnisharp server for the current solution
-nnoremap <leader>ss :OmniSharpStartServer<cr>
-nnoremap <leader>sp :OmniSharpStopServer<cr>
+" vim-lsc
+let g:lsc_server_commands = {
+\  'cpp': {
+\    'command': 'ccls',
+\    'log_level': -1,
+\    'suppress_stderr': v:true,
+\  }
+\}
+let g:lsc_auto_map = {
+ \  'GoToDefinition': 'gd',
+ \  'FindReferences': 'gr',
+ \  'Rename': 'gR',
+ \  'ShowHover': 'K',
+ \  'FindCodeActions': 'ga',
+ \  'Completion': 'omnifunc',
+ \}
+let g:lsc_enable_autocomplete  = v:true
+let g:lsc_enable_diagnostics   = v:false
+let g:lsc_reference_highlights = v:false
+let g:lsc_trace_level          = 'off'

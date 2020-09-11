@@ -1,10 +1,13 @@
 [user]
-	name = charlie-wt
-	email = cwt1g14@soton.ac.uk
+	; name = charlie-wt
+	; email = cwt1g14@soton.ac.uk
+	name = concord
+	email = MrMechanicalhorse@gmail.com
 [alias]
 	c = commit -am
 	d = diff
 	s = status
+	l = log --graph --oneline --abbrev-commit --decorate --all
 	br = branch
 	ci = commit
 	co = checkout
