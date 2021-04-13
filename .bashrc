@@ -11,7 +11,7 @@ fi
 # rifle (open file with suitable program; comes from ranger)
 alias rf=rifle
 # quick name for ranger (and when it exits, bash gets put into what ranger's directory was)
-alias ra='ranger --choosedir=$HOME/.local/share/ranger/current_dir; cd $(cat $HOME/.local/share/ranger/current_dir)'
+alias ra='ranger --choosedir=$HOME/.local/share/ranger/current_dir; cd "$(cat $HOME/.local/share/ranger/current_dir)"'
 # why is python 2 the default anywhere any more
 alias python=/usr/bin/python3
 alias pip=/usr/bin/pip3
@@ -82,7 +82,8 @@ mkrn () {
        hs)  ghc --make ${1%.*} && ./${1%.*}        ;;
        js)  node "$1"                              ;;
        py)  python "$1"                            ;;
-       *)   echo "unknown filetype '${1##*.}'."    ;;
+       rs)  rustc "$1" && ./${1%.*}                ;;
+       *)   [[ -f "Cargo.toml" ]] && cargo run || echo "unknown filetype '${1##*.}'." ;;
     esac
 }
 

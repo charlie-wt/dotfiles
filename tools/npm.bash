@@ -1,0 +1,1 @@
+export PATH=$PATH:~/.local/share/npm/packages/bin

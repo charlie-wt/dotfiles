@@ -6,6 +6,7 @@ call plug#begin('~/.vim/bundle')
 
 " appearance
 Plug 'gruvbox-community/gruvbox'
+" Plug 'sainnhe/gruvbox-material'
 Plug 'vim-airline/vim-airline'
 " languages
 Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
@@ -19,7 +20,7 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'machakann/vim-swap'
 " ide
-Plug 'junegunn/fzf', { 'dir': '~/src/fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
@@ -54,6 +55,8 @@ set copyindent
 " colours
 set termguicolors
 set background=dark
+" silent! colo gruvbox
+" let g:gruvbox_material_background = 'hard'
 silent! colo gruvbox
 " full mouse support
 set mouse=a
@@ -133,9 +136,6 @@ nnoremap <c-l> <c-w>l
 " H/L to go to start/end of line
 noremap H ^
 noremap L $
-" swap ; and :
-noremap : ;
-noremap ; :
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
 " an easier-to-reach way of moving to the previous tabpage
@@ -163,6 +163,10 @@ nnoremap <silent> <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
 " fzf, for finding files
 noremap <leader>f :Files<cr>
 noremap <leader>r :Rg<cr>
+" easier saving & quitting
+nnoremap <silent> <leader>j :update<cr>
+nnoremap <silent> <leader>k :q<cr>
+nnoremap <silent> <leader>l :x<cr>
 " repeat the last macro
 nnoremap Q @@
 " make j & k move by wrapped lines, unless given a count -- aka. 10j still
@@ -352,6 +356,11 @@ let g:goyo_width = 81
 let g:lsc_server_commands = {
 \  'cpp': {
 \    'command': 'ccls',
+\    'log_level': -1,
+\    'suppress_stderr': v:true,
+\  },
+\  'rust': {
+\    'command': 'rls',
 \    'log_level': -1,
 \    'suppress_stderr': v:true,
 \  }
