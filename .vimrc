@@ -1,51 +1,50 @@
 set nocompatible
 
 
-" === Plugins ==================================================================
+" === Plugins ==========================================================================
 call plug#begin('~/.vim/bundle')
 
 " appearance
-Plug 'gruvbox-community/gruvbox'
 " Plug 'sainnhe/gruvbox-material'
+Plug 'gruvbox-community/gruvbox'
 Plug 'vim-airline/vim-airline'
 " languages
-Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
-Plug 'derekwyatt/vim-fswitch'
-Plug 'sheerun/vim-polyglot'
 Plug 'ap/vim-css-color'
-Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'derekwyatt/vim-fswitch'
+Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
+Plug 'sheerun/vim-polyglot'
 Plug 'vim-pandoc/vim-pandoc'
+Plug 'vim-pandoc/vim-pandoc-syntax'
 " commands
+Plug 'machakann/vim-swap'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-Plug 'machakann/vim-swap'
 " ide
+Plug 'ajh17/VimCompletesMe'
 Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'natebosch/vim-lsc'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
-Plug 'junegunn/goyo.vim'
-Plug 'natebosch/vim-lsc'
-Plug 'ajh17/VimCompletesMe'
 " background
 Plug 'ConradIrwin/vim-bracketed-paste'
-Plug 'tpope/vim-repeat'
 Plug 'andymass/vim-matchup'
-Plug 'wellle/targets.vim'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'tpope/vim-repeat'
+Plug 'wellle/targets.vim'
+" other
+Plug 'junegunn/goyo.vim'
 
 call plug#end()
 
 
-" === General ==================================================================
+" === General ==========================================================================
 " syntax highlighting
 syntax on
 " line numbers - hybrid mode (current line absolute, all others relative)
 set number relativenumber
 " tab size
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+set tabstop=4 softtabstop=4 shiftwidth=4
 " highlight search results incrementally as they're typed
 set hlsearch incsearch
 " ignore case in searches unless we type a capital letter
@@ -53,20 +52,19 @@ set ignorecase smartcase
 " copy indentation level from previous line
 set copyindent
 " colours
-set termguicolors
 set background=dark
 " silent! colo gruvbox
 " let g:gruvbox_material_background = 'hard'
+let g:gruvbox_contrast_dark = 'black'
 silent! colo gruvbox
 " full mouse support
 set mouse=a
 " show command as it's being typed
 set showcmd
 " don't reset cursor to start of line when moving
-set nosol
+set nostartofline
 " tab completion opens all options in a list
-set wildmenu
-set wildmode=list:longest,full
+set wildmenu wildmode=list:longest,full
 " reload files edited outside of vim
 set autoread
 " don't fold by default
@@ -78,8 +76,7 @@ set binary noendofline
 " set character encoding - utf-8 without BOM (Byte Order Marker)
 set encoding=utf-8 nobomb
 " centralize backups, swapfiles & undo history
-set backupdir=~/.vim/backups
-set directory=~/.vim/swaps
+set backupdir=~/.vim/backups directory=~/.vim/swaps
 if exists("&undodir")
     set undodir=~/.vim/undo
 endif
@@ -92,8 +89,7 @@ if &term =~ '256color'
     set t_ut=
 endif
 " whitespace characters
-set list
-set listchars=tab:\|\ ,extends:▶,precedes:◀
+set list listchars=tab:\|\ ,extends:▶,precedes:◀
 " start continuations of broken lines on current indent level
 if exists('&breakindent')
     set breakindent
@@ -104,6 +100,8 @@ set backspace=indent,eol,start
 set formatoptions=croqnj
 " prefer spaces over tabs by default
 set expandtab
+" open new splits on the right/bottom
+set splitright splitbelow
 " don't redraw the screen in the middle of executing a macro -- improves speed
 set lazyredraw
 " true colours
@@ -122,26 +120,28 @@ set colorcolumn=+1
 set completeopt=menu,menuone,noinsert,noselect
 
 
-" === Custom commands ==========================================================
+" === Custom commands ==================================================================
 let mapleader = " "
 
-" == Basic maps
-" clear search highlighting with \
+" == Basic maps & commands
+" clear search highlighting with
 nnoremap \ :noh<cr>:<backspace>
-" Ctrl+HJKL to go between splits
-nnoremap <c-j> <c-w>j
-nnoremap <c-k> <c-w>k
-nnoremap <c-h> <c-w>h
-nnoremap <c-l> <c-w>l
-" H/L to go to start/end of line
+" go to start/end of line
 noremap H ^
 noremap L $
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
-" an easier-to-reach way of moving to the previous tabpage
+" easier-to-reach way of moving to the previous tabpage
 noremap gy gT
-
-" == New commands
+" don't make { and } add to the jumplist
+nnoremap <silent> } :<c-u>execute 'keepjumps norm! ' . v:count1 . '}'<cr>
+nnoremap <silent> { :<c-u>execute 'keepjumps norm! ' . v:count1 . '{'<cr>
+" easier saving & quitting
+nnoremap <silent> <leader>j :update<cr>
+nnoremap <silent> <leader>k :q<cr>
+nnoremap <silent> <leader>l :x<cr>
+" easy way to update the diff if in vimdiff mode
+nnoremap du :diffupdate<cr>
 " system clipboard access with Ctrl+C/P:
 if has("clipboard")
     " if vim has system clipboard support, use it
@@ -152,21 +152,20 @@ else
     vnoremap <c-c> :w !xsel -i -b<cr><cr>
     noremap <c-p> :r !xsel -o -b<cr><cr>
 endif
-" leader+cd: set current directory (all windows) to directory of current file
+" set current directory (all windows) to directory of current file
 nnoremap <silent> <leader>cd :cd %:p:h<cr>
-" :Diff to view a diff of unsaved changes
-command Diff execute 'w !git diff --no-index % -'
-" leader+s: replace all instances of the keyword under the cursor.
+" quickly view a diff of unsaved changes
+command! Diff execute 'w !git diff --no-index % -'
+" for if you copy something in written in windows, adding an extra empty line for every
+" real one
+command! UnWindows execute ':g/^/+d'
+" replace all instances of the keyword under the cursor.
 nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
-" leader+w: strip trailing whitespace
+" strip trailing whitespace
 nnoremap <silent> <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
 " fzf, for finding files
 noremap <leader>f :Files<cr>
 noremap <leader>r :Rg<cr>
-" easier saving & quitting
-nnoremap <silent> <leader>j :update<cr>
-nnoremap <silent> <leader>k :q<cr>
-nnoremap <silent> <leader>l :x<cr>
 " repeat the last macro
 nnoremap Q @@
 " make j & k move by wrapped lines, unless given a count -- aka. 10j still
@@ -177,10 +176,13 @@ nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
 noremap <silent> <F3> :NERDTreeToggle<CR>
 " F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
 noremap <silent> <F8> :TagbarToggle<CR>
+" reload vimrc easily
+" * extra :! is needed as for some reason sourcing the vimrc creates a ghost edit
+noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
 
 " == Functions
 " F2 to toggle ALE -- even if it's not initially loaded
-function ToggleALE()
+function! ToggleALE()
     if !exists(':ALEToggleBuffer')
         exec ':ALEToggle'
         exec ':ALEEnable'
@@ -190,9 +192,9 @@ function ToggleALE()
 endfunction
 noremap <silent> <F2> :call ToggleALE()<cr>
 
-" <leader>t__: insert TODO comments above the current line, with tags defined
-" by __. NOTE: relies on the commentary plugin
-function Todo(tag)
+" insert TODO comments above the current line, with tags defined by a:tag. NOTE: relies
+" on the commentary plugin
+function! Todo(tag)
     exec "normal OTODO #".a:tag
     exec "normal \<Plug>CommentaryLine"
 endfunction
@@ -213,7 +215,7 @@ command Errors :call ToggleLocList()
 noremap <silent> <leader>er :call ToggleLocList()<cr>
 
 " if in a markdown or tex file, open the corresponding pdf easily
-function OpenPDF()
+function! OpenPDF()
     " if our file's called '.md' or '.tex', look for '.pdf' -- not eg. '.md.pdf'
     let pdfname = '.pdf'
     if expand('%:t') !~ '^\.[^\.]\+$'
@@ -229,11 +231,11 @@ function OpenPDF()
     exec ':redraw!'
 endfunction
 
-function TodoTick()
+function! TodoTick()
     let line = getline('.')
     let pos = col('.')
-    if line =~ '.*\[ \].*'
-        s/\[ \]/[x]/
+    if line =~ '.*\[[ ~]\].*'
+        s/\[[ ~]\]/[x]/
     elseif line =~ '.*\[x\].*'
         s/\[x\]/[ ]/
     endif
@@ -267,7 +269,7 @@ nnoremap <C-z> <nop>
 nnoremap <C-\> <nop>
 
 
-" === Autocommands =============================================================
+" === Autocommands =====================================================================
 " apparently it's faster to group all your autocommands together in a group,
 " that clears itself before adding its commands.
 augroup my_autocmds
@@ -278,8 +280,12 @@ augroup my_autocmds
     au insertleave * :set hlsearch
 
     " highlight trailing whitespace
-    au bufenter * :match ErrorMsg '\s\+$'
-    au winenter * :match ErrorMsg '\s\+$'
+    " -- some filetypes, like my python one, already highlight trailing whitespace and
+    " -- this extra match messes that up
+    let ft_blacklist = ['python']
+    au vimenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
+    au bufenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
+    au winenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
 
     " quickly add TODO comments (see Todo function above)
     au vimenter * nnoremap <leader>tbg :call Todo("bug")<CR>
@@ -297,40 +303,38 @@ augroup my_autocmds
     au vimenter * nnoremap <leader>tvf :call Todo("verify")<CR>
 
     " set some filetypes
-    au bufenter *.p8 set filetype=lua
-    au winenter *.p8 set filetype=lua
+    au bufenter,winenter *.p8 setlocal filetype=lua
 
     " filetype-specific options
-    au filetype cpp setlocal tw=88 cc=+1 noet cinoptions=(0,u0,U0 comments^=:///
-    au filetype typescript setlocal sw=2 sts=2 et
+    au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
     au filetype haskell setlocal ts=4 sw=4 sts=4 et
+    au filetype markdown,pandoc setlocal ts=4 sts=4 sw=4 et
     au filetype qmake setlocal commentstring=#%s
+    au filetype typescript setlocal sw=2 sts=2 et
 
     " filetype-specific maps
     " fswitch  for switching between header/source files
     au filetype cpp noremap <silent> <leader>of :FSHere<cr>
     au filetype cpp noremap <silent> <leader>ol :FSSplitRight<cr>
-    " F5 to 'compile' certain files (markdown, latex) TODO use :make
-    au FileType markdown noremap <F5> :!mdpdf "%" & disown<CR><CR>
-    au FileType tex noremap <F5> :!xelatex "%"<CR><CR>
-    " F6 to turn markdown into beamer slides (instead of normal latex doc)
-    au FileType markdown noremap <F6> :!mdsl "%" & disown<CR><CR>
-    " F7 to turn markdown into report
-    au FileType markdown noremap <F7> :!mdrep "%"<CR><CR>
+    " 'compile' certain files (markdown, latex) TODO use :make
+    au filetype markdown noremap <f5> :!mdpdf "%" & disown<cr><cr>
+    au filetype tex noremap <f5> :!xelatex "%"<cr><cr>
+    " turn markdown into beamer slides (instead of normal latex doc)
+    au filetype markdown noremap <f6> :!mdsl "%" & disown<cr><cr>
+    " turn markdown into report
+    au filetype markdown noremap <f7> :!mdrep "%"<cr><cr>
     " leader+o to open the corresponding pdf to this file
     au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
 
     " extra syntax highlighting
     " normal aliases to primitive numeric types
-    au Syntax c,cpp syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64 f32 f64
+    au syntax c,cpp syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64 f32 f64
 augroup END
 
 
-" === Plugin config ============================================================
+" === Plugin config ====================================================================
 " airline
 set laststatus=2
-" let g:airline_powerline_fonts=1
-" let g:crystalline_theme = 'gruvbox'
 
 " vim-pandoc
 let g:pandoc#modules#disabled = ["folding"]
@@ -345,12 +349,15 @@ let g:ale_sign_error='✘'
 let g:ale_sign_warning='⚠'
 let g:ale_echo_msg_format='[%linter%] %s'
 let g:ale_c_parse_makefile=1
-let g:ale_cpp_cppcheck_options = '--enable=style --language=c++'
-let g:ale_cpp_gcc_options = '--std=c++17' " TODO set based on makefile
+let g:ale_cpp_cppcheck_options = '--enable=all --language=c++ --std=c++17 --force'
+let g:ale_cpp_gcc_options = '--std=c++17 -Wall -Wextra -Wpedantic' " TODO set based on makefile
 let g:ale_sign_column_always = 1
 
 " goyo
-let g:goyo_width = 81
+let g:goyo_width = 89
+
+" vim-tmux-navigator
+let g:tmux_navigator_disable_when_zoomed = 1
 
 " vim-lsc
 let g:lsc_server_commands = {

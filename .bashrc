@@ -1,48 +1,52 @@
+# === Start ============================================================================
 # if there's an automatically generated bashrc with stuff in it
 if [ -f ~/dotfiles/.bashrc.auto ]; then
     . ~/dotfiles/.bashrc.auto
 fi
 
-### MY STUFF ###
-# when terminal is frozen by ^s, allow unfreezing with any key.
-[[ $- == *i* ]] && stty ixany
-
-## aliases:
-# rifle (open file with suitable program; comes from ranger)
-alias rf=rifle
-# quick name for ranger (and when it exits, bash gets put into what ranger's directory was)
-alias ra='ranger --choosedir=$HOME/.local/share/ranger/current_dir; cd "$(cat $HOME/.local/share/ranger/current_dir)"'
-# why is python 2 the default anywhere any more
-alias python=/usr/bin/python3
-alias pip=/usr/bin/pip3
-# shorter clear
+# === Aliases ==========================================================================
 alias c=clear
-# clear & ls
 alias cl='clear && ls'
-# qmake
-alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
-# xclip into system (ctrl+c/v) clipboard
 alias xcl='xclip -sel clip'
-# vim
 alias v=vim
-# git
 alias g=git
-# quickly list tagged todo comments as made by the corresponding vimrc functions
-alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
-# edit the shelf
-alias shelf='vim ~/Documents/shelf.md'
+
+alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
+alias tma="tmux attach -t"
 # there's already a fd on ubuntu
 alias fd='fdfind'
 # rg in c(++) code only
 alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
-## my scripts:
-export PATH=$PATH:~/.bin
-# pip stuff
-export PATH=$PATH:~/.local/bin
+# quick name for ranger (and when it exits, bash gets put into what ranger's directory was)
+alias ra='ranger --choosedir=$HOME/.local/share/ranger/current_dir; cd "$(cat $HOME/.local/share/ranger/current_dir)"'
+alias rf=rifle
+# why is python 2 the default anywhere any more
+alias python=/usr/bin/python3
+alias pip=/usr/bin/pip3
+# ssd tries to inherit my weird custom TERM, so need to stop it from doing that.
+#alias ssh='TERM=xterm ssh'
 
-## functions:
+# quickly list tagged todo comments as made by the corresponding vimrc functions
+alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
+# edit the shelf
+alias shelf='vim "+cd ~/Documents/shelf" ~/Documents/shelf/articles/done.md'
+
+# === Functions ========================================================================
 mkcd () { mkdir "$@" && cd "$@"; }
-# Easy way to extract archives
+
+# move 'up' so many directories instead of using several cd ../../, etc.
+up () { cd $(eval printf '../'%.0s {1..$1}); }
+
+# make a note
+note () {
+    case $1 in
+        *.md) vim "+set nospell" "+Goyo" "$1"                 ;;
+        "")   vim "+set filetype=pandoc nospell" "+Goyo"      ;;
+        *)    vim "+set filetype=pandoc nospell" "+Goyo" "$1" ;;
+    esac
+}
+
+# easy way to extract archives
 extract () {
     [ ! -f "$1" ] && echo "'$1' is not a valid file!" && return 1
 
@@ -62,23 +66,14 @@ extract () {
     esac
 }
 
-# make a note
-note () {
-    case $1 in
-        *.md) vim "+set nospell" "+Goyo" "$1"                 ;;
-        "")   vim "+set filetype=pandoc nospell" "+Goyo"      ;;
-        *)    vim "+set filetype=pandoc nospell" "+Goyo" "$1" ;;
-    esac
-}
-
-# Quick way to do simple compilations & run, for small bits of (normally) test code.
+# quick way to do simple compilations & run, for small bits of (normally) test code.
 mkrn () {
     case ${1##*.} in
-       C)   g++ -Wall -o ${1%.*} "$1" && ./${1%.*} ;;
-       c)   gcc -Wall -o ${1%.*} "$1" && ./${1%.*} ;;
-       cc)  g++ -Wall -o ${1%.*} "$1" && ./${1%.*} ;;
-       cpp) g++ -Wall -o ${1%.*} "$1" && ./${1%.*} ;;
-       cxx) g++ -Wall -o ${1%.*} "$1" && ./${1%.*} ;;
+       C)   g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       c)   gcc -Wall            -o ${1%.*} "$1" && ./${1%.*} ;;
+       cc)  g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       cpp) g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       cxx) g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
        hs)  ghc --make ${1%.*} && ./${1%.*}        ;;
        js)  node "$1"                              ;;
        py)  python "$1"                            ;;
@@ -86,9 +81,6 @@ mkrn () {
        *)   [[ -f "Cargo.toml" ]] && cargo run || echo "unknown filetype '${1##*.}'." ;;
     esac
 }
-
-# Move 'up' so many directories instead of using several cd ../../, etc.
-up () { cd $(eval printf '../'%.0s {1..$1}); }
 
 # basically an alias
 gip () { get-iplayer --modes=best --pid=$1; }
@@ -130,10 +122,10 @@ goals () {
     vim $fname
 }
 
-## environment variables:
+# === Environment Variables ============================================================
 COLORTERM=truecolor
 VISUAL=vim; export VISUAL EDITOR=vim; export EDITOR
-# Add color in less (for manpages)
+# add color in less (for manpages)
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'
 export LESS_TERMCAP_me=$'\E[0m'
@@ -141,6 +133,16 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
+# my scripts
+export PATH=$PATH:~/.bin
+# prompt
+# export PS1="\[\e[m\]\[\e[33m\]\W\[\e[32m\] $\[\e[m\] "
+# other stuff
+export HISTSIZE=10000
+
+# === Other -- End =====================================================================
+# when terminal is frozen by ^s, allow unfreezing with any key.
+[[ $- == *i* ]] && stty ixany
 
 # source files created for other software (to get completion, for example)
 for f in $(ls -A ~/dotfiles/tools) ; do source ~/dotfiles/tools/$f ; done

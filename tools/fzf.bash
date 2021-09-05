@@ -14,5 +14,12 @@ fi
 # ------------
 source "$fzf_dir/shell/key-bindings.bash"
 
+
+
+# my settings
+
 # Use rg for files to filter through, ignoring vcs-ignored files.
 export FZF_DEFAULT_COMMAND='rg --files'
+# export FZF_DEFAULT_COMMAND='fd --type file'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
