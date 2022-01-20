@@ -25,7 +25,6 @@ Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'natebosch/vim-lsc'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'w0rp/ale', { 'on': 'ALEToggleBuffer' }
 " background
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'andymass/vim-matchup'
@@ -41,86 +40,49 @@ packadd termdebug
 
 
 " === General ==========================================================================
-" syntax highlighting
 syntax on
-" line numbers - hybrid mode (current line absolute, all others relative)
 set number relativenumber
-" tab size
 set tabstop=4 softtabstop=4 shiftwidth=4
-" highlight search results incrementally as they're typed
 set hlsearch incsearch
-" ignore case in searches unless we type a capital letter
 set ignorecase smartcase
-" copy indentation level from previous line
 set copyindent
-" colours
 set background=dark
-" silent! colo gruvbox
-" let g:gruvbox_material_background = 'hard'
-" let g:gruvbox_contrast_dark = 'black'
-" let g:gruvbox_contrast_dark = 'hard'
-silent! colo gruvbox
-" full mouse support
 set mouse=a
-" show command as it's being typed
 set showcmd
-" don't reset cursor to start of line when moving
 set nostartofline
-" tab completion opens all options in a list
 set wildmenu wildmode=list:longest,full
-" reload files edited outside of vim
 set autoread
-" don't fold by default
 set nofoldenable
-" don't reset cursor to start of line when moving
 set nostartofline
-" don't add newlines to the end of files
 set binary noendofline
-" set character encoding - utf-8 without BOM (Byte Order Marker)
 set encoding=utf-8 nobomb
-" centralize backups, swapfiles & undo history
-set backupdir=~/.vim/backups directory=~/.vim/swaps
-if exists("&undodir")
-    set undodir=~/.vim/undo
-endif
-" don't create backups for temp files
-set backupskip=/tmp/*,/private/tmp/*
-" disable error bells
 set noerrorbells
-" fix for bg col changing when scrolling
-if &term =~ '256color'
-    set t_ut=
-endif
-" whitespace characters
 set list listchars=tab:\|\ ,extends:▶,precedes:◀
-" start continuations of broken lines on current indent level
 if exists('&breakindent')
     set breakindent
 endif
-" allow backspacing over everything
 set backspace=indent,eol,start
-" formatting options, for gq
 set formatoptions=croqnj
-" prefer spaces over tabs by default
 set expandtab
-" open new splits on the right/bottom
 set splitright splitbelow
-" don't redraw the screen in the middle of executing a macro -- improves speed
 set lazyredraw
-" true colours
 if exists('+termguicolors')
     let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
     let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
     set termguicolors
 endif
+set textwidth=88
+set colorcolumn=+1
+set completeopt=menu,menuone,noinsert,noselect
+" let g:gruvbox_contrast_dark = 'black'
+silent! colo gruvbox
 " highlight visual selections with only a slightly lighter background
 hi Visual term=none cterm=none gui=none ctermbg=239
-" Default text width
-set textwidth=88
-" Highlight the column after the maximum text width
-set colorcolumn=+1
-" config for autocompletion
-set completeopt=menu,menuone,noinsert,noselect
+" centralize backups, swapfiles & undo history
+set backupdir=~/.vim/backups directory=~/.vim/swaps
+if exists("&undodir")
+    set undodir=~/.vim/undo
+endif
 
 
 " === Custom commands ==================================================================
@@ -182,24 +144,11 @@ nnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
 nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
 " F3 to toggle NERDTree
 noremap <silent> <F3> :NERDTreeToggle<CR>
-" F8 to toggle tagbar - NOTE: tagbar needs universal ctags (or exuberant ctags)
-noremap <silent> <F8> :TagbarToggle<CR>
 " reload vimrc easily
 " * extra :! is needed as for some reason sourcing the vimrc creates a ghost edit
 noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
 
 " == Functions
-" F2 to toggle ALE -- even if it's not initially loaded
-function! ToggleALE()
-    if !exists(':ALEToggleBuffer')
-        exec ':ALEToggle'
-        exec ':ALEEnable'
-        exec ':ALEToggleBuffer'
-    endif
-    exec ':ALEToggleBuffer'
-endfunction
-noremap <silent> <F2> :call ToggleALE()<cr>
-
 " insert TODO comments above the current line, with tags defined by a:tag. NOTE: relies
 " on the commentary plugin
 function! Todo(tag)
@@ -250,6 +199,20 @@ function! TodoTick()
     exec 'normal ' . pos . '|'
 endfunction
 noremap <silent> <leader>x :call TodoTick()<cr>
+
+function! RenameFile()
+    let old_name = expand('%')
+    let new_name = input('New file name: ', expand('%'), 'file')
+    if new_name != '' && new_name != old_name
+        let old_alt = expand('#')
+        exec ':saveas ' . new_name
+        let @# = old_alt
+        exec ':bd ' . bufnr(old_name)
+        exec ':silent !rm ' . old_name
+        redraw!
+    endif
+endfunction
+map <leader>n :call RenameFile()<cr>
 
 " custom function for styling folds
 function! CustomFoldText()
