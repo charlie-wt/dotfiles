@@ -25,6 +25,8 @@ alias python=/usr/bin/python3
 alias pip=/usr/bin/pip3
 # ssd tries to inherit my weird custom TERM, so need to stop it from doing that.
 #alias ssh='TERM=xterm ssh'
+# update flatpaks
+alias fpu='flatpak update -y && flatpak uninstall --unused'
 
 # quickly list tagged todo comments as made by the corresponding vimrc functions
 alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
@@ -69,11 +71,11 @@ extract () {
 # quick way to do simple compilations & run, for small bits of (normally) test code.
 mkrn () {
     case ${1##*.} in
-       C)   g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
-       c)   gcc -Wall            -o ${1%.*} "$1" && ./${1%.*} ;;
-       cc)  g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
-       cpp) g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
-       cxx) g++ -Wall -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       C)   g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       c)   gcc -Wall -g            -o ${1%.*} "$1" && ./${1%.*} ;;
+       cc)  g++ -Wall -g -fsanitize=address -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       cpp) g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       cxx) g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
        hs)  ghc --make ${1%.*} && ./${1%.*}        ;;
        js)  node "$1"                              ;;
        py)  python "$1"                            ;;
@@ -146,3 +148,5 @@ export HISTSIZE=10000
 
 # source files created for other software (to get completion, for example)
 for f in $(ls -A ~/dotfiles/tools) ; do source ~/dotfiles/tools/$f ; done
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

@@ -37,6 +37,8 @@ Plug 'junegunn/goyo.vim'
 
 call plug#end()
 
+packadd termdebug
+
 
 " === General ==========================================================================
 " syntax highlighting
@@ -55,7 +57,8 @@ set copyindent
 set background=dark
 " silent! colo gruvbox
 " let g:gruvbox_material_background = 'hard'
-let g:gruvbox_contrast_dark = 'black'
+" let g:gruvbox_contrast_dark = 'black'
+" let g:gruvbox_contrast_dark = 'hard'
 silent! colo gruvbox
 " full mouse support
 set mouse=a
@@ -124,7 +127,12 @@ set completeopt=menu,menuone,noinsert,noselect
 let mapleader = " "
 
 " == Basic maps & commands
-" clear search highlighting with
+" better [[ / ]] behaviour -- make them work when using k&r-style curly brackets.
+" TODO #finish: make these robust (eg. [[ when on a base-level {, either when outside a
+"               block)
+" nnoremap [[ 99[{
+" nnoremap ]] 99[{%][%
+" clear search highlighting
 nnoremap \ :noh<cr>:<backspace>
 " go to start/end of line
 noremap H ^
@@ -227,7 +235,7 @@ function! OpenPDF()
         return
     endif
     " open the pdf, as unobstructively as possible
-    exec ':silent !gio open ' . pdfname . ' > /dev/null &'
+    exec ':silent !gio open "' . pdfname . '" > /dev/null &'
     exec ':redraw!'
 endfunction
 
@@ -304,6 +312,7 @@ augroup my_autocmds
 
     " set some filetypes
     au bufenter,winenter *.p8 setlocal filetype=lua
+    au bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
 
     " filetype-specific options
     au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
@@ -314,17 +323,23 @@ augroup my_autocmds
 
     " filetype-specific maps
     " fswitch  for switching between header/source files
-    au filetype cpp noremap <silent> <leader>of :FSHere<cr>
-    au filetype cpp noremap <silent> <leader>ol :FSSplitRight<cr>
+    au filetype cpp,glsl noremap <silent> <leader>of :FSHere<cr>
+    au filetype cpp,glsl noremap <silent> <leader>ol :FSSplitRight<cr>
     " 'compile' certain files (markdown, latex) TODO use :make
-    au filetype markdown noremap <f5> :!mdpdf "%" & disown<cr><cr>
+    au filetype markdown,pandoc noremap <f5> :!mdpdf "%" & disown<cr><cr>
     au filetype tex noremap <f5> :!xelatex "%"<cr><cr>
     " turn markdown into beamer slides (instead of normal latex doc)
-    au filetype markdown noremap <f6> :!mdsl "%" & disown<cr><cr>
+    au filetype markdown,pandoc noremap <f6> :!mdsl "%" & disown<cr><cr>
     " turn markdown into report
-    au filetype markdown noremap <f7> :!mdrep "%"<cr><cr>
+    au filetype markdown,pandoc noremap <f7> :!mdrep "%"<cr><cr>
     " leader+o to open the corresponding pdf to this file
     au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
+
+    " vim-fswitch for shaders
+    au bufenter,winenter *.vert let b:fswitchdst = 'frag'
+    au bufenter,winenter *.vert let b:fswitchlocs = './'
+    au bufenter,winenter *.frag let b:fswitchdst = 'vert'
+    au bufenter,winenter *.frag let b:fswitchlocs = './'
 
     " extra syntax highlighting
     " normal aliases to primitive numeric types
@@ -384,3 +399,4 @@ let g:lsc_enable_autocomplete  = v:true
 let g:lsc_enable_diagnostics   = v:false
 let g:lsc_reference_highlights = v:false
 let g:lsc_trace_level          = 'off'
+
