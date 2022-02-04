@@ -7,6 +7,7 @@ fi
 # === Aliases ==========================================================================
 alias c=clear
 alias cl='clear && ls'
+alias cll='clear && ll'
 alias xcl='xclip -sel clip'
 alias v=vim
 alias g=git
