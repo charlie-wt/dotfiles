@@ -29,6 +29,7 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'andymass/vim-matchup'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'cohama/lexima.vim'
 Plug 'tpope/vim-repeat'
 Plug 'wellle/targets.vim'
 " other
