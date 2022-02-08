@@ -27,7 +27,7 @@ alias pip=/usr/bin/pip3
 # ssd tries to inherit my weird custom TERM, so need to stop it from doing that.
 #alias ssh='TERM=xterm ssh'
 # update flatpaks
-alias fpu='flatpak update -y && flatpak uninstall --unused'
+alias fpu='flatpak update -y && flatpak uninstall --unused -y'
 
 # quickly list tagged todo comments as made by the corresponding vimrc functions
 alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
