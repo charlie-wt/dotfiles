@@ -5,9 +5,12 @@ if [ -f ~/dotfiles/.bashrc.auto ]; then
 fi
 
 # === Aliases ==========================================================================
+alias l='ls -GF'
+alias la='ls -AG'
+alias ll='ls -lAGh'
 alias c=clear
-alias cl='clear && ls'
-alias cll='clear && ll'
+alias cl='c && l'
+alias cll='c && ll'
 alias xcl='xclip -sel clip'
 alias v=vim
 alias g=git

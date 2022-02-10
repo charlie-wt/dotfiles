@@ -1,4 +1,4 @@
-fzf_dir=/home/charlie/src/bin/fzf
+fzf_dir=~/src/bin/fzf
 
 # Setup fzf
 # ---------
