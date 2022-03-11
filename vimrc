@@ -21,7 +21,7 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 " ide
 Plug 'ajh17/VimCompletesMe'
-Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --all --no-update-rc' }
+Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'natebosch/vim-lsc'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
