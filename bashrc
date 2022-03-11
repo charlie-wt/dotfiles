@@ -1,7 +1,7 @@
 # === Start ============================================================================
 # if there's an automatically generated bashrc with stuff in it
-if [ -f ~/dotfiles/.bashrc.auto ]; then
-    . ~/dotfiles/.bashrc.auto
+if [ -f ~/dotfiles/bashrc.auto ]; then
+    . ~/dotfiles/bashrc.auto
 fi
 
 # === Aliases ==========================================================================
@@ -152,5 +152,3 @@ export HISTSIZE=10000
 
 # source files created for other software (to get completion, for example)
 for f in $(ls -A ~/dotfiles/tools) ; do source ~/dotfiles/tools/$f ; done
-
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
