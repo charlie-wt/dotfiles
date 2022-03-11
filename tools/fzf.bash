@@ -1,18 +1,19 @@
-fzf_dir=~/src/bin/fzf
+base_dir=~/src/bin/fzf
+[[ ! -e "$base_dir" ]] && return 1
 
 # Setup fzf
 # ---------
-if [[ ! "$PATH" == *$fzf_dir/bin* ]]; then
-  export PATH="${PATH:+${PATH}:}$fzf_dir/bin"
+if [[ ! "$PATH" == *$base_dir/bin* ]]; then
+  export PATH="${PATH:+${PATH}:}$base_dir/bin"
 fi
 
 # Auto-completion
 # ---------------
-[[ $- == *i* ]] && source "$fzf_dir/shell/completion.bash" 2> /dev/null
+[[ $- == *i* ]] && source "$base_dir/shell/completion.bash" 2> /dev/null
 
 # Key bindings
 # ------------
-source "$fzf_dir/shell/key-bindings.bash"
+source "$base_dir/shell/key-bindings.bash"
 
 
 

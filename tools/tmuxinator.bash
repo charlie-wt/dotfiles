@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+[[ -z $(which tmuxinator) ]] && return 1
+
 _tmuxinator() {
     COMPREPLY=()
     local word
