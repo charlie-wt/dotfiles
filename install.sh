@@ -95,7 +95,7 @@ function dotfile {
 # === Symlinking dotfiles ==============================================================
 dotfile bashrc
 dotfile gitconfig "$config_home/git/config"
-[[ $(tmux -V) =~ "tmux 3" ]] && dotfile tmux.conf "$config_home/tmux/tmux.conf" || dotfile tmux.conf
+dotfile tmux.conf "$config_home/tmux/tmux.conf"
 dotfile vimrc
 
 
@@ -144,3 +144,10 @@ echo \* run :PluginInstall in vim to install plugins
 echo \* run \<prefix\>+I in tmux to install plugins
 echo \* do any machine-specific setup in local.gitconfig, bash/local, vim/local etc.
 
+if [[ ! $(tmux -V) =~ "tmux 3" ]]; then
+    echo
+    echo WARN: your tmux is too old to understand \$XDG_CONFIG_HOME.
+    echo       best thing is to make bash/local/tmux.bash, with this line:
+    echo
+    echo alias tmux=\"tmux -f \${XDG_CONFIG_HOME:-\$HOME/.config}/tmux/tmux.conf\"
+fi
