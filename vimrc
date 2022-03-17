@@ -5,7 +5,6 @@ set nocompatible
 call plug#begin('~/.vim/bundle')
 
 " appearance
-" Plug 'sainnhe/gruvbox-material'
 Plug 'gruvbox-community/gruvbox'
 Plug 'vim-airline/vim-airline'
 " languages
@@ -16,7 +15,9 @@ Plug 'sheerun/vim-polyglot'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 " commands
+Plug 'bronson/vim-visual-star-search'
 Plug 'machakann/vim-swap'
+Plug 'michaeljsmith/vim-indent-object'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 " ide
@@ -36,8 +37,6 @@ Plug 'wellle/targets.vim'
 Plug 'junegunn/goyo.vim'
 
 call plug#end()
-
-packadd termdebug
 
 
 " === General ==========================================================================
@@ -68,8 +67,6 @@ set expandtab
 set splitright splitbelow
 set lazyredraw
 if exists('+termguicolors')
-    let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
-    let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
     set termguicolors
 endif
 set textwidth=88
@@ -78,7 +75,7 @@ set completeopt=menu,menuone,noinsert,noselect
 " let g:gruvbox_contrast_dark = 'black'
 silent! colo gruvbox
 " highlight visual selections with only a slightly lighter background
-hi Visual term=none cterm=none gui=none ctermbg=239
+hi Visual term=none cterm=none gui=none ctermbg=239 guibg=#3c3836
 " centralize backups, swapfiles & undo history
 set backupdir=~/.vim/backups directory=~/.vim/swaps
 if exists("&undodir")
@@ -137,6 +134,9 @@ nnoremap <silent> <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
 " fzf, for finding files
 noremap <leader>f :Files<cr>
 noremap <leader>r :Rg<cr>
+" alternate version of :Rg command, that doesn't match on filename (but still prints it)
+command! -bang -nargs=* RgContents call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
+noremap <leader>R :RgContents<cr>
 " repeat the last macro
 nnoremap Q @@
 " make j & k move by wrapped lines, unless given a count -- aka. 10j still
@@ -144,7 +144,7 @@ nnoremap Q @@
 nnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
 nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
 " F3 to toggle NERDTree
-noremap <silent> <F3> :NERDTreeToggle<CR>
+noremap <silent> <f3> :NERDTreeToggle<cr>
 " reload vimrc easily
 " * extra :! is needed as for some reason sourcing the vimrc creates a ghost edit
 noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
@@ -215,7 +215,7 @@ function! RenameFile()
 endfunction
 map <leader>n :call RenameFile()<cr>
 
-" custom function for styling folds
+" custom function to style folds
 function! CustomFoldText()
     " adapted from https://dhruvasagar.com/2013/03/28/vim-better-foldtext
     let indent = repeat(' '.indent(v:foldstart))
@@ -231,14 +231,46 @@ function! CustomFoldText()
 endfunction
 set foldtext=CustomFoldText()
 
+" custom function to style the tab line
+" TODO #bug: gruvbox hard-coded
+hi TabLineNr ctermfg=214 ctermbg=237 guifg=#fabd2f guibg=#3c3836 cterm=bold
+hi TabLineModified ctermfg=109 ctermbg=237 guifg=#83a598 guibg=#3c3836 cterm=bold
+function! Tabline()
+    let s = ''
+    for i in range(tabpagenr('$'))
+        let tab = i + 1
+        let winnr = tabpagewinnr(tab)
+        let buflist = tabpagebuflist(tab)
+        let bufnr = buflist[winnr - 1]
+        let bufname = bufname(bufnr)
+        let bufmodified = getbufvar(bufnr, "&mod") ? '+' : ''
+        let tabbodycol = (tab == tabpagenr() ? '%#TabLineSel#' : '%#TabLine#')
+
+        let s .= tabbodycol
+        let s .= '['
+        let s .= '%' . tab . 'T'
+        let s .= '%#TabLineNr#' .  tab
+        let s .= '%#TabLineModified#' . bufmodified . ' '
+        let s .= tabbodycol
+        let s .= (bufname != '' ? fnamemodify(bufname, ':t') : '[No Name] ')
+
+        let s .= '] '
+    endfor
+
+    let s .= '%#TabLineFill#'
+    let s .= '%=%999XX'
+    return s
+endfunction
+set tabline=%!Tabline()
+
 " == Disabled commands
 " K -> run a program to look up keyword under the cursor
 " nnoremap K <nop>
 " Ctrl+Z -> background the vim process
-nnoremap <C-z> <nop>
+nnoremap <c-z> <nop>
 " Ctrl+\ -> evaluate expression, replace the whole command line with the result
 "           (I currently use this as my tmux prefix)
-nnoremap <C-\> <nop>
+nnoremap <c-\> <nop>
 
 
 " === Autocommands =====================================================================
@@ -246,6 +278,13 @@ nnoremap <C-\> <nop>
 " that clears itself before adding its commands.
 augroup my_autocmds
     au!
+
+    " set some filetypes
+    au vimenter,bufenter,winenter ~/notes/* setlocal filetype=pandoc
+    au vimenter,bufenter,winenter *.p8 setlocal filetype=lua
+    au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
+    au vimenter,bufenter,winenter *.td setlocal filetype=tablegen
+    au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
 
     " temporarily clear search highlighting when in insert mode.
     au insertenter * :set nohlsearch
@@ -255,40 +294,36 @@ augroup my_autocmds
     " -- some filetypes, like my python one, already highlight trailing whitespace and
     " -- this extra match messes that up
     let ft_blacklist = ['python']
-    au vimenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
-    au bufenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
-    au winenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
+    au vimenter,bufenter,winenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
 
     " quickly add TODO comments (see Todo function above)
-    au vimenter * nnoremap <leader>tbg :call Todo("bug")<CR>
-    au vimenter * nnoremap <leader>tcl :call Todo("cleanup")<CR>
-    au vimenter * nnoremap <leader>tcr :call Todo("correctness")<CR>
-    au vimenter * nnoremap <leader>tdc :call Todo("documentation")<CR>
-    au vimenter * nnoremap <leader>ten :call Todo("enhancement")<CR>
-    au vimenter * nnoremap <leader>tft :call Todo("feature")<CR>
-    au vimenter * nnoremap <leader>tfn :call Todo("finish")<CR>
-    au vimenter * nnoremap <leader>trf :call Todo("refactor")<CR>
-    au vimenter * nnoremap <leader>trm :call Todo("remove")<CR>
-    au vimenter * nnoremap <leader>tsp :call Todo("speed")<CR>
-    au vimenter * nnoremap <leader>ttm :call Todo("temp")<CR>
-    au vimenter * nnoremap <leader>tts :call Todo("test")<CR>
-    au vimenter * nnoremap <leader>tvf :call Todo("verify")<CR>
-
-    " set some filetypes
-    au bufenter,winenter *.p8 setlocal filetype=lua
-    au bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
+    au vimenter * nnoremap <leader>tbg :call Todo("bug")<cr>
+    au vimenter * nnoremap <leader>tcl :call Todo("cleanup")<cr>
+    au vimenter * nnoremap <leader>tcr :call Todo("correctness")<cr>
+    au vimenter * nnoremap <leader>tdc :call Todo("documentation")<cr>
+    au vimenter * nnoremap <leader>ten :call Todo("enhancement")<cr>
+    au vimenter * nnoremap <leader>tft :call Todo("feature")<cr>
+    au vimenter * nnoremap <leader>tfn :call Todo("finish")<cr>
+    au vimenter * nnoremap <leader>trf :call Todo("refactor")<cr>
+    au vimenter * nnoremap <leader>trm :call Todo("remove")<cr>
+    au vimenter * nnoremap <leader>tsp :call Todo("speed")<cr>
+    au vimenter * nnoremap <leader>ttm :call Todo("temp")<cr>
+    au vimenter * nnoremap <leader>tts :call Todo("test")<cr>
+    au vimenter * nnoremap <leader>tvf :call Todo("verify")<cr>
 
     " filetype-specific options
     au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
     au filetype haskell setlocal ts=4 sw=4 sts=4 et
-    au filetype markdown,pandoc setlocal ts=4 sts=4 sw=4 et
+    au filetype markdown,pandoc setlocal ts=4 sts=4 sw=4 et spellcapcheck=
     au filetype qmake setlocal commentstring=#%s
     au filetype typescript setlocal sw=2 sts=2 et
 
     " filetype-specific maps
     " fswitch  for switching between header/source files
     au filetype cpp,glsl noremap <silent> <leader>of :FSHere<cr>
+    au filetype cpp,glsl noremap <silent> <leader>oh :FSSplitLeft<cr>
     au filetype cpp,glsl noremap <silent> <leader>ol :FSSplitRight<cr>
+    au filetype cpp,glsl noremap <silent> <leader>ot :FSTab<cr>
     " 'compile' certain files (markdown, latex) TODO use :make
     au filetype markdown,pandoc noremap <f5> :!mdpdf "%" & disown<cr><cr>
     au filetype tex noremap <f5> :!xelatex "%"<cr><cr>
@@ -308,7 +343,7 @@ augroup my_autocmds
     " extra syntax highlighting
     " normal aliases to primitive numeric types
     au syntax c,cpp syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64 f32 f64
-augroup END
+augroup end
 
 
 " === Plugin config ====================================================================
@@ -317,20 +352,6 @@ set laststatus=2
 
 " vim-pandoc
 let g:pandoc#modules#disabled = ["folding"]
-
-" ale
-let g:ale_enabled=1
-let g:ale_python_pylint_executable='pylint3'
-let g:ale_lint_on_enter=0
-let g:ale_lint_on_save=0
-let g:ale_lint_on_filetype_changed=0
-let g:ale_sign_error='✘'
-let g:ale_sign_warning='⚠'
-let g:ale_echo_msg_format='[%linter%] %s'
-let g:ale_c_parse_makefile=1
-let g:ale_cpp_cppcheck_options = '--enable=all --language=c++ --std=c++17 --force'
-let g:ale_cpp_gcc_options = '--std=c++17 -Wall -Wextra -Wpedantic' " TODO set based on makefile
-let g:ale_sign_column_always = 1
 
 " goyo
 let g:goyo_width = 89
@@ -352,15 +373,21 @@ let g:lsc_server_commands = {
 \  }
 \}
 let g:lsc_auto_map = {
- \  'GoToDefinition': 'gd',
- \  'FindReferences': 'gr',
- \  'Rename': 'gR',
- \  'ShowHover': 'K',
- \  'FindCodeActions': 'ga',
- \  'Completion': 'omnifunc',
- \}
+\  'GoToDefinition': 'gd',
+\  'FindReferences': 'gr',
+\  'NextReference': '<c-n>',
+\  'PreviousReference': '<c-p>',
+\  'Rename': 'gR',
+\  'ShowHover': v:true,
+\  'FindImplementations': 'gI',
+\  'FindCodeActions': 'ga',
+\  'Completion': 'omnifunc',
+\}
 let g:lsc_enable_autocomplete  = v:true
 let g:lsc_enable_diagnostics   = v:false
-let g:lsc_reference_highlights = v:false
+let g:lsc_reference_highlights = v:true
+let g:lsc_enable_popup_syntax  = v:true
 let g:lsc_trace_level          = 'off'
 
+" `personal` is a symlink to `dotfiles/vim`
+runtime! personal/**/*.vim

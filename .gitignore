@@ -1,0 +1,5 @@
+# local-setup-specific config (ie. mostly for work)
+bash/local
+vim/local
+local.gitconfig
+

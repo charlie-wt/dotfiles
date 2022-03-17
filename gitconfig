@@ -1,8 +1,7 @@
-[user]
-    ; name = charlie-wt
-    ; email = cwt1g14@soton.ac.uk
-    name = concord
-    email = MrMechanicalhorse@gmail.com
+[include]
+    ; put per-setup config (such as default [user] in this file)
+    ; TODO #bug: dotfiles path hard-coded (couldn't get relative path to work)
+    path = ~/dotfiles/local.gitconfig
 [alias]
     a  = add
     br = branch
@@ -10,6 +9,7 @@
     ci = commit
     co = checkout
     d  = diff
+    dc  = diff --cached
     l  = log --graph --oneline --abbrev-commit --decorate --all
     last = log -1 HEAD
     ll = log --graph --decorate --all
@@ -21,3 +21,5 @@
     tool = vimdiff
 [mergetool "vimdiff"]
     cmd = "vimdiff -O $LOCAL $MERGED $REMOTE"
+; [core]
+;     excludesFile = "~/.gitignore"
