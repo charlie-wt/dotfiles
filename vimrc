@@ -16,6 +16,7 @@ Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 " commands
 Plug 'bronson/vim-visual-star-search'
+Plug 'derekwyatt/vim-protodef'
 Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'tpope/vim-commentary'
@@ -78,10 +79,11 @@ silent! colo gruvbox
 " TODO #bug: gruvbox hard-coded
 hi Visual term=none cterm=none gui=none ctermbg=239 guibg=#3c3836
 " centralize backups, swapfiles & undo history
-set backupdir=~/.vim/backups directory=~/.vim/swaps
+set backupdir=~/.local/state/vim/backups directory=~/.local/state/vim/swaps
 if exists("&undodir")
-    set undodir=~/.vim/undo
+    set undodir=~/.local/state/vim/undo
 endif
+set viminfofile=~/.local/state/vim/viminfo
 
 
 " === Custom commands ==================================================================

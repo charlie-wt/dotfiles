@@ -1,4 +1,7 @@
-base_dir="${XDG_DATA_HOME:-$HOME/.local/share}/npm"
-[[ ! -e "$base_dir" ]] && return 1
+[[ ! -e "$data_home/npm" ]] && return 1
+[[ ! -e "$config_home/npm" ]] && return 1
 
-export PATH=$PATH:"$base_dir/npm/packages/bin"
+# NOTE these take ages to run, so disabling until i need them
+
+# export PATH=$PATH:"$data_home/npm/bin"
+# export NPM_CONFIG_USERCONFIG="$config_home/npm/npmrc"

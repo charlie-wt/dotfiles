@@ -5,7 +5,15 @@ export DOTFILES=$(dirname "$(readlink -f ~/.bashrc)")
 # source automatically generated bashrc if there is one
 [ -f $DOTFILES/bashrc.auto ] && source $DOTFILES/bashrc.auto
 
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
+config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
+state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 # === Aliases ==========================================================================
 alias l='ls -GF'
