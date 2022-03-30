@@ -1,4 +1,4 @@
-base_dir="${XDG_DATA_HOME:-$HOME/.local/share}/nvm"
+base_dir="$data_home/nvm"
 [[ ! -e "$base_dir" ]] && return 1
 
 export NVM_DIR=$base_dir
