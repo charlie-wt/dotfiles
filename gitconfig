@@ -1,7 +1,6 @@
 [include]
-    ; put per-setup config (such as default [user] in this file)
-    ; TODO #bug: dotfiles path hard-coded (couldn't get relative path to work)
-    path = ~/dotfiles/local.gitconfig
+    ; put per-machine config (such as default [user]) in this file
+    path = local.gitconfig
 [alias]
     a  = add
     br = branch
@@ -9,7 +8,7 @@
     ci = commit
     co = checkout
     d  = diff
-    dc  = diff --cached
+    dc = diff --cached
     l  = log --graph --oneline --abbrev-commit --decorate --all
     last = log -1 HEAD
     ll = log --graph --decorate --all
@@ -21,5 +20,3 @@
     tool = vimdiff
 [mergetool "vimdiff"]
     cmd = "vimdiff -O $LOCAL $MERGED $REMOTE"
-; [core]
-;     excludesFile = "~/.gitignore"

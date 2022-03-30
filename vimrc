@@ -75,6 +75,7 @@ set completeopt=menu,menuone,noinsert,noselect
 " let g:gruvbox_contrast_dark = 'black'
 silent! colo gruvbox
 " highlight visual selections with only a slightly lighter background
+" TODO #bug: gruvbox hard-coded
 hi Visual term=none cterm=none gui=none ctermbg=239 guibg=#3c3836
 " centralize backups, swapfiles & undo history
 set backupdir=~/.vim/backups directory=~/.vim/swaps
@@ -84,6 +85,7 @@ endif
 
 
 " === Custom commands ==================================================================
+nnoremap <space> <nop>
 let mapleader = " "
 
 " == Basic maps & commands
@@ -139,11 +141,11 @@ command! -bang -nargs=* RgContents call fzf#vim#grep("rg --column --line-number 
 noremap <leader>R :RgContents<cr>
 " repeat the last macro
 nnoremap Q @@
-" make j & k move by wrapped lines, unless given a count -- aka. 10j still
-" goes down 10 'true' lines
+" make j & k move by wrapped lines, unless given a count -- aka. 10j still goes down 10
+" 'true' lines
 nnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
 nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
-" F3 to toggle NERDTree
+" toggle NERDTree
 noremap <silent> <f3> :NERDTreeToggle<cr>
 " reload vimrc easily
 " * extra :! is needed as for some reason sourcing the vimrc creates a ghost edit
@@ -186,7 +188,7 @@ function! OpenPDF()
     endif
     " open the pdf, as unobstructively as possible
     exec ':silent !gio open "' . pdfname . '" > /dev/null &'
-    exec ':redraw!'
+    redraw!
 endfunction
 
 function! TodoTick()
@@ -269,7 +271,7 @@ set tabline=%!Tabline()
 " Ctrl+Z -> background the vim process
 nnoremap <c-z> <nop>
 " Ctrl+\ -> evaluate expression, replace the whole command line with the result
-"           (I currently use this as my tmux prefix)
+"           (i currently use this as my tmux prefix)
 nnoremap <c-\> <nop>
 
 
@@ -283,7 +285,6 @@ augroup my_autocmds
     au vimenter,bufenter,winenter ~/notes/* setlocal filetype=pandoc
     au vimenter,bufenter,winenter *.p8 setlocal filetype=lua
     au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
-    au vimenter,bufenter,winenter *.td setlocal filetype=tablegen
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
 
     " temporarily clear search highlighting when in insert mode.

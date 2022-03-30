@@ -18,7 +18,7 @@ config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 # === Aux functions ====================================================================
 # yes/no prompt
 # $1: the prompt string
-# $2: default value (optional) -- can be true or false
+# $2: default value (optional) -- can be `true` or `false`
 # returns: 0 if `yes` chosen; 1 if `no` chosen; if no default was given, will loop
 # usage: `if yesno "wanna do the thing?" true; then
 #             echo did the thing!
@@ -59,10 +59,9 @@ function yesno {
 
 # symlink a dotfile, presenting a prompt (or doing a default behaviour) if there's a conflict
 #
-# note: if `$default_choice` is `true` or `false`, follow that instead of presenting a
-# prompt in case of conflict.
+# note: default choice set by `$default_choice` variable (`true` or `false`).
 # $1: name of the file (in this directory) to symlink
-# $2: name of symlink, including directory -- defaults to ~/.$1
+# $2: name of symlink, including directory (optional) -- defaults to ~/.$1
 # returns: 0 if symlink was made for dotfile; else 1
 function dotfile {
     # params
@@ -70,7 +69,7 @@ function dotfile {
     link_name="${2:-$HOME/.$dotfile_name}"
 
     if [[ ! -f $d/$dotfile_name ]]; then
-        echo "error in install.sh: can't find dotfile $dotfile_name"
+        echo "can't find dotfile $dotfile_name to symlink"
         return 1
     fi
 
@@ -95,6 +94,8 @@ function dotfile {
 # === Symlinking dotfiles ==============================================================
 dotfile bashrc
 dotfile gitconfig "$config_home/git/config"
+dotfile gitignore "$config_home/git/ignore"
+dotfile local.gitconfig "$config_home/git/local.gitconfig"
 dotfile tmux.conf "$config_home/tmux/tmux.conf"
 dotfile vimrc
 
@@ -113,11 +114,11 @@ else
 fi
 
 # basic setup for vim plugin manager
-vim_plug_dir="$HOME/.vim/autoload/plug.vim"
-if [[ -e "$vim_plug_dir" ]]; then
-    echo "plug.vim already exists in $vim_plug_dir; skipping"
+vim_plug_loc="$HOME/.vim/autoload/plug.vim"
+if [[ -e "$vim_plug_loc" ]]; then
+    echo "plug.vim already exists in $vim_plug_loc; skipping"
 else
-    curl -fLo "$vim_plug_dir" --create-dirs \
+    curl -fLo "$vim_plug_loc" --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 

@@ -1,8 +1,11 @@
 # === Start ============================================================================
-# if there's an automatically generated bashrc with stuff in it
-if [ -f ~/dotfiles/bashrc.auto ]; then
-    . ~/dotfiles/bashrc.auto
-fi
+# export dotfiles dir as directory ~/.bashrc is symlinked into
+export DOTFILES=$(dirname "$(readlink -f ~/.bashrc)")
+
+# source automatically generated bashrc if there is one
+[ -f $DOTFILES/bashrc.auto ] && source $DOTFILES/bashrc.auto
+
+data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
 
 # === Aliases ==========================================================================
 alias l='ls -GF'
@@ -23,7 +26,7 @@ alias fd='fdfind'
 # rg in c(++) code only
 alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
 # quick name for ranger (and when it exits, bash gets put into what ranger's directory was)
-alias ra='ranger --choosedir=$HOME/.local/share/ranger/current_dir; cd "$(cat $HOME/.local/share/ranger/current_dir)"'
+alias ra='ranger --choosedir=$data_home/ranger/current_dir; cd "$(cat $data_home/ranger/current_dir)"'
 alias rf=rifle
 # python 2 :'(((
 alias python='/usr/bin/env python3'
@@ -90,13 +93,14 @@ mkrn () {
 # get size of current directory (and size of constituent directories).
 # by default also lists the top 25 constituent directories. can give it a number
 # argument to list that many directories, or 'all', to list every constituent directory.
+# NOTE: suppresses error messages, since they're usually 'permission denied' clutter
 size () {
     [ $# -ge 1 ] && size=$1 || size=25
 
     if [ $size == "all" ] ; then
-        du -ahd1 | sort -hr
+        du -ahd1 2>/dev/null | sort -hr
     else
-        du -ahd1 | sort -hr | head -n $((size+1))
+        du -ahd1 2>/dev/null | sort -hr | head -n $((size+1))
     fi
 }
 
@@ -117,10 +121,14 @@ export PATH=$PATH:~/.bin
 export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
 # other stuff
 export HISTSIZE=100000
+export HISTFILESIZE=$HISTSIZE
 
 # === Other -- End =====================================================================
 # when terminal is frozen by ^s, allow unfreezing with any key.
 [[ $- == *i* ]] && stty ixany
 
 # source other files (eg. for setup-specific stuff, or for external programs)
-for f in $(find ~/dotfiles/bash -type f) ; do source $f ; done
+for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do source $f ; done
+# explicitly source machine-local files afterwards, so they can override earlier config
+[[ -d $DOTFILES/bash/local ]] && \
+    for f in $(find $DOTFILES/bash/local -maxdepth 1 -type f) ; do source $f ; done
