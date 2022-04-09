@@ -139,4 +139,4 @@ export HISTFILESIZE=$HISTSIZE
 for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do source $f ; done
 # explicitly source machine-local files afterwards, so they can override earlier config
 [[ -d $DOTFILES/bash/local ]] && \
-    for f in $(find $DOTFILES/bash/local -maxdepth 1 -type f) ; do source $f ; done
+    for f in $(find $DOTFILES/bash/local/ -maxdepth 1 -type f) ; do source $f ; done
