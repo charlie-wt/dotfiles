@@ -102,8 +102,9 @@ dotfile vimrc
 
 # === Other bits =======================================================================
 # make directories for vim swapfiles & backups
-mkdir -p ~/.vim/backups
-mkdir -p ~/.vim/swaps
+mkdir -p ~/.local/state/vim/backups
+mkdir -p ~/.local/state/vim/swaps
+mkdir -p ~/.local/state/vim/undo
 
 # make directory for extra vim scripts
 vim_personal_dir="$HOME/.vim/personal"

@@ -73,6 +73,7 @@ endif
 set textwidth=88
 set colorcolumn=+1
 set completeopt=menu,menuone,noinsert,noselect
+set shortmess+=F
 " let g:gruvbox_contrast_dark = 'black'
 silent! colo gruvbox
 " highlight visual selections with only a slightly lighter background
@@ -96,7 +97,7 @@ let mapleader = " "
 "               block)
 " nnoremap [[ 99[{
 " nnoremap ]] 99[{%][%
-" clear search highlighting
+" clear search highlighting & any messages in command line
 nnoremap \ :noh<cr>:<backspace>
 " go to start/end of line
 noremap H ^
@@ -109,9 +110,9 @@ noremap gy gT
 nnoremap <silent> } :<c-u>execute 'keepjumps norm! ' . v:count1 . '}'<cr>
 nnoremap <silent> { :<c-u>execute 'keepjumps norm! ' . v:count1 . '{'<cr>
 " easier saving & quitting
-nnoremap <silent> <leader>j :update<cr>
-nnoremap <silent> <leader>k :q<cr>
-nnoremap <silent> <leader>l :x<cr>
+nnoremap <silent> <leader>j :silent update<cr>
+nnoremap <silent> <leader>k :silent q<cr>
+nnoremap <silent> <leader>l :silent x<cr>
 " easy way to update the diff if in vimdiff mode
 nnoremap du :diffupdate<cr>
 " system clipboard access with Ctrl+C/P:
