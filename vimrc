@@ -395,3 +395,4 @@ let g:lsc_trace_level          = 'off'
 
 " `personal` is a symlink to `dotfiles/vim`
 runtime! personal/**/*.vim
+runtime! personal-local/**/*.vim

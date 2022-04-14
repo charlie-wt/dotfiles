@@ -12,7 +12,10 @@ elif [[ $1 = -n ]]; then
     default_choice=false
 fi
 
+cache_home="${XDG_CONFIG_HOME:-$HOME/.cache}"
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+data_home="${XDG_CONFIG_HOME:-$HOME/.local/share}"
+state_home="${XDG_CONFIG_HOME:-$HOME/.local/state}"
 
 
 # === Aux functions ====================================================================
@@ -94,24 +97,40 @@ function dotfile {
 # === Symlinking dotfiles ==============================================================
 dotfile bashrc
 dotfile gitconfig "$config_home/git/config"
-dotfile gitignore "$config_home/git/ignore"
-dotfile local.gitconfig "$config_home/git/local.gitconfig"
+dotfile local/gitignore "$config_home/git/ignore"
+dotfile local/gitconfig "$config_home/git/local.gitconfig"
 dotfile tmux.conf "$config_home/tmux/tmux.conf"
 dotfile vimrc
 
 
 # === Other bits =======================================================================
 # make directories for vim swapfiles & backups
-mkdir -p ~/.local/state/vim/backups
-mkdir -p ~/.local/state/vim/swaps
-mkdir -p ~/.local/state/vim/undo
+mkdir -p "$state_home/vim/backups"
+mkdir -p "$state_home/vim/swaps"
+mkdir -p "$state_home/vim/undo"
 
-# make directory for extra vim scripts
+# make directories for extra vim scripts
 vim_personal_dir="$HOME/.vim/personal"
-if [[ -e $vim_personal_dir ]]; then
-    echo "vim personal dir already exists; skipping"
+if [[ -L "$vim_personal_dir" ]]; then
+    if [[ -d "$d/vim" ]]; then
+        echo "vim personal dir already exists; skipping"
+    else
+        echo "deleting old vim personal dir that points to nothing"
+        rm "$vim_personal_dir"
+    fi
 else
-    [[ -d $d/vim ]] && ln -s $d/vim $vim_personal_dir
+    [[ -d "$d/vim" ]] && ln -s "$d/vim" "$vim_personal_dir"
+fi
+vim_personal_local_dir="$HOME/.vim/personal-local"
+if [[ -L "$vim_personal_local_dir" ]]; then
+    if [[ -d "$d/local/vim" ]]; then
+        echo "vim personal local dir already exists; skipping"
+    else
+        echo "deleting old vim personal local dir that points to nothing"
+        rm "$vim_personal_local_dir"
+    fi
+else
+    [[ -d "$d/local/vim" ]] && ln -s "$d/local/vim" "$vim_personal_local_dir"
 fi
 
 # basic setup for vim plugin manager
@@ -144,7 +163,7 @@ echo
 echo DONE. remember to do these too:
 echo \* run :PluginInstall in vim to install plugins
 echo \* run \<prefix\>+I in tmux to install plugins
-echo \* do any machine-specific setup in local.gitconfig, bash/local, vim/local etc.
+echo \* do any machine-specific setup in local/\{gitconfig,bash/*,vim/*\}
 
 if [[ ! $(tmux -V) =~ "tmux 3" ]]; then
     echo
