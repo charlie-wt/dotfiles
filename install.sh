@@ -12,10 +12,10 @@ elif [[ $1 = -n ]]; then
     default_choice=false
 fi
 
-cache_home="${XDG_CONFIG_HOME:-$HOME/.cache}"
+cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
-data_home="${XDG_CONFIG_HOME:-$HOME/.local/share}"
-state_home="${XDG_CONFIG_HOME:-$HOME/.local/state}"
+data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
+state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 
 # === Aux functions ====================================================================
