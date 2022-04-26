@@ -7,6 +7,28 @@
 export VENV_HOME="$HOME/.local/var/venv"
 
 
+verify-name-supplied () {
+    if [ -z "$1" ]; then
+        echo please specify a venv.
+        return 1
+    fi
+}
+
+verify-is-a-known-venv () {
+    verify-name-supplied "$1" || return 1
+    if [ ! -d "$VENV_HOME/$1" ]; then
+        echo "unknown venv $1 -- available venvs:"
+        venv-ls
+        return 1
+    fi
+    if [ ! -f "$VENV_HOME/$1/bin/activate" ]; then
+        echo "$1 is not a valid venv -- available venvs:"
+        venv-ls
+        return 1
+    fi
+}
+
+
 venv () {
     if [ -z "$1" ]; then
         echo working on $(venv-on)
@@ -35,22 +57,15 @@ venv-ls () {
 }
 
 venv-new () {
+    verify-name-supplied "$1" || return 1
+
     venv_name="$1"
     python3 -m venv "$VENV_HOME/$venv_name"
     venv-set $venv_name
 }
 
 venv-rm () {
-    if [ -z "$1" ]; then
-        echo please specify a venv to remove.
-        return 1
-    fi
-
-    if [ ! -d "$VENV_HOME/$1" ]; then
-        echo "unknown venv $1 -- available venvs:"
-        venv-ls
-        return 1
-    fi
+    verify-is-a-known-venv "$1" || return 1
 
     [ "$(venv-on)" == "$1" ] && venv-unset
 
@@ -58,17 +73,7 @@ venv-rm () {
 }
 
 venv-set () {
-    if [ ! -d "$VENV_HOME/$1" ]; then
-        echo "unknown venv $1 -- available venvs:"
-        venv-ls
-        return 1
-    fi
-
-    if [ ! -f "$VENV_HOME/$1/bin/activate" ]; then
-        echo "$1 is not a valid venv -- available venvs:"
-        venv-ls
-        return 1
-    fi
+    verify-is-a-known-venv "$1" || return 1
 
     source "$VENV_HOME/$1/bin/activate"
 }

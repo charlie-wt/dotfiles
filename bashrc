@@ -37,8 +37,8 @@ alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
 alias ra='ranger --choosedir=$data_home/ranger/current_dir; cd "$(cat $data_home/ranger/current_dir)"'
 alias rf=rifle
 # python 2 :'(((
-alias python='/usr/bin/env python3'
-alias pip='/usr/bin/env pip3'
+# alias python='/usr/bin/env python3'
+# alias pip='/usr/bin/env pip3'
 # ssh tries to inherit my weird custom TERM, so need to stop it from doing that.
 #alias ssh='TERM=xterm ssh'
 # update flatpaks
@@ -92,7 +92,7 @@ mkrn () {
        cxx) g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
        hs)  ghc --make ${1%.*} && ./${1%.*}        ;;
        js)  node "$1"                              ;;
-       py)  python "$1"                            ;;
+       py)  python3 "$1"                           ;;
        rs)  rustc "$1" && ./${1%.*}                ;;
        *)   [[ -f "Cargo.toml" ]] && cargo run || echo "unknown filetype '${1##*.}'." ;;
     esac
