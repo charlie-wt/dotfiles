@@ -153,10 +153,13 @@ fi
 
 # basic rust setup
 rustup_dir="$data_home/rustup"
-if [[ -e "$rustup_dir" ]]; then
-    echo "rustup already exists in $rustup_dir; skipping"
+cargo_dir="$data_home/cargo"
+if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
+    echo "rustup & cargo already exist in $rustup_dir & $cargo_dir; skipping"
 elif [[ $default_choice = true ]] || yesno "do you want to install rust & cargo?"; then
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path
+    export RUSTUP_HOME=$rustup_dir
+    export CARGO_HOME=$cargo_dir
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 fi
 
 # reminders for manual bits i've not automated yet
