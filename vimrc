@@ -385,6 +385,7 @@ let g:lsc_auto_map = {
 \  'FindImplementations': 'gI',
 \  'FindCodeActions': 'ga',
 \  'Completion': 'omnifunc',
+\  'SignatureHelp': 'gm',
 \}
 let g:lsc_enable_autocomplete  = v:true
 let g:lsc_enable_diagnostics   = v:false
@@ -392,6 +393,6 @@ let g:lsc_reference_highlights = v:true
 let g:lsc_enable_popup_syntax  = v:true
 let g:lsc_trace_level          = 'off'
 
-" `personal` is a symlink to `dotfiles/vim`
+" `personal{-local}` is a symlink to `dotfiles/{local/}vim`
 runtime! personal/**/*.vim
 runtime! personal-local/**/*.vim

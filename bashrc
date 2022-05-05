@@ -103,7 +103,7 @@ mkrn () {
 # argument to list that many directories, or 'all', to list every constituent directory.
 # NOTE: suppresses error messages, since they're usually 'permission denied' clutter
 size () {
-    [ $# -ge 1 ] && size=$1 || size=25
+    [ $# -ge 1 ] && local size=$1 || local size=25
 
     if [ $size == "all" ] ; then
         du -ahd1 2>/dev/null | sort -hr
@@ -113,8 +113,8 @@ size () {
 }
 
 # === Environment Variables ============================================================
-COLORTERM=truecolor
-VISUAL=vim; export VISUAL EDITOR=vim; export EDITOR
+export COLORTERM=truecolor
+export VISUAL=vim EDITOR=vim
 # add color in less (for manpages)
 export LESS_TERMCAP_mb=$'\E[01;31m'
 export LESS_TERMCAP_md=$'\E[01;31m'

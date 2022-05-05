@@ -28,18 +28,18 @@ state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 #             echo did the thing!
 #         fi`
 function yesno {
-        qn=$1
-        default=$2
+        local qn=$1
+        local default=$2
 
         # set our default based on input
         if [ -z "$default" ]; then
-            opts="[y/n]"
+            local opts="[y/n]"
             default=""
         elif [ "$default" = true ]; then
-            opts="[Y/n]"
+            local opts="[Y/n]"
             default="y"
         else
-            opts="[y/N]"
+            local opts="[y/N]"
             default="n"
         fi
 
@@ -69,8 +69,8 @@ function yesno {
 # returns: 0 if symlink was made for dotfile; else 1
 function dotfile {
     # params
-    dotfile_name="$1"
-    link_name="${2:-$HOME/.$dotfile_name}"
+    local dotfile_name="$1"
+    local link_name="${2:-$HOME/.$dotfile_name}"
 
     if [[ ! -f $d/$dotfile_name ]]; then
         echo "can't find dotfile $dotfile_name to symlink"
