@@ -173,7 +173,7 @@ function! ToggleLocList()
     catch
     endtry
 endfunction
-command Errors :call ToggleLocList()
+command! Errors :call ToggleLocList()
 noremap <silent> <leader>er :call ToggleLocList()<cr>
 
 " if in a markdown or tex file, open the corresponding pdf easily
