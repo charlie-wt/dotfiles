@@ -50,7 +50,16 @@ alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
 # === Functions ========================================================================
 mkcd () { mkdir -p "$@" && cd "$@"; }
 
-# move 'up' so many directories instead of using several cd ../../, etc.
+# go to dotfiles dir, or install them
+dots () {
+    case $1 in
+        i|install) $DOTFILES/install.sh ;;
+        "")        cd $DOTFILES         ;;
+        *)         >&2 echo ?           ;;
+    esac
+}
+
+# `up 3` == `cd ../../..`
 up () { cd $(eval printf '../'%.0s {1..$1}); }
 
 # make a note
