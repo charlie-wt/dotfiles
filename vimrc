@@ -84,6 +84,8 @@ if exists("&undodir")
     set undodir=~/.local/state/vim/undo
 endif
 set viminfofile=~/.local/state/vim/viminfo
+set switchbuf+=usetab,newtab  " testing out, mostly for quickfix window (lsc 'FindReferences')
+set nrformats-=octal
 
 
 " === Custom commands ==================================================================
@@ -383,7 +385,7 @@ let g:lsc_auto_map = {
 \  'Rename': 'gR',
 \  'ShowHover': v:true,
 \  'FindImplementations': 'gI',
-\  'FindCodeActions': 'ga',
+\  'FindCodeActions': 'gA',
 \  'Completion': 'omnifunc',
 \  'SignatureHelp': 'gm',
 \}

@@ -7,9 +7,9 @@ d=$(dirname "$(readlink -e "$0")")
 
 # -y or -n options to always pick yes/no at prompts
 default_choice=""
-if [[ $1 = -y ]]; then
+if [ "$1" = "-y" ]; then
     default_choice=true
-elif [[ $1 = -n ]]; then
+elif [ "$1" = "-n" ]; then
     default_choice=false
 fi
 
@@ -61,6 +61,8 @@ function yesno {
         done
 }
 
+
+# === Symlinking dotfiles ==============================================================
 # symlink a dotfile, presenting a prompt (or doing a default behaviour) if there's a conflict
 #
 # note: default choice set by `$default_choice` variable (`true` or `false`).
@@ -72,17 +74,17 @@ function dotfile {
     local dotfile_name="$1"
     local link_name="${2:-$HOME/.$dotfile_name}"
 
-    if [[ ! -f $d/$dotfile_name ]]; then
+    if [ ! -f $d/$dotfile_name ]; then
         echo "can't find dotfile $dotfile_name to symlink"
         return 1
     fi
 
     # if `$link_name` exists, check if we should replace it with a new symlink
     if [[ -e "$link_name" || -L "$link_name" ]]; then
-        if [[ "$default_choice" = false ]]; then
+        if [ "$default_choice" = false ]; then
             echo "WARN: $link_name already exists, so did not make a link."
             return 1
-        elif [[ "$default_choice" = "" ]] &&
+        elif [ "$default_choice" = "" ] &&
              ! yesno "$link_name already exists -- replace it?" true; then
             return 1
         fi
@@ -94,14 +96,45 @@ function dotfile {
     ln -s "$d/$dotfile_name" "$link_name"
 }
 
-
-# === Symlinking dotfiles ==============================================================
 dotfile bashrc
 dotfile gitconfig "$config_home/git/config"
-dotfile local/gitignore "$config_home/git/ignore"
 dotfile local/gitconfig "$config_home/git/local.gitconfig"
+dotfile local/gitignore "$config_home/git/ignore"
 dotfile tmux.conf "$config_home/tmux/tmux.conf"
 dotfile vimrc
+
+
+# === Symlinking other directories =====================================================
+function symlink {
+    local link_name="$1"
+    local target="$2"
+    local name="$3"
+
+    if [ -L "$link_name" ]; then
+        existing_target=$(readlink "$link_name")
+
+        if [ -d "$target" ] && [ "$existing_target" = "$target" ]; then
+            echo "$name already exists; skipping"
+        elif [ -d "$target" ]; then
+            if [ ! -d "$existing_target" ]; then
+                echo "replacing old $name that points to nothing"
+                rm "$link_name" && ln -s "$target" "$link_name"
+            elif [ "$default_choice" = "true" ] ||
+                 yesno "$name at '$link_name' already points to '$existing_target'; replace it?" true; then
+                echo "replacing old $name"
+                rm "$link_name" && ln -s "$target" "$link_name"
+            fi
+        elif [ "$existing_target" = "$target" ]; then
+            echo "deleting old $name that points to nothing"
+            rm "$link_name"
+        fi
+    elif [ -d "$target" ]; then
+        # might fail if $link_name exists but isn't a symlink, but eh
+        ln -s "$target" "$link_name"
+    fi
+}
+symlink "$HOME/.vim/personal" "$d/vim" "vim personal dir"
+symlink "$HOME/.vim/personal-local" "$d/local/vim" "vim personal local dir"
 
 
 # === Other bits =======================================================================
@@ -110,33 +143,9 @@ mkdir -p "$state_home/vim/backups"
 mkdir -p "$state_home/vim/swaps"
 mkdir -p "$state_home/vim/undo"
 
-# make directories for extra vim scripts
-vim_personal_dir="$HOME/.vim/personal"
-if [[ -L "$vim_personal_dir" ]]; then
-    if [[ -d "$d/vim" ]]; then
-        echo "vim personal dir already exists; skipping"
-    else
-        echo "deleting old vim personal dir that points to nothing"
-        rm "$vim_personal_dir"
-    fi
-else
-    [[ -d "$d/vim" ]] && ln -s "$d/vim" "$vim_personal_dir"
-fi
-vim_personal_local_dir="$HOME/.vim/personal-local"
-if [[ -L "$vim_personal_local_dir" ]]; then
-    if [[ -d "$d/local/vim" ]]; then
-        echo "vim personal local dir already exists; skipping"
-    else
-        echo "deleting old vim personal local dir that points to nothing"
-        rm "$vim_personal_local_dir"
-    fi
-else
-    [[ -d "$d/local/vim" ]] && ln -s "$d/local/vim" "$vim_personal_local_dir"
-fi
-
 # basic setup for vim plugin manager
 vim_plug_loc="$HOME/.vim/autoload/plug.vim"
-if [[ -e "$vim_plug_loc" ]]; then
+if [ -e "$vim_plug_loc" ]; then
     echo "plug.vim already exists in $vim_plug_loc; skipping"
 else
     curl -fLo "$vim_plug_loc" --create-dirs \
@@ -145,7 +154,7 @@ fi
 
 # setup tmux plugin manager
 tpm_dir="$config_home/tmux/plugins/tpm"
-if [[ -e "$tpm_dir" ]]; then
+if [ -e "$tpm_dir" ]; then
     echo "tpm already exists in $tpm_dir; skipping"
 else
     git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
@@ -156,7 +165,7 @@ rustup_dir="$data_home/rustup"
 cargo_dir="$data_home/cargo"
 if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
     echo "rustup & cargo already exist in $rustup_dir & $cargo_dir; skipping"
-elif [[ $default_choice = true ]] || yesno "do you want to install rust & cargo?"; then
+elif [ $default_choice = true ] || yesno "do you want to install rust & cargo?"; then
     export RUSTUP_HOME=$rustup_dir
     export CARGO_HOME=$cargo_dir
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path

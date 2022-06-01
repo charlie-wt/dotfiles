@@ -1,5 +1,5 @@
 base_dir="$data_home/nvm"
-[[ ! -e "$base_dir" ]] && return 1
+[ ! -e "$base_dir" ] && return 1
 
 export NVM_DIR=$base_dir
 

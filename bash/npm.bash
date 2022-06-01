@@ -1,5 +1,5 @@
-[[ ! -e "$data_home/npm" ]] && return 1
-[[ ! -e "$config_home/npm" ]] && return 1
+[ ! -e "$data_home/npm" ] && return 1
+[ ! -e "$config_home/npm" ] && return 1
 
 # NOTE these take ages to run, so disabling until i need them
 

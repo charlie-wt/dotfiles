@@ -1,5 +1,5 @@
 [include]
-    ; put per-machine config (such as default [user]) in this file
+    ; put per-machine config here (symlinked to $DOTFILES/local/gitconfig)
     path = local.gitconfig
 [alias]
     a  = add

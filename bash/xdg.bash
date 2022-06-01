@@ -17,7 +17,7 @@ alias mocp="mocp -M $config_home/moc"
 export PYLINTHOME="$cache_home/pylint"
 
 # sqlite
-[[ -e "$config_home/sqlite3/sqliterc" ]] && alias sqlite3="sqlite3 -init $config_home/sqlite3/sqliterc"
+[ -e "$config_home/sqlite3/sqliterc" ] && alias sqlite3="sqlite3 -init $config_home/sqlite3/sqliterc"
 export SQLITE_HISTORY="$data_home/sqlite/history"
 
 # terminfo
