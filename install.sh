@@ -119,6 +119,9 @@ function symlink {
             if [ ! -d "$existing_target" ]; then
                 echo "replacing old $name that points to nothing"
                 rm "$link_name" && ln -s "$target" "$link_name"
+            elif [ "$default_choice" = "false" ]; then
+                echo "WARN: $link_name already exists, so did not make a link."
+                return 1
             elif [ "$default_choice" = "true" ] ||
                  yesno "$name at '$link_name' already points to '$existing_target'; replace it?" true; then
                 echo "replacing old $name"
