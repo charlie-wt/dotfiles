@@ -50,6 +50,8 @@ alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
 # === Functions ========================================================================
 mkcd () { mkdir -p "$@" && cd "$@"; }
 
+cdc () { cd "$config_home/$1"; }
+
 # go to dotfiles dir, or install them
 dots () {
     case $1 in

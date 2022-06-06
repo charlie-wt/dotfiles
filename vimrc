@@ -21,6 +21,7 @@ Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
+Plug 'arp242/jumpy.vim'
 " ide
 Plug 'ajh17/VimCompletesMe'
 Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --bin' }
