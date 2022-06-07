@@ -43,7 +43,15 @@ venv-on () {
 }
 
 venv-ls () {
-    pushd "$VENV_HOME" >/dev/null ; ls -Cd */ | tr -d '/' ; popd >/dev/null
+    local str=$(
+        for d in $(ls "$VENV_HOME"); do
+            [ -d "$VENV_HOME/$d" ] && [ -f "$VENV_HOME/$d/bin/activate" ] && echo $d;
+        done)
+
+    # if running interactively, concat onto one line & pad with 3 spaces
+    [ -t 1 ] && str="${str//$'\n'/   }"
+
+    printf "$str\n"
 }
 
 venv-new () {
@@ -55,17 +63,27 @@ venv-new () {
 }
 
 venv-rm () {
-    verify-is-a-known-venv "$1" || return 1
+    name="$(get-unique-name-match "$1")"
+    [ -z "$name" ] && return 1
 
-    [ "$(venv-on)" == "$1" ] && venv-unset
+    # if given a regex instead of an exact name, confirm if we're about to remove the
+    # right venv.
+    if ! $(verify-is-a-known-venv "$1" 2>/dev/null); then
+        ! yesno "remove matching venv "$name"?" y && return 1
+    else
+        echo removing "$name"
+    fi
 
-    rm -rf "$VENV_HOME/$1"
+    [ "$(venv-on)" == "$name" ] && venv-unset
+
+    rm -rf "$VENV_HOME/$name"
 }
 
 venv-set () {
-    verify-is-a-known-venv "$1" || return 1
+    name="$(get-unique-name-match "$1")"
+    [ -z "$name" ] && return 1
 
-    source "$VENV_HOME/$1/bin/activate"
+    source "$VENV_HOME/$name/bin/activate"
 }
 
 venv-unset () {
@@ -75,7 +93,7 @@ venv-unset () {
 # utils
 verify-name-supplied () {
     if [ -z "$1" ]; then
-        echo please specify a venv.
+        >&2 echo please specify a venv.
         return 1
     fi
 }
@@ -83,13 +101,26 @@ verify-name-supplied () {
 verify-is-a-known-venv () {
     verify-name-supplied "$1" || return 1
     if [ ! -d "$VENV_HOME/$1" ]; then
-        echo "unknown venv $1 -- available venvs:"
-        venv-ls
+        >&2 echo "unknown venv $1 -- available venvs:"
+        >&2 venv-ls
         return 1
     fi
-    if [ ! -f "$VENV_HOME/$1/bin/activate" ]; then
-        echo "$1 is not a valid venv -- available venvs:"
-        venv-ls
+}
+
+# echoes the name of the single venv that matches the regex `$1`, or nothing with a
+# stderr msg if that can't be done.
+get-unique-name-match () {
+    verify-name-supplied "$1" || return 1
+
+    # check for valid env to switch to
+    local match=$(venv-ls | grep "$1")
+
+    if [ -z "$match" ] ||  # even if no matches, assigning to `match` makes 1 empty line
+       [ "$(echo "$match" | wc -l)" -ne 1 ]; then
+        >&2 echo unknown or ambiguous venv \'"$1"\'. available:
+        >&2 venv-ls
         return 1
     fi
+
+    echo $match
 }

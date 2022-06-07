@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 
+source "bash/_utils.bash"
+
+
 # === Basic vars =======================================================================
 # directory of this script
 d=$(dirname "$(readlink -e "$0")")
@@ -19,55 +22,12 @@ data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 
-# === Aux functions ====================================================================
-# yes/no prompt
-# $1: the prompt string
-# $2: default value (optional) -- can be `true` or `false`
-# returns: 0 if `yes` chosen; 1 if `no` chosen; if no default was given, will loop
-# usage: `if yesno "wanna do the thing?" true; then
-#             echo did the thing!
-#         fi`
-function yesno {
-        local qn=$1
-        local default=$2
-
-        # set our default based on input
-        if [ -z "$default" ]; then
-            local opts="[y/n]"
-            default=""
-        elif [ "$default" = true ]; then
-            local opts="[Y/n]"
-            default="y"
-        else
-            local opts="[y/N]"
-            default="n"
-        fi
-
-        while true; do
-            # read input
-            read -p "$qn $opts " -n 1 -s -r input
-            echo ${input}
-
-            # if nothing entered and have a default, return it
-            if [[ -z "$input" && ! -z "$default" ]]; then
-                [ "$default" = "y" ] && return 0 || return 1
-            fi
-
-            # else if something entered, return if valid
-            if [[ "$input" =~ ^[yYnN]$ ]]; then
-                input=${input:-${default}}
-                [[ "$input" =~ ^[yY]$ ]] && return 0 || return 1
-            fi
-        done
-}
-
-
 # === Symlinking dotfiles ==============================================================
-# symlink a dotfile, presenting a prompt (or doing a default behaviour) if there's a conflict
+# symlink a dotfile. if there's a conflict, present a prompt (or do a default behaviour)
 #
 # note: default choice set by `$default_choice` variable (`true` or `false`).
-# $1: name of the file (in this directory) to symlink
-# $2: name of symlink, including directory (optional) -- defaults to ~/.$1
+# $1: name of the file to symlink (relative path)
+# $2: name of symlink (absolute path) -- optional, defaults to ~/.$1
 # returns: 0 if symlink was made for dotfile; else 1
 function dotfile {
     # params
@@ -81,11 +41,14 @@ function dotfile {
 
     # if `$link_name` exists, check if we should replace it with a new symlink
     if [[ -e "$link_name" || -L "$link_name" ]]; then
-        if [ "$default_choice" = false ]; then
+        if [ "$(readlink $link_name)" = "$d/$dotfile_name" ]; then
+            echo "dotfile $dotfile_name already set correctly; skipping."
+            return 1
+        elif [ "$default_choice" = false ]; then
             echo "WARN: $link_name already exists, so did not make a link."
             return 1
         elif [ "$default_choice" = "" ] &&
-             ! yesno "$link_name already exists -- replace it?" true; then
+             ! yesno "$link_name already exists -- replace it?" y; then
             return 1
         fi
         rm "$link_name"
@@ -123,7 +86,7 @@ function symlink {
                 echo "WARN: $link_name already exists, so did not make a link."
                 return 1
             elif [ "$default_choice" = "true" ] ||
-                 yesno "$name at '$link_name' already points to '$existing_target'; replace it?" true; then
+                 yesno "$name at '$link_name' already points to '$existing_target'; replace it?" y; then
                 echo "replacing old $name"
                 rm "$link_name" && ln -s "$target" "$link_name"
             fi
