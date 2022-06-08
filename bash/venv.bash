@@ -9,13 +9,8 @@ export VENV_HOME="$HOME/.local/var/venv"
 
 # main interface
 venv () {
-    if [ -z "$1" ]; then
-        local on=$(venv-on)
-        [ -n "$on" ] && echo "working on $on" || echo "(not in a venv)"
-        return
-    fi
-
     case "$1" in
+        ""|on)                     venv-on    "${@:2}" ;;
         ls|list|show)              venv-ls    "${@:2}" ;;
         new|mk|make|add)           venv-new   "${@:2}" ;;
         rm|del*|remove|uninstall)  venv-rm    "${@:2}" ;;
@@ -28,7 +23,8 @@ venv () {
             echo " rm | del* | remove | uninstall \$ENV:   remove a venv"
             echo " set | workon | go | in \$ENV:           enter a venv"
             echo " unset | deac* | out:                   leave current venv"
-            echo " [nothing]:                             print current venv"
+            echo " [nothing] | on:                        print current venv"
+            echo " help | -h:                             print this message"
             ;;
         *)
             echo "unknown command $1; commands:"
@@ -39,7 +35,11 @@ venv () {
 
 # individual commands
 venv-on () {
-    echo "${VIRTUAL_ENV##*/}"
+    local on="${VIRTUAL_ENV##*/}"
+    # make a nicer message if running interactively
+    [ -t 1 ] && on=$([ -n "$on" ] && echo "working on $on" || echo "(not in a venv)")
+
+    echo "$on"
 }
 
 venv-ls () {
