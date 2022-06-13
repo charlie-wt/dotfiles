@@ -15,13 +15,13 @@ Plug 'sheerun/vim-polyglot'
 Plug 'vim-pandoc/vim-pandoc'
 Plug 'vim-pandoc/vim-pandoc-syntax'
 " commands
+Plug 'arp242/jumpy.vim'
 Plug 'bronson/vim-visual-star-search'
 Plug 'derekwyatt/vim-protodef'
 Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-Plug 'arp242/jumpy.vim'
 " ide
 Plug 'ajh17/VimCompletesMe'
 Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --bin' }
@@ -87,6 +87,7 @@ endif
 set viminfofile=~/.local/state/vim/viminfo
 set switchbuf+=usetab,newtab  " testing out, mostly for quickfix window (lsc 'FindReferences')
 set nrformats-=octal
+set sidescrolloff=5
 
 
 " === Custom commands ==================================================================
@@ -153,7 +154,7 @@ nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
 " toggle NERDTree
 noremap <silent> <f3> :NERDTreeToggle<cr>
 " reload vimrc easily
-" * extra :! is needed as for some reason sourcing the vimrc creates a ghost edit
+" * extra :e! is needed as for some reason sourcing the vimrc adds an empty unsaved edit
 noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
 
 " == Functions
@@ -297,10 +298,8 @@ augroup my_autocmds
     au insertleave * :set hlsearch
 
     " highlight trailing whitespace
-    " -- some filetypes, like my python one, already highlight trailing whitespace and
-    " -- this extra match messes that up
-    let ft_blacklist = ['python']
-    au vimenter,bufenter,winenter * if index(ft_blacklist, &ft) < 0 | :match ErrorMsg '\s\+$'
+    " (note: some syntax plugins try to do this too, so remember to disable it for them)
+    au vimenter,bufenter,winenter * :match ErrorMsg '\s\+$'
 
     " quickly add TODO comments (see Todo function above)
     au vimenter * nnoremap <leader>tbg :call Todo("bug")<cr>
@@ -318,7 +317,8 @@ augroup my_autocmds
     au vimenter * nnoremap <leader>tvf :call Todo("verify")<cr>
 
     " filetype-specific options
-    au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
+    " TODO #temp: only set in graphcore.vim
+    " au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
     au filetype haskell setlocal ts=4 sw=4 sts=4 et
     au filetype markdown,pandoc setlocal ts=4 sts=4 sw=4 et spellcapcheck=
     au filetype qmake setlocal commentstring=#%s
@@ -396,6 +396,11 @@ let g:lsc_reference_highlights = v:true
 let g:lsc_enable_popup_syntax  = v:true
 let g:lsc_trace_level          = 'off'
 
+" i already highlight trailing whitespace, & this messes it up
+" (for the 'vim-python/python-syntax' plugin used by vim-polyglot)
+let g:python_highlight_space_errors = 0
+
+" === Local config =====================================================================
 " `personal{-local}` is a symlink to `dotfiles/{local/}vim`
 runtime! personal/**/*.vim
 runtime! personal-local/**/*.vim
