@@ -43,3 +43,15 @@ function yesno {
             fi
         done
 }
+
+# insert a call to this into a script, to 'break' there and be able to type `echo`
+# (etc.) to see what's going on.
+# from: https://blog.jez.io/bash-debugger/
+function debugger {
+  echo "[DBG] Press ^D to resume, or ^C to abort."
+  local line
+  while read -r -p "> " line; do
+    eval "$line"
+  done
+  echo
+}
