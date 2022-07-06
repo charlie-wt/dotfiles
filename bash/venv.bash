@@ -28,7 +28,7 @@ venv () {
             ;;
         *)
             echo "unknown command $1; commands:"
-            echo "ls   new   rm   set   unset"
+            echo "ls   new   rm   set   unset   on   help"
             ;;
     esac
 }
