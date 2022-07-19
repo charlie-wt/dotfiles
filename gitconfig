@@ -14,6 +14,7 @@
     ll = log --graph --decorate --all
     mg = merge
     s  = status
+    st = stash
     trunk = log --first-parent master
     unstage = reset HEAD --
 [merge]

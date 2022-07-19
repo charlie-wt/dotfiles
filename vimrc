@@ -37,6 +37,8 @@ Plug 'wellle/targets.vim'
 " other
 Plug 'junegunn/goyo.vim'
 
+Plug 'ojroques/vim-oscyank', {'branch': 'main'}
+
 call plug#end()
 
 
@@ -118,16 +120,6 @@ nnoremap <silent> <leader>k :silent q<cr>
 nnoremap <silent> <leader>l :silent x<cr>
 " easy way to update the diff if in vimdiff mode
 nnoremap du :diffupdate<cr>
-" system clipboard access with Ctrl+C/P:
-if has("clipboard")
-    " if vim has system clipboard support, use it
-    vnoremap <c-c> "+y
-    noremap <c-p> "+p
-else
-    " otherwise, use the (external) xsel package (can only copy whole lines)
-    vnoremap <c-c> :w !xsel -i -b<cr><cr>
-    noremap <c-p> :r !xsel -o -b<cr><cr>
-endif
 " set current directory (all windows) to directory of current file
 nnoremap <silent> <leader>cd :cd %:p:h<cr>
 " quickly view a diff of unsaved changes
@@ -158,6 +150,27 @@ noremap <silent> <f3> :NERDTreeToggle<cr>
 noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
 
 " == Functions
+" system clipboard access with Ctrl+C/P:
+" NOTE: this is a function executed below in a `vimenter` autocmd, because otherwise it
+" would run before plugins had loaded so we wouldn't be able to check for vim-oscyank
+function! SetupSystemClipboard()
+    if has("clipboard")
+        " use built-in system clipboard support
+        vnoremap <c-c> "+y
+        noremap <c-p> "+p
+    elseif exists('g:loaded_oscyank')
+        " use osc 52 escape code (only supported in some terminals)
+        vnoremap <c-c> :OSCYank<cr>:<backspace>
+    elseif executable("xsel") && system("xsel") !~ 'Can''t open display'
+        " use the (external) xsel package (can only copy whole lines)
+        vnoremap <c-c> :w !xsel -i -b<cr><cr>
+        noremap <c-p> :r !xsel -o -b<cr><cr>
+    else
+        " <c-u> removes the automatically added '<,'> that'd make the `echo` error
+        vnoremap <c-c> :<c-u>echo 'no known system clipboard access'<cr>
+    endif
+endfunction
+
 " insert TODO comments above the current line, with tags defined by a:tag. NOTE: relies
 " on the commentary plugin
 function! Todo(tag)
@@ -349,6 +362,9 @@ augroup my_autocmds
     " extra syntax highlighting
     " normal aliases to primitive numeric types
     au syntax c,cpp syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64 f32 f64
+
+    " set up ability to copy to the system clipboard
+    au vimenter * call SetupSystemClipboard()
 augroup end
 
 
@@ -398,7 +414,9 @@ let g:lsc_trace_level          = 'off'
 
 " i already highlight trailing whitespace, & this messes it up
 " (for the 'vim-python/python-syntax' plugin used by vim-polyglot)
-let g:python_highlight_space_errors = 0
+let g:python_highlight_space_errors = v:false
+
+let g:oscyank_silent = v:true
 
 " === Local config =====================================================================
 " `personal{-local}` is a symlink to `dotfiles/{local/}vim`
