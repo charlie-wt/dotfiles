@@ -40,8 +40,6 @@ alias rf=rifle
 # python 2 :'(((
 # alias python='/usr/bin/env python3'
 # alias pip='/usr/bin/env pip3'
-# ssh tries to inherit my weird custom TERM, so need to stop it from doing that.
-#alias ssh='TERM=xterm ssh'
 # update flatpaks
 alias fpu='flatpak update -y && flatpak uninstall --unused -y'
 
@@ -135,8 +133,6 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
-# my scripts
-export PATH=$PATH:~/.bin
 # prompt
 export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
 # other stuff

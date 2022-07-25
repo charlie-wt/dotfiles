@@ -90,6 +90,7 @@ set viminfofile=~/.local/state/vim/viminfo
 set switchbuf+=usetab,newtab  " testing out, mostly for quickfix window (lsc 'FindReferences')
 set nrformats-=octal
 set sidescrolloff=5
+let &t_ut=''
 
 
 " === Custom commands ==================================================================
