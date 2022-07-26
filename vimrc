@@ -393,6 +393,11 @@ let g:lsc_server_commands = {
 \    'command': 'rls',
 \    'log_level': -1,
 \    'suppress_stderr': v:true,
+\  },
+\  'lua': {
+\   'command': 'lua-language-server',
+\   'log_level': -1,
+\   'suppres_stderr': v:true,
 \  }
 \}
 let g:lsc_auto_map = {

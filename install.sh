@@ -60,11 +60,12 @@ function dotfile {
 }
 
 dotfile bashrc
-dotfile gitconfig "$config_home/git/config"
+dotfile gitconfig       "$config_home/git/config"
 dotfile local/gitconfig "$config_home/git/local.gitconfig"
 dotfile local/gitignore "$config_home/git/ignore"
-dotfile tmux.conf "$config_home/tmux/tmux.conf"
+dotfile tmux.conf       "$config_home/tmux/tmux.conf"
 dotfile vimrc
+dotfile kitty.conf      "$config_home/kitty/kitty.conf"
 
 
 # === Symlinking other directories =====================================================
