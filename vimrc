@@ -132,10 +132,10 @@ command! UnWindows execute ':g/^/+d'
 nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
 " strip trailing whitespace
 nnoremap <silent> <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
-" fzf, for finding files
+" fzf, for finding files & text
 noremap <leader>f :Files<cr>
 noremap <leader>r :Rg<cr>
-" alternate version of :Rg command, that doesn't match on filename (but still prints it)
+" alternate to :Rg, that doesn't match on filename (but still prints it)
 command! -bang -nargs=* RgContents call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 noremap <leader>R :RgContents<cr>
 " repeat the last macro
@@ -285,6 +285,51 @@ function! Tabline()
 endfunction
 set tabline=%!Tabline()
 
+function! ToPrevFile()
+    " TODO #finish: do this enough times to change file, not just once
+    " prob do via :jumplist -> parse -> look for change of filename (though not sure
+    " this is robust?)
+    :execute "normal! \<c-o>"
+endfunction
+
+function! ShuntRight()
+    :vs
+    if &splitright
+        :execute "normal! \<c-w>h"
+    endif
+    :call ToPrevFile()
+endfunction
+
+function! ShuntLeft()
+    :vs
+    if !&splitright
+        :execute "normal! \<c-w>l"
+    endif
+    :call ToPrevFile()
+endfunction
+
+function! ShuntDown()
+    :sp
+    if &splitbelow
+        :execute "normal! \<c-w>k"
+    endif
+    :call ToPrevFile()
+endfunction
+
+function! ShuntUp()
+    :sp
+    if !&splitbelow
+        :execute "normal! \<c-w>j"
+    endif
+    :call ToPrevFile()
+endfunction
+
+function! ShuntTab()
+    :tabe %
+    :execute "normal! gT"
+    :call ToPrevFile()
+endfunction
+
 " == Disabled commands
 " K -> run a program to look up keyword under the cursor
 " nnoremap K <nop>
@@ -339,7 +384,7 @@ augroup my_autocmds
     au filetype typescript setlocal sw=2 sts=2 et
 
     " filetype-specific maps
-    " fswitch  for switching between header/source files
+    " fswitch for switching between header/source files
     au filetype cpp,glsl noremap <silent> <leader>of :FSHere<cr>
     au filetype cpp,glsl noremap <silent> <leader>oh :FSSplitLeft<cr>
     au filetype cpp,glsl noremap <silent> <leader>ol :FSSplitRight<cr>

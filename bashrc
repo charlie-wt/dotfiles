@@ -27,6 +27,7 @@ alias v=vim
 alias g=git
 alias gs='git status'
 alias gd='git diff'
+alias gdc='git dc'
 
 alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 alias tma="tmux attach -t"

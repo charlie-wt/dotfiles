@@ -100,7 +100,7 @@ function symlink {
         ln -s "$target" "$link_name"
     fi
 }
-symlink "$HOME/.vim/personal" "$d/vim" "vim personal dir"
+symlink "$HOME/.vim/personal"       "$d/vim"       "vim personal dir"
 symlink "$HOME/.vim/personal-local" "$d/local/vim" "vim personal local dir"
 
 
