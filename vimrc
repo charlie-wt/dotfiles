@@ -20,6 +20,7 @@ Plug 'bronson/vim-visual-star-search'
 Plug 'derekwyatt/vim-protodef'
 Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
+Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 " ide
@@ -36,8 +37,6 @@ Plug 'tpope/vim-repeat'
 Plug 'wellle/targets.vim'
 " other
 Plug 'junegunn/goyo.vim'
-
-Plug 'ojroques/vim-oscyank', {'branch': 'main'}
 
 call plug#end()
 
@@ -56,7 +55,6 @@ set nostartofline
 set wildmenu wildmode=list:longest,full
 set autoread
 set nofoldenable
-set nostartofline
 set binary noendofline
 set encoding=utf-8 nobomb
 set noerrorbells
@@ -87,7 +85,7 @@ if exists("&undodir")
     set undodir=~/.local/state/vim/undo
 endif
 set viminfofile=~/.local/state/vim/viminfo
-set switchbuf+=usetab,newtab  " testing out, mostly for quickfix window (lsc 'FindReferences')
+" set switchbuf+=usetab,newtab  " testing out, mostly for quickfix window (lsc 'FindReferences')
 set nrformats-=octal
 set sidescrolloff=5
 let &t_ut=''
@@ -119,6 +117,8 @@ nnoremap <silent> { :<c-u>execute 'keepjumps norm! ' . v:count1 . '{'<cr>
 nnoremap <silent> <leader>j :silent update<cr>
 nnoremap <silent> <leader>k :silent q<cr>
 nnoremap <silent> <leader>l :silent x<cr>
+nnoremap <silent> <leader>K :silent qa<cr>
+nnoremap <silent> <leader>L :silent xa<cr>
 " easy way to update the diff if in vimdiff mode
 nnoremap du :diffupdate<cr>
 " set current directory (all windows) to directory of current file
@@ -285,11 +285,45 @@ function! Tabline()
 endfunction
 set tabline=%!Tabline()
 
-function! ToPrevFile()
-    " TODO #finish: do this enough times to change file, not just once
-    " prob do via :jumplist -> parse -> look for change of filename (though not sure
-    " this is robust?)
+" TODO #cleanup: separate (into a plugin?)
+function! ToPrevLoc()
+    " TODO #cleanup: want(ed) to move back to the previous file in the jumplist that
+    " isn't the current one. prob best to do by parsing the jumplist directly; however,
+    " :jumps has a 'file/text' column, which has the either text of the line to jump to
+    " (if it's in the current file), or the name of the file to jump to. could just look
+    " for when that column has a valid filename, but you could have a case (unlikely)
+    " where the text of the line to jump to in the current file also happens to be a
+    " valid filename. you do get row & column numbers too so you could check that if the
+    " file/text is a valid filename, it's not also the contents of that row/col in the
+    " current file, but that only makes a clash less likely.
+    "
+    " can't use `:e #` since consecutive uses of `ToPrevLoc()` would give incorrect
+    " results.
+    "
+    " getjumplist() from patch 8.0.1497 might make this easier.
+    "
+    " actually, sometimes you *do* want to move back to the previous jump in the same
+    " file: eg. `FindReferences -> go to a result in current file -> Shunt*`. you'd
+    " want a window at the location of the reference to be shunted, but for the revealed
+    " 'underneath' position to be where you ran `FindReferences` from, which is in the
+    " same file.
+
+    " TODO #enhancement: use winline() to keep the viewport the same too
     :execute "normal! \<c-o>"
+endfunction
+function! ToPrevFile()
+    let l:current_file = expand('%:p')
+    let l:new_file = l:current_file
+
+    " keep jumping back until the current filename changes
+    while l:new_file == l:current_file
+        :call ToPrevLoc()
+        let l:new_file = expand('%:p')
+        if match(execute(':jumps', 'silent!'), 'file/text\n>') != -1
+            " reached the end of the jumplist
+            break
+        end
+    endwhile
 endfunction
 
 function! ShuntRight()
@@ -297,7 +331,7 @@ function! ShuntRight()
     if &splitright
         :execute "normal! \<c-w>h"
     endif
-    :call ToPrevFile()
+    :call ToPrevLoc()
 endfunction
 
 function! ShuntLeft()
@@ -305,7 +339,7 @@ function! ShuntLeft()
     if !&splitright
         :execute "normal! \<c-w>l"
     endif
-    :call ToPrevFile()
+    :call ToPrevLoc()
 endfunction
 
 function! ShuntDown()
@@ -313,7 +347,7 @@ function! ShuntDown()
     if &splitbelow
         :execute "normal! \<c-w>k"
     endif
-    :call ToPrevFile()
+    :call ToPrevLoc()
 endfunction
 
 function! ShuntUp()
@@ -321,14 +355,23 @@ function! ShuntUp()
     if !&splitbelow
         :execute "normal! \<c-w>j"
     endif
-    :call ToPrevFile()
+    :call ToPrevLoc()
 endfunction
 
 function! ShuntTab()
+    let l:p = getpos('.')
     :tabe %
+    :call setpos('.', [0, l:p[1], l:p[2], l:p[3]])
     :execute "normal! gT"
-    :call ToPrevFile()
+    :call ToPrevLoc()
 endfunction
+
+nnoremap <leader><c-o> :call ToPrevFile()<cr>
+nnoremap <leader><c-h> :call ShuntLeft()<cr>
+nnoremap <leader><c-l> :call ShuntRight()<cr>
+nnoremap <leader><c-j> :call ShuntDown()<cr>
+nnoremap <leader><c-k> :call ShuntUp()<cr>
+nnoremap <leader><c-t> :call ShuntTab()<cr>
 
 " == Disabled commands
 " K -> run a program to look up keyword under the cursor
