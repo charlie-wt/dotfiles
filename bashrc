@@ -35,8 +35,8 @@ alias tma="tmux attach -t"
 alias fd='fdfind'
 # rg in c(++) code only
 alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
-# quick name for ranger (and when it exits, bash gets put into what ranger's directory was)
-alias ra='ranger --choosedir=$data_home/ranger/current_dir; cd "$(cat $data_home/ranger/current_dir)"'
+# quick name for ranger (and when it exits, bash gets put into wherever ranger was)
+alias ra='. ranger'
 alias rf=rifle
 # python 2 :'(((
 # alias python='/usr/bin/env python3'
@@ -96,16 +96,14 @@ extract () {
 # quick way to do simple compilations & run, for small bits of (normally) test code.
 mkrn () {
     case ${1##*.} in
-       C)   g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
-       c)   gcc -Wall -g            -o ${1%.*} "$1" && ./${1%.*} ;;
-       cc)  g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
-       cpp) g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
-       cxx) g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
-       hs)  ghc --make ${1%.*} && ./${1%.*}        ;;
-       js)  node "$1"                              ;;
-       py)  python3 "$1"                           ;;
-       rs)  rustc "$1" && ./${1%.*}                ;;
-       *)   [[ -f "Cargo.toml" ]] && cargo run || echo "unknown filetype '${1##*.}'." ;;
+       c)             gcc -Wall -g            -o ${1%.*} "$1" && ./${1%.*} ;;
+       C|cc|cpp|cxx)  g++ -Wall -g -std=c++17 -o ${1%.*} "$1" && ./${1%.*} ;;
+       hs)            ghc --make ${1%.*} && ./${1%.*}                      ;;
+       js)            node "$1"                                            ;;
+       py)            python3 "$1"                                         ;;
+       rs)            rustc "$1" && ./${1%.*}                              ;;
+       *)
+           [[ -f "Cargo.toml" ]] && cargo run || echo "unknown filetype '${1##*.}'." ;;
     esac
 }
 

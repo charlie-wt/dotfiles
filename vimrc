@@ -20,7 +20,7 @@ Plug 'bronson/vim-visual-star-search'
 Plug 'derekwyatt/vim-protodef'
 Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
-Plug 'ojroques/vim-oscyank', {'branch': 'main'}
+Plug 'ojroques/vim-oscyank', { 'branch': 'main' }
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 " ide
@@ -177,6 +177,7 @@ endfunction
 function! Todo(tag)
     exec "normal OTODO #".a:tag
     exec "normal \<Plug>CommentaryLine"
+    exec "normal $F#El"
 endfunction
 
 " toggle the location list
@@ -306,9 +307,14 @@ function! ToPrevLoc()
     " file: eg. `FindReferences -> go to a result in current file -> Shunt*`. you'd
     " want a window at the location of the reference to be shunted, but for the revealed
     " 'underneath' position to be where you ran `FindReferences` from, which is in the
-    " same file.
+    " same file. maybe the best heuristic is to do ^o until *something* changes, since
+    " the most annoying case is where there's a kind of 'ghost' jump at the top of the
+    " list, so doing ^o does nothing.
 
-    " TODO #enhancement: use winline() to keep the viewport the same too
+    " TODO #enhancement: use winsaveview()/winloadview() to keep the viewport the same?
+    "   (not sure if we can do that simply -- the state we want will be from the place
+    "   we've already moved from once we call Shunt. could continuously record window
+    "   states, but bleh)
     :execute "normal! \<c-o>"
 endfunction
 function! ToPrevFile()
@@ -394,6 +400,10 @@ augroup my_autocmds
     au vimenter,bufenter,winenter *.p8 setlocal filetype=lua
     au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
+
+    " TODO #finish
+    " au filechangedshell letlocal g:winpos=winsaveview()
+    " au filechangedshellpost winloadview(g:winpos)
 
     " temporarily clear search highlighting when in insert mode.
     au insertenter * :set nohlsearch
