@@ -94,6 +94,7 @@ let &t_ut=''
 " === Custom commands ==================================================================
 nnoremap <space> <nop>
 let mapleader = " "
+let maplocalleader = "  "
 
 " == Basic maps & commands
 " better [[ / ]] behaviour -- make them work when using k&r-style curly brackets.
