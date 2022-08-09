@@ -120,6 +120,7 @@ nnoremap <silent> <leader>k :silent q<cr>
 nnoremap <silent> <leader>l :silent x<cr>
 nnoremap <silent> <leader>K :silent qa<cr>
 nnoremap <silent> <leader>L :silent xa<cr>
+nnoremap <silent> <leader>J :silent tabc<cr>
 " easy way to update the diff if in vimdiff mode
 nnoremap du :diffupdate<cr>
 " set current directory (all windows) to directory of current file
@@ -313,9 +314,13 @@ function! ToPrevLoc()
     " list, so doing ^o does nothing.
 
     " TODO #enhancement: use winsaveview()/winloadview() to keep the viewport the same?
-    "   (not sure if we can do that simply -- the state we want will be from the place
-    "   we've already moved from once we call Shunt. could continuously record window
-    "   states, but bleh)
+    "
+    " not sure if we can do that simply -- the state we want will be from the place
+    " we've already moved from once we call Shunt. could continuously record window
+    " states, but bleh
+    "
+    " maybe should just record continuously, since it'd be nice to store viewport info
+    " with the jumplist in general, to improve ^o & ^i.
     :execute "normal! \<c-o>"
 endfunction
 function! ToPrevFile()
@@ -401,6 +406,7 @@ augroup my_autocmds
     au vimenter,bufenter,winenter *.p8 setlocal filetype=lua
     au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
+    au vimenter,bufenter,winenter *.gdb setlocal filetype=gdb
 
     " TODO #finish
     " au filechangedshell letlocal g:winpos=winsaveview()
