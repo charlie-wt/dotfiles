@@ -137,8 +137,8 @@ export PATH=$PATH:~/.bin
 # prompt
 export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
 # other stuff
-export HISTSIZE=100000
-export HISTFILESIZE=$HISTSIZE
+# export HISTSIZE=100000
+# export HISTFILESIZE=$HISTSIZE
 
 # === Other -- End =====================================================================
 # when terminal is frozen by ^s, allow unfreezing with any key.

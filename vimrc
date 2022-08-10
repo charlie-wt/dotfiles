@@ -177,10 +177,27 @@ endfunction
 " insert TODO comments above the current line, with tags defined by a:tag. NOTE: relies
 " on the commentary plugin
 function! Todo(tag)
-    exec "normal OTODO #".a:tag
-    exec "normal \<Plug>CommentaryLine"
+    exec "normal O"
+    exec "normal ccTODO #".a:tag
+    Commentary
     exec "normal $F#El"
 endfunction
+
+nnoremap <leader>tbg :call Todo("bug")<cr>
+nnoremap <leader>tcl :call Todo("cleanup")<cr>
+nnoremap <leader>tcr :call Todo("correctness")<cr>
+nnoremap <leader>tdc :call Todo("documentation")<cr>
+nnoremap <leader>ten :call Todo("enhancement")<cr>
+nnoremap <leader>tft :call Todo("feature")<cr>
+nnoremap <leader>tfn :call Todo("finish")<cr>
+nnoremap <leader>trf :call Todo("refactor")<cr>
+nnoremap <leader>trb :call Todo("robustness")<cr>
+nnoremap <leader>trm :call Todo("remove")<cr>
+nnoremap <leader>tsp :call Todo("speed")<cr>
+nnoremap <leader>ttm :call Todo("temp")<cr>
+nnoremap <leader>tts :call Todo("test")<cr>
+nnoremap <leader>tvf :call Todo("verify")<cr>
+
 
 " toggle the location list
 function! ToggleLocList()
@@ -339,43 +356,47 @@ function! ToPrevFile()
 endfunction
 
 function! ShuntRight()
-    :vs
+    vsplit
     if &splitright
-        :execute "normal! \<c-w>h"
+        execute "normal! \<c-w>h"
     endif
-    :call ToPrevLoc()
+    call ToPrevLoc()
 endfunction
 
 function! ShuntLeft()
-    :vs
+    vsplit
     if !&splitright
-        :execute "normal! \<c-w>l"
+        execute "normal! \<c-w>l"
     endif
-    :call ToPrevLoc()
+    call ToPrevLoc()
 endfunction
 
 function! ShuntDown()
-    :sp
+    split
     if &splitbelow
-        :execute "normal! \<c-w>k"
+        execute "normal! \<c-w>k"
     endif
-    :call ToPrevLoc()
+    call ToPrevLoc()
 endfunction
 
 function! ShuntUp()
-    :sp
+    split
     if !&splitbelow
-        :execute "normal! \<c-w>j"
+        execute "normal! \<c-w>j"
     endif
-    :call ToPrevLoc()
+    call ToPrevLoc()
 endfunction
 
 function! ShuntTab()
     let l:p = getpos('.')
-    :tabe %
-    :call setpos('.', [0, l:p[1], l:p[2], l:p[3]])
-    :execute "normal! gT"
-    :call ToPrevLoc()
+    let l:curr_win = win_getid()
+
+    tabedit %
+
+    call setpos('.', [0, l:p[1], l:p[2], l:p[3]])
+    call win_gotoid(l:curr_win)
+
+    call ToPrevLoc()
 endfunction
 
 nnoremap <leader><c-o> :call ToPrevFile()<cr>
@@ -419,21 +440,6 @@ augroup my_autocmds
     " highlight trailing whitespace
     " (note: some syntax plugins try to do this too, so remember to disable it for them)
     au vimenter,bufenter,winenter * :match ErrorMsg '\s\+$'
-
-    " quickly add TODO comments (see Todo function above)
-    au vimenter * nnoremap <leader>tbg :call Todo("bug")<cr>
-    au vimenter * nnoremap <leader>tcl :call Todo("cleanup")<cr>
-    au vimenter * nnoremap <leader>tcr :call Todo("correctness")<cr>
-    au vimenter * nnoremap <leader>tdc :call Todo("documentation")<cr>
-    au vimenter * nnoremap <leader>ten :call Todo("enhancement")<cr>
-    au vimenter * nnoremap <leader>tft :call Todo("feature")<cr>
-    au vimenter * nnoremap <leader>tfn :call Todo("finish")<cr>
-    au vimenter * nnoremap <leader>trf :call Todo("refactor")<cr>
-    au vimenter * nnoremap <leader>trm :call Todo("remove")<cr>
-    au vimenter * nnoremap <leader>tsp :call Todo("speed")<cr>
-    au vimenter * nnoremap <leader>ttm :call Todo("temp")<cr>
-    au vimenter * nnoremap <leader>tts :call Todo("test")<cr>
-    au vimenter * nnoremap <leader>tvf :call Todo("verify")<cr>
 
     " filetype-specific options
     " TODO #temp: only set in graphcore.vim

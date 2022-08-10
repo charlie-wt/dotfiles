@@ -5,3 +5,6 @@ ulimit -c unlimited
 /usr/bin/setxkbmap -option "caps:swapescape"
 
 echo $PATH="$PATH:~/.local/bin"
+
+export HISTSIZE=100000
+export HISTFILESIZE=$HISTSIZE
