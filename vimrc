@@ -429,9 +429,10 @@ augroup my_autocmds
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
     au vimenter,bufenter,winenter *.gdb setlocal filetype=gdb
 
-    " TODO #finish
-    " au filechangedshell letlocal g:winpos=winsaveview()
-    " au filechangedshellpost winloadview(g:winpos)
+    " TODO #finish: keep the viewport when reloading a file
+    " https://stackoverflow.com/a/4255960
+    au filechangedshell     * let b:wpos = winsaveview()
+    au filechangedshellpost * if(exists('b:wpos')) | call winrestview(b:wpos) | endif
 
     " temporarily clear search highlighting when in insert mode.
     au insertenter * :set nohlsearch
