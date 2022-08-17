@@ -70,15 +70,15 @@ dotfile kitty.conf      "$config_home/kitty/kitty.conf"
 
 # === Symlinking other directories =====================================================
 function symlink {
-    local link_name="$1"
-    local target="$2"
+    local target="$1"
+    local link_name="$2"
     local name="$3"
 
     if [ -L "$link_name" ]; then
         existing_target=$(readlink "$link_name")
 
         if [ -d "$target" ] && [ "$existing_target" = "$target" ]; then
-            echo "$name already exists; skipping"
+            echo "$name already set correctly; skipping"
         elif [ -d "$target" ]; then
             if [ ! -d "$existing_target" ]; then
                 echo "replacing old $name that points to nothing"
@@ -100,8 +100,8 @@ function symlink {
         ln -s "$target" "$link_name"
     fi
 }
-symlink "$HOME/.vim/personal"       "$d/vim"       "vim personal dir"
-symlink "$HOME/.vim/personal-local" "$d/local/vim" "vim personal local dir"
+symlink "$d/vim"       "$HOME/.vim/personal"       "vim personal dir"
+symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
 
 
 # === Other bits =======================================================================

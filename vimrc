@@ -355,6 +355,7 @@ function! ToPrevFile()
     endwhile
 endfunction
 
+" TODO #finish: add an option, for whether to focus on the shunted or underlying window?
 function! ShuntRight()
     vsplit
     if &splitright
