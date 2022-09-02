@@ -40,7 +40,7 @@ function dotfile {
     fi
 
     # if `$link_name` exists, check if we should replace it with a new symlink
-    if [[ -e "$link_name" || -L "$link_name" ]]; then
+    if [ -e "$link_name" ]; then
         if [ "$(readlink $link_name)" = "$d/$dotfile_name" ]; then
             echo "dotfile $dotfile_name already set correctly; skipping."
             return 1
