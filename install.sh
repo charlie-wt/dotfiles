@@ -60,6 +60,7 @@ function dotfile {
 }
 
 dotfile bashrc
+dotfile gdbinit
 dotfile gitconfig       "$config_home/git/config"
 dotfile local/gitconfig "$config_home/git/local.gitconfig"
 dotfile local/gitignore "$config_home/git/ignore"
