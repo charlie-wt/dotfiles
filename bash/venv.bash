@@ -43,6 +43,8 @@ venv-on () {
 }
 
 venv-ls () {
+    [ ! -d "$VENV_HOME" ] && return
+
     local str=$(
         for d in $(ls "$VENV_HOME"); do
             [ -d "$VENV_HOME/$d" ] && [ -f "$VENV_HOME/$d/bin/activate" ] && echo $d;

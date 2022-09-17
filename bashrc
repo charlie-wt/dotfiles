@@ -47,6 +47,12 @@ alias fpu='flatpak update -y && flatpak uninstall --unused -y'
 # quickly list tagged todo comments as made by the corresponding vimrc functions
 alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
 
+# TODO #temp: need to explicitly tell sudo to keep $TERMINFO, to keep xterm-kitty;
+# without it, exiting vim won't clear the screen of it properly. doing `sudo visudo` and
+# adding `Defaults env_keep += "TERM TERMINFO"` works for `sudo vim`, but not `sudo -E
+# vim`.
+alias sv='sudo -E TERMINFO="$TERMINFO" vim'
+
 # === Functions ========================================================================
 mkcd () { mkdir -p "$@" && cd "$@"; }
 
