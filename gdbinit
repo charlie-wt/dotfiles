@@ -3,6 +3,12 @@ set print pretty on
 set pagination off
 set confirm off
 
+
+# don't step into the standard library
+skip -gfi /usr/include/c++/*/*/*
+skip -gfi /usr/include/c++/*/*
+skip -gfi /usr/include/c++/*
+
 # commands:
 #
 # watch foo

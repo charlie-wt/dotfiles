@@ -17,7 +17,6 @@ Plug 'vim-pandoc/vim-pandoc-syntax'
 " commands
 Plug 'arp242/jumpy.vim'
 Plug 'bronson/vim-visual-star-search'
-Plug 'derekwyatt/vim-protodef'
 Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'ojroques/vim-oscyank', { 'branch': 'main' }
@@ -80,11 +79,12 @@ silent! colo gruvbox
 " TODO #bug: gruvbox hard-coded
 hi Visual term=none cterm=none gui=none ctermbg=239 guibg=#3c3836
 " centralize backups, swapfiles & undo history
-set backupdir=~/.local/state/vim/backups directory=~/.local/state/vim/swaps
+set backupdir=$XDG_STATE_HOME/vim/backups directory=$XDG_STATE_HOME/vim/swaps
 if exists("&undodir")
-    set undodir=~/.local/state/vim/undo
+    set undofile
+    set undodir=$XDG_STATE_HOME/vim/undo
 endif
-set viminfofile=~/.local/state/vim/viminfo
+set viminfofile=$XDG_STATE_HOME/vim/viminfo
 " set switchbuf+=usetab,newtab  " testing out, mostly for quickfix window (lsc 'FindReferences')
 set nrformats-=octal
 set sidescrolloff=5
@@ -99,7 +99,7 @@ let maplocalleader = "  "
 " == Basic maps & commands
 " better [[ / ]] behaviour -- make them work when using k&r-style curly brackets.
 " TODO #finish: make these robust (eg. [[ when on a base-level {, either when outside a
-"               block)
+"               block). prob easiest to do via [m etc., with an `if` for 'class' case
 " nnoremap [[ 99[{
 " nnoremap ]] 99[{%][%
 " clear search highlighting & any messages in command line
@@ -338,6 +338,10 @@ function! ToPrevLoc()
     "
     " maybe should just record continuously, since it'd be nice to store viewport info
     " with the jumplist in general, to improve ^o & ^i.
+
+    " TODO #enhancement: this also gets rid of undo history.
+    "
+    " maybe the answer is just to make it persistent, with `set undofile undodir`
     :execute "normal! \<c-o>"
 endfunction
 function! ToPrevFile()
@@ -408,8 +412,6 @@ nnoremap <leader><c-k> :call ShuntUp()<cr>
 nnoremap <leader><c-t> :call ShuntTab()<cr>
 
 " == Disabled commands
-" K -> run a program to look up keyword under the cursor
-" nnoremap K <nop>
 " Ctrl+Z -> background the vim process
 nnoremap <c-z> <nop>
 " Ctrl+\ -> evaluate expression, replace the whole command line with the result
@@ -430,7 +432,7 @@ augroup my_autocmds
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
     au vimenter,bufenter,winenter *.gdb setlocal filetype=gdb
 
-    " TODO #finish: keep the viewport when reloading a file
+    " TODO #test: keep the viewport when reloading a file
     " https://stackoverflow.com/a/4255960
     au filechangedshell     * let b:wpos = winsaveview()
     au filechangedshellpost * if(exists('b:wpos')) | call winrestview(b:wpos) | endif
