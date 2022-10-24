@@ -114,6 +114,13 @@ verify-is-a-known-venv () {
 get-unique-name-match () {
     verify-name-supplied "$1" || return 1
 
+    # if they've given an exact match, go with it -- otherwise, if you've got a venv
+    # with a name that's a subset of another venv's name, there's no way to refer to it.
+    if verify-is-a-known-venv "$1" 2>/dev/null; then
+        echo "$1"
+        return
+    fi
+
     # check for valid env to switch to
     local match=$(venv-ls | grep "$1")
 
