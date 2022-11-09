@@ -1,4 +1,4 @@
-base_dir="$data_home/nvm"
+base_dir="$(data-home)/nvm"
 [ ! -e "$base_dir" ] && return 1
 
 export NVM_DIR=$base_dir

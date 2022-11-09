@@ -1,13 +1,22 @@
-set history save on
-set print pretty on
-set pagination off
 set confirm off
+set history save on
+set pagination off
+set print pretty on
 
 
 # don't step into the standard library
 skip -gfi /usr/include/c++/*/*/*
 skip -gfi /usr/include/c++/*/*
 skip -gfi /usr/include/c++/*
+
+# source local config
+python
+import gdb
+import os
+path = os.getenv('DOTFILES') + '/local/gdbinit'
+if os.path.isfile(path):
+    gdb.execute(f'source {path}')
+end
 
 # commands:
 #
@@ -24,7 +33,10 @@ skip -gfi /usr/include/c++/*
 #
 # dprintf myfun,"x is %i",x
 #
+# catch throw
 # catch catch
+#
+# call func_returning_void  # could be a printing function
 #
 # gdbserver host:port /path/to/a.out
 # > then connect from gdb with target remote host:port

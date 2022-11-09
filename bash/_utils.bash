@@ -55,3 +55,28 @@ function debugger {
     done
     echo
 }
+
+# echo xdg vars
+function cache-home {
+    is-defined "$XDG_CACHE_HOME" && [ -d "$XDG_CACHE_HOME" ] \
+        && echo "$XDG_CACHE_HOME" \
+        || echo "$HOME/.cache"
+}
+
+function config-home {
+    is-defined "$XDG_CONFIG_HOME" && [ -d "$XDG_CONFIG_HOME" ] \
+        && echo "$XDG_CONFIG_HOME" \
+        || echo "$HOME/.config"
+}
+
+function data-home {
+    is-defined "$XDG_DATA_HOME" && [ -d "$XDG_DATA_HOME" ] \
+        && echo "$XDG_DATA_HOME" \
+        || echo "$HOME/.local/share"
+}
+
+function state-home {
+    is-defined "$XDG_STATE_HOME" && [ -d "$XDG_STATE_HOME" ] \
+        && echo "$XDG_STATE_HOME" \
+        || echo "$HOME/.state"
+}

@@ -5,15 +5,18 @@ export DOTFILES=$(dirname "$(readlink -f ~/.bashrc)")
 # source automatically generated bashrc if there is one
 [ -f $DOTFILES/bashrc.auto ] && source $DOTFILES/bashrc.auto
 
+# TODO #cleanup: gets sourced twice
+source $DOTFILES/bash/_utils.bash
+
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
-cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
-config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
-data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
-state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
+cache_home="$(cache-home)"
+config_home="$(config-home)"
+data_home="$(data-home)"
+state_home="$(state-home)"
 
 # === Aliases ==========================================================================
 alias l='ls -GF'
@@ -28,6 +31,7 @@ alias g=git
 alias gs='git status'
 alias gd='git diff'
 alias gdc='git dc'
+alias gdb='gdb -q'
 
 alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 alias tma="tmux attach -t"
@@ -56,7 +60,7 @@ alias sv='sudo -E TERMINFO="$TERMINFO" vim'
 # === Functions ========================================================================
 mkcd () { mkdir -p "$@" && cd "$@"; }
 
-cdc () { cd "$config_home/$1"; }
+cdc () { cd "$(config-home)/$1"; }
 
 # go to dotfiles dir, or install them
 dots () {

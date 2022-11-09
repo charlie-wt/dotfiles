@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 
-source "bash/_utils.bash"
-
-
 # === Basic vars =======================================================================
 # directory of this script
 d=$(dirname "$(readlink -e "$0")")
+
+source "$d/bash/_utils.bash"
 
 # -y or -n options to always pick yes/no at prompts
 default_choice=""
@@ -15,11 +14,6 @@ if [ "$1" = "-y" ]; then
 elif [ "$1" = "-n" ]; then
     default_choice=false
 fi
-
-cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
-config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
-data_home="${XDG_DATA_HOME:-$HOME/.local/share}"
-state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 
 # === Symlinking dotfiles ==============================================================
@@ -61,12 +55,12 @@ function dotfile {
 
 dotfile bashrc
 dotfile gdbinit
-dotfile gitconfig       "$config_home/git/config"
-dotfile local/gitconfig "$config_home/git/local.gitconfig"
-dotfile local/gitignore "$config_home/git/ignore"
-dotfile tmux.conf       "$config_home/tmux/tmux.conf"
+dotfile gitconfig       "$(config-home)/git/config"
+dotfile local/gitconfig "$(config-home)/git/local.gitconfig"
+dotfile local/gitignore "$(config-home)/git/ignore"
+dotfile tmux.conf       "$(config-home)/tmux/tmux.conf"
 dotfile vimrc
-dotfile kitty.conf      "$config_home/kitty/kitty.conf"
+dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
 
 
 # === Symlinking other directories =====================================================
@@ -107,9 +101,9 @@ symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
 
 # === Other bits =======================================================================
 # make directories for vim swapfiles & backups
-mkdir -p "$state_home/vim/backups"
-mkdir -p "$state_home/vim/swaps"
-mkdir -p "$state_home/vim/undo"
+mkdir -p "$(state-home)/vim/backups"
+mkdir -p "$(state-home)/vim/swaps"
+mkdir -p "$(state-home)/vim/undo"
 
 # basic setup for vim plugin manager
 vim_plug_loc="$HOME/.vim/autoload/plug.vim"
@@ -121,7 +115,7 @@ else
 fi
 
 # setup tmux plugin manager
-tpm_dir="$config_home/tmux/plugins/tpm"
+tpm_dir="$(config-home)/tmux/plugins/tpm"
 if [ -e "$tpm_dir" ]; then
     echo "tpm already exists in $tpm_dir; skipping"
 else
@@ -129,8 +123,8 @@ else
 fi
 
 # basic rust setup
-rustup_dir="$data_home/rustup"
-cargo_dir="$data_home/cargo"
+rustup_dir="$(data-home)/rustup"
+cargo_dir="$(data-home)/cargo"
 if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
     echo "rustup & cargo already exist in $rustup_dir & $cargo_dir; skipping"
 elif [ "$default_choice" != false ]; then
@@ -145,14 +139,14 @@ fi
 # reminders for manual bits i've not automated yet
 echo
 echo DONE. remember to do these too:
-echo \* run :PluginInstall in vim to install plugins
-echo \* run \<prefix\>+I in tmux to install plugins
-echo \* do any machine-specific setup in local/\{gitconfig,bash/*,vim/*\}
+echo "* run :PluginInstall in vim to install plugins"
+echo "* run <prefix>+I in tmux to install plugins"
+echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
 
 if [[ ! $(tmux -V) =~ "tmux 3" ]]; then
     echo
-    echo WARN: your tmux is too old to understand \$XDG_CONFIG_HOME.
-    echo       best thing is to make bash/local/tmux.bash, with this line:
+    echo "WARN: your tmux is too old to understand \$XDG_CONFIG_HOME."
+    echo "      best thing is to make bash/local/tmux.bash, with this line:"
     echo
-    echo alias tmux=\"tmux -f \${XDG_CONFIG_HOME:-\$HOME/.config}/tmux/tmux.conf\"
+    echo 'alias tmux="tmux -f ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf"'
 fi

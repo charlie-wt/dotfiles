@@ -452,12 +452,15 @@ augroup my_autocmds
     au filetype markdown,pandoc setlocal ts=4 sts=4 sw=4 et spellcapcheck=
     au filetype qmake setlocal commentstring=#%s
     au filetype typescript setlocal sw=2 sts=2 et
+    au filetype log setlocal cursorline
 
     " filetype-specific maps
     " fswitch for switching between header/source files
     au filetype cpp,glsl noremap <silent> <leader>of :FSHere<cr>
     au filetype cpp,glsl noremap <silent> <leader>oh :FSSplitLeft<cr>
     au filetype cpp,glsl noremap <silent> <leader>ol :FSSplitRight<cr>
+    au filetype cpp,glsl noremap <silent> <leader>ok :FSSplitAbove<cr>
+    au filetype cpp,glsl noremap <silent> <leader>oj :FSSplitBelow<cr>
     au filetype cpp,glsl noremap <silent> <leader>ot :FSTab<cr>
     " 'compile' certain files (markdown, latex) TODO use :make
     au filetype markdown,pandoc noremap <f5> :!mdpdf "%" & disown<cr><cr>
