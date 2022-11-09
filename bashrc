@@ -13,11 +13,6 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
-cache_home="$(cache-home)"
-config_home="$(config-home)"
-data_home="$(data-home)"
-state_home="$(state-home)"
-
 # === Aliases ==========================================================================
 alias l='ls -GF'
 alias la='ls -AGF'
