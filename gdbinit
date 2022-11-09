@@ -11,8 +11,7 @@ skip -gfi /usr/include/c++/*
 
 # source local config
 python
-import gdb
-import os
+import gdb, os
 path = os.getenv('DOTFILES') + '/local/gdbinit'
 if os.path.isfile(path):
     gdb.execute(f'source {path}')
