@@ -2,6 +2,13 @@
 #
 # NOTE: this should be sourced before anything else in bash/, or local/bash/
 
+
+# include-guard, since this'll be sourced in lots of places
+[ -n "${__utils_included+x}" ] && return 1
+__utils_included=1
+
+
+
 # is the environment variable `$1` defined?
 function is-defined {
     [ -z ${1+x} ] && return 1 || return 0
@@ -42,6 +49,36 @@ function yesno {
             [[ "$input" =~ ^[yY]$ ]] && return 0 || return 1
         fi
     done
+}
+
+# confirm whether to do an action, with a yesno prompt, but also responding to a
+# $default_choice variable. if $default_choice is `true` or `false`, the yesno prompt is
+# not presented.
+#
+# $1: a message to print if $default_choice is `false`.
+# $2: yesno prompt
+# $3: yesno default (ie. [Yn] vs. [yN] vs. [yn])
+function confirm-action {
+    local default_false_message="$1"
+    local prompt="$2"
+    local yesno_default="$3"
+
+    local default="$default_choice"
+    if [[ "$default_choice" != true && \
+          "$default_choice" != false && \
+          "$default_choice" != "" ]]; then
+        >&2 echo "internal error: unknown \$default_choice '$default_choice'"
+        default=""
+    fi
+
+    if [ "$default" = false ]; then
+        >&2 echo "$default_false_message"
+        return 1
+    elif [ "$default" = "" ] && ! yesno "$prompt" "$yesno_default"; then
+        return 1
+    fi
+
+    return 0
 }
 
 # insert a call to this into a script, to 'break' there and be able to type `echo`

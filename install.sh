@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
 
-# === Basic vars =======================================================================
-# directory of this script
-d=$(dirname "$(readlink -e "$0")")
-
+# === Basic setup ======================================================================
+d=$(dirname "$(readlink -e "$0")")  # directory of this script
 source "$d/bash/_utils.bash"
 
 # -y or -n options to always pick yes/no at prompts
@@ -15,54 +13,90 @@ elif [ "$1" = "-n" ]; then
     default_choice=false
 fi
 
+# general function to symlink a file, presenting prompts under various scenarios.
+# responds to $default_choice.
+#
+# fails with an error message if the file to link to doesn't exist.
+#
+# will make any necessary directories that the symlink will sit in.
+#
+# $1: absolute(!) path of file to link to -- you'll probably want to prepend $d.
+# $2: absolute path to symlink to be made.
+# $3: human-friendly name of the thing being symlinked, for messages.
+#
+# example: `symlink "$d/vimrc" "$HOME/.vimrc" "my vimrc"
+function symlink {
+    local target="$1"
+    local link_name="$2"
+    local name="$3"
+
+    if [ ! -e "$target" ]; then
+        >&2 echo "$name: can't find target $target to symlink"
+        return 1
+    fi
+
+    if [ -L "$link_name" ]; then
+        existing_target=$(readlink -f "$link_name")
+
+        if [ -e "$target" ] && [ "$existing_target" = "$target" ]; then
+            echo "$name already set correctly; skipping"
+            return 0
+        fi
+
+        if [ -e "$target" ]; then
+            if [ -e "$existing_target" ]; then
+                if confirm-action "WARN: '$link_name' is already a symlink, so did not make a link." \
+                                  "$name: '$link_name' already points to '$existing_target'; replace it?" \
+                                  y; then
+                    echo "replacing old $name"
+                    rm "$link_name"
+                else
+                    return 0
+                fi
+            else
+                if confirm-action "WARN: '$link_name' exists as a dead link; did not make a new link." \
+                                  "$name: '$link_name' exists as a dead link -- replace it?" \
+                                  y; then
+                    echo "replacing dead link for $name"
+                    rm "$link_name"
+                else
+                    return 0
+                fi
+            fi
+        fi
+    elif [ -e "$link_name" ]; then
+        if confirm-action "WARN: '$link_name' already exists, so did not make a link." \
+                          "$name: a file at '$link_name' already exists; replace it?" \
+                          n; then
+            echo "replacing old $name"
+            rm "$link_name"
+        else
+            return 0
+        fi
+    fi
+
+    # make a new symlink
+    mkdir -p $(dirname "$link_name")
+    ln -s "$target" "$link_name"
+}
+
 
 # === Symlinking dotfiles ==============================================================
-# symlink a dotfile. if there's a conflict, present a prompt (or do a default behaviour)
+# wrapper around `symlink`, specifically for dotfiles.
 #
-# note: default choice set by `$default_choice` variable (`true` or `false`).
-# $1: name of the file to symlink (relative path)
+# $1: name of the file to link to (relative path, from $d)
 # $2: name of symlink (absolute path) -- optional, defaults to ~/.$1
-# returns: 0 if symlink was made for dotfile; else 1
 function dotfile {
     # params
     local dotfile_name="$1"
     local link_name="${2:-$HOME/.$dotfile_name}"
 
-    if [ ! -f $d/$dotfile_name ]; then
-        >&2 echo "can't find dotfile $dotfile_name to symlink"
+    if ! symlink "$d/$dotfile_name" "$link_name" "dotfile $dotfile_name"; then
         return 1
     fi
-
-    # if `$link_name` exists, check if we should replace it with a new symlink
-    if [ -e "$link_name" ]; then
-        if [ "$(readlink $link_name)" = "$d/$dotfile_name" ]; then
-            echo "dotfile $dotfile_name already set correctly; skipping."
-            return 1
-        elif [ "$default_choice" = false ]; then
-            echo "WARN: $link_name already exists, so did not make a link."
-            return 1
-        elif [ "$default_choice" = "" ] &&
-             ! yesno "$link_name already exists -- replace it?" y; then
-            return 1
-        fi
-        rm "$link_name"
-    elif [ -L "$link_name" ]; then
-        # exists as a dead symlink
-        if [ "$default_choice" = false ]; then
-            echo "WARN: $link_name exists as a dead link; did not make a new link."
-            return 1
-        elif [ "$default_choice" = "" ] &&
-             ! yesno "$link_name exists as a dead link -- replace it?" y; then
-            return 1
-        fi
-        rm "$link_name"
-    fi
-
-    # make the symlink, including any needed dirs
-    mkdir -p $(dirname "$link_name")
-    ln -s "$d/$dotfile_name" "$link_name"
 }
 
+echo symlinking dotfiles...
 dotfile bashrc
 dotfile gdbinit
 dotfile gitconfig       "$(config-home)/git/config"
@@ -71,45 +105,43 @@ dotfile local/gitignore "$(config-home)/git/ignore"
 dotfile tmux.conf       "$(config-home)/tmux/tmux.conf"
 dotfile vimrc
 dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
+echo
 
 
 # === Symlinking other directories =====================================================
-function symlink {
-    local target="$1"
-    local link_name="$2"
-    local name="$3"
+echo symlinking other files...
+[ -e "$d/vim" ]       && symlink "$d/vim"       "$HOME/.vim/personal"       "vim personal dir"
+[ -e "$d/local/vim" ] && symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
+echo
 
-    if [ -L "$link_name" ]; then
-        existing_target=$(readlink "$link_name")
 
-        if [ -d "$target" ] && [ "$existing_target" = "$target" ]; then
-            echo "$name already set correctly; skipping"
-        elif [ -d "$target" ]; then
-            if [ ! -d "$existing_target" ]; then
-                echo "replacing old $name that points to nothing"
-                rm "$link_name" && ln -s "$target" "$link_name"
-            elif [ "$default_choice" = "false" ]; then
-                echo "WARN: $link_name already exists, so did not make a link."
-                return 1
-            elif [ "$default_choice" = "true" ] ||
-                 yesno "$name at '$link_name' already points to '$existing_target'; replace it?" y; then
-                echo "replacing old $name"
-                rm "$link_name" && ln -s "$target" "$link_name"
-            fi
-        elif [ "$existing_target" = "$target" ]; then
-            echo "deleting old $name that points to nothing"
-            rm "$link_name"
-        fi
-    elif [ -d "$target" ]; then
-        # might fail if $link_name exists but isn't a symlink, but eh
-        ln -s "$target" "$link_name"
+# === Install scripts ==================================================================
+# general function
+install_location="$HOME/.local/bin"
+script_root="$d"
+function install-script {
+    # params
+    local script_name="$1"
+
+    if ! symlink "$script_root/$script_name" "$install_location/$script_name" "$script_name script"; then
+        >&2 echo "(looking in $script_root for scripts; have you set \$script_root correctly?)"
+        return 1
     fi
 }
-symlink "$d/vim"       "$HOME/.vim/personal"       "vim personal dir"
-symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
+
+echo symlinking scripts...
+
+# install local scripts, if-present
+if [ -x "$d/local/install-scripts" ]; then
+    script_root="$d/local/scripts"
+    . "$d/local/install-scripts"
+fi
+echo
 
 
 # === Other bits =======================================================================
+echo doing other misc stuff...
+
 # make directories for vim swapfiles & backups
 mkdir -p "$(state-home)/vim/backups"
 mkdir -p "$(state-home)/vim/swaps"
