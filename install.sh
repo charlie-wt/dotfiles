@@ -29,7 +29,7 @@ function dotfile {
     local link_name="${2:-$HOME/.$dotfile_name}"
 
     if [ ! -f $d/$dotfile_name ]; then
-        echo "can't find dotfile $dotfile_name to symlink"
+        >&2 echo "can't find dotfile $dotfile_name to symlink"
         return 1
     fi
 
@@ -43,6 +43,16 @@ function dotfile {
             return 1
         elif [ "$default_choice" = "" ] &&
              ! yesno "$link_name already exists -- replace it?" y; then
+            return 1
+        fi
+        rm "$link_name"
+    elif [ -L "$link_name" ]; then
+        # exists as a dead symlink
+        if [ "$default_choice" = false ]; then
+            echo "WARN: $link_name exists as a dead link; did not make a new link."
+            return 1
+        elif [ "$default_choice" = "" ] &&
+             ! yesno "$link_name exists as a dead link -- replace it?" y; then
             return 1
         fi
         rm "$link_name"
