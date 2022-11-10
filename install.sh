@@ -108,13 +108,6 @@ dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
 echo
 
 
-# === Symlinking other directories =====================================================
-echo symlinking other files...
-[ -e "$d/vim" ]       && symlink "$d/vim"       "$HOME/.vim/personal"       "vim personal dir"
-[ -e "$d/local/vim" ] && symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
-echo
-
-
 # === Install scripts ==================================================================
 # general function
 install_location="$HOME/.local/bin"
@@ -136,6 +129,13 @@ if [ -x "$d/local/install-scripts" ]; then
     script_root="$d/local/scripts"
     . "$d/local/install-scripts"
 fi
+echo
+
+
+# === Symlinking other directories =====================================================
+echo symlinking other files...
+[ -e "$d/vim" ]       && symlink "$d/vim"       "$HOME/.vim/personal"       "vim personal dir"
+[ -e "$d/local/vim" ] && symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
 echo
 
 
