@@ -508,7 +508,7 @@ let g:lsc_server_commands = {
 \    'suppress_stderr': v:true,
 \  },
 \  'rust': {
-\    'command': 'rls',
+\    'command': 'rustup run stable rust-analyzer',
 \    'log_level': -1,
 \    'suppress_stderr': v:true,
 \  },
