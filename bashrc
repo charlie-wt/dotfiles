@@ -137,8 +137,6 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
-# my scripts
-export PATH=$PATH:~/.bin
 # prompt
 export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
 # other stuff

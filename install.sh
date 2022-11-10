@@ -112,11 +112,19 @@ echo
 # general function
 install_location="$HOME/.local/bin"
 script_root="$d"
+# wrapper around `symlink`, specifically for scripts.
+#
+# $1: name of file to link to (relative to $script_root)
+# $1: (optional) installed name of the script. defaults to that of the linked-to file
 function install-script {
     # params
-    local script_name="$1"
+    local script_path="$1"
+    local script_name="${2:-$(basename $script_path)}"
 
-    if ! symlink "$script_root/$script_name" "$install_location/$script_name" "$script_name script"; then
+    local target="$script_root/$script_path"
+    local link_name="$install_location/$script_name"
+
+    if ! symlink "$target" "$link_name" "$script_path script"; then
         >&2 echo "(looking in $script_root for scripts; have you set \$script_root correctly?)"
         return 1
     fi
