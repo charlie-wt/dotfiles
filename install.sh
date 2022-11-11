@@ -14,7 +14,7 @@ elif [ "$1" = "-n" ]; then
 fi
 
 # general function to symlink a file, presenting prompts under various scenarios.
-# responds to $default_choice.
+# responds to $default_choice ("true", "false", "").
 #
 # fails with an error message if the file to link to doesn't exist.
 #
@@ -24,6 +24,11 @@ fi
 # $2: absolute path to symlink to be made.
 # $3: human-friendly name of the thing being symlinked, for messages.
 #
+# returns:
+# 0: if the symlink now exists (including if it was already set correctly)
+# 1: if the symlink does not now exist (if there was a conflict, and the user cancelled)
+# 2: on error
+#
 # example: `symlink "$d/vimrc" "$HOME/.vimrc" "my vimrc"
 function symlink {
     local target="$1"
@@ -32,7 +37,7 @@ function symlink {
 
     if [ ! -e "$target" ]; then
         >&2 echo "$name: can't find target $target to symlink"
-        return 1
+        return 2
     fi
 
     if [ -L "$link_name" ]; then
@@ -51,7 +56,7 @@ function symlink {
                     echo "replacing old $name"
                     rm "$link_name"
                 else
-                    return 0
+                    return 1
                 fi
             else
                 if confirm-action "WARN: '$link_name' exists as a dead link; did not make a new link." \
@@ -60,7 +65,7 @@ function symlink {
                     echo "replacing dead link for $name"
                     rm "$link_name"
                 else
-                    return 0
+                    return 1
                 fi
             fi
         fi
@@ -71,7 +76,7 @@ function symlink {
             echo "replacing old $name"
             rm "$link_name"
         else
-            return 0
+            return 1
         fi
     fi
 
@@ -91,9 +96,8 @@ function dotfile {
     local dotfile_name="$1"
     local link_name="${2:-$HOME/.$dotfile_name}"
 
-    if ! symlink "$d/$dotfile_name" "$link_name" "dotfile $dotfile_name"; then
-        return 1
-    fi
+    symlink "$d/$dotfile_name" "$link_name" "dotfile $dotfile_name"
+    return $?
 }
 
 echo symlinking dotfiles...
@@ -124,10 +128,11 @@ function install-script {
     local target="$script_root/$script_path"
     local link_name="$install_location/$script_name"
 
-    if ! symlink "$target" "$link_name" "$script_path script"; then
-        >&2 echo "(looking in $script_root for scripts; have you set \$script_root correctly?)"
-        return 1
-    fi
+    symlink "$target" "$link_name" "$script_path script"
+
+    res=$?
+    [ $res -eq 2 ] && >&2 echo "(looking in $script_root for scripts; have you set \$script_root correctly?)"
+    return $res
 }
 
 echo symlinking scripts...
