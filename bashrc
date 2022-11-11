@@ -60,9 +60,9 @@ cdc () { cd "$(config-home)/$1"; }
 # go to dotfiles dir, or install them
 dots () {
     case $1 in
-        i|install) $DOTFILES/install.sh "${@:2}" ;;
-        "")        cd $DOTFILES                  ;;
-        *)         >&2 echo ?                    ;;
+        i|install) $DOTFILES/install "${@:2}" ;;
+        "")        cd $DOTFILES               ;;
+        *)         >&2 echo ?                 ;;
     esac
 }
 
