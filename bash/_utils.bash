@@ -9,10 +9,46 @@ __utils_included=1
 
 
 
+# for printing with some colours
+# TODO #feature: add a with-colour, or something?
+function title {
+    echo -e "\e[32m""$@""\e[0m"
+}
+
+function error {
+    echo -e "\e[31m""$@""\e[0m"
+}
+
+function warn {
+    echo -e "\e[33m""$@""\e[0m"
+}
+
+function info {
+    echo -e "\e[36m""$@""\e[0m"
+}
+
+function unimportant {
+    echo -e "\e[90m""$@""\e[0m"
+}
+
+function error-pref {
+    echo "$(error ERROR):" "$@"
+}
+
+function warn-pref {
+    echo "$(warn WARN):" "$@"
+}
+
+function info-pref {
+    echo "$(info INFO):" "$@"
+}
+
+
 # is the environment variable `$1` defined?
 function is-defined {
     [ -z ${1+x} ] && return 1 || return 0
 }
+
 
 # yes/no prompt
 # $1: the prompt string
@@ -67,7 +103,7 @@ function confirm-action {
     if [[ "$default_choice" != true && \
           "$default_choice" != false && \
           "$default_choice" != "" ]]; then
-        >&2 echo "internal error: unknown \$default_choice '$default_choice'"
+        >&2 echo "$(error internal error): unknown \$default_choice '$default_choice'"
         default=""
     fi
 
@@ -81,6 +117,7 @@ function confirm-action {
     return 0
 }
 
+
 # insert a call to this into a script, to 'break' there and be able to type `echo`
 # (etc.) to see what's going on.
 # from: https://blog.jez.io/bash-debugger/
@@ -92,6 +129,7 @@ function debugger {
     done
     echo
 }
+
 
 # echo xdg vars
 function cache-home {
@@ -117,3 +155,4 @@ function state-home {
         && echo "$XDG_STATE_HOME" \
         || echo "$HOME/.state"
 }
+
