@@ -1,4 +1,4 @@
-# === Start ============================================================================
+# === Init =============================================================================
 # export dotfiles dir as directory ~/.bashrc is symlinked into
 export DOTFILES=$(dirname "$(readlink -f ~/.bashrc)")
 
@@ -8,10 +8,30 @@ export DOTFILES=$(dirname "$(readlink -f ~/.bashrc)")
 # TODO #cleanup: gets sourced twice
 source $DOTFILES/bash/_utils.bash
 
+
+# === Environment Variables ============================================================
+# xdg vars
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+
+# add color in less (for manpages)
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+
+# other
+export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
+export COLORTERM=truecolor
+export VISUAL=vim EDITOR=vim
+# export HISTSIZE=100000
+# export HISTFILESIZE=$HISTSIZE
+
 
 # === Aliases ==========================================================================
 alias l='ls -GF'
@@ -51,6 +71,7 @@ alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
 # adding `Defaults env_keep += "TERM TERMINFO"` works for `sudo vim`, but not `sudo -E
 # vim`.
 alias sv='sudo -E TERMINFO="$TERMINFO" vim'
+
 
 # === Functions ========================================================================
 mkcd () { mkdir -p "$@" && cd "$@"; }
@@ -126,27 +147,13 @@ size () {
     fi
 }
 
-# === Environment Variables ============================================================
-export COLORTERM=truecolor
-export VISUAL=vim EDITOR=vim
-# add color in less (for manpages)
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-# prompt
-export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
-# other stuff
-# export HISTSIZE=100000
-# export HISTFILESIZE=$HISTSIZE
 
-# === Other -- End =====================================================================
+# === Other ============================================================================
 # when terminal is frozen by ^s, allow unfreezing with any key.
 [[ $- == *i* ]] && stty ixany
 
+
+# === End ==============================================================================
 # source other files (eg. for setup-specific stuff, or for external programs)
 for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do source $f ; done
 # explicitly source machine-local files afterwards, so they can override earlier config
