@@ -115,7 +115,7 @@ echo
 # === Install scripts ==================================================================
 # general function
 install_location="$HOME/.local/bin"
-script_root="$d"
+script_root="$d/scripts"
 # wrapper around `symlink`, specifically for scripts.
 #
 # $1: name of file to link to (relative to $script_root)
@@ -136,6 +136,7 @@ function install-script {
 }
 
 title "symlinking scripts..."
+install-script update-kitty
 
 # install local scripts, if-present
 if [ -x "$d/local/install-scripts" ]; then

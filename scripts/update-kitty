@@ -1,0 +1,18 @@
+#!/bin/env sh
+
+d="/home/$USER/Applications"
+
+curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh -s -- dest="$d" launch=n
+
+apps_dir="/home/$USER/.local/share/applications"
+[ -d "$XDG_DATA_HOME" ] && apps_dir="$XDG_DATA_HOME/applications"
+
+# manual bits i seem to have to do to integrate kitty's .desktop files
+cp -r "$d"/kitty.app/share/applications/*.desktop "$apps_dir"
+
+sed -i "s|Icon=kitty|Icon=$d/kitty.app/share/icons/hicolor/scalable/apps/kitty.svg|g" "$apps_dir"/kitty*.desktop
+sed -i "s|Exec=kitty|Exec=$d/kitty.app/bin/kitty|g" "$apps_dir"/kitty*.desktop
+
+# terminfo
+mkdir -p "$TERMINFO"
+cp -r "$d"/kitty.app/share/terminfo/* "$TERMINFO"
