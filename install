@@ -20,7 +20,7 @@ fi
 #
 # will make any necessary directories that the symlink will sit in.
 #
-# $1: absolute(!) path of file to link to -- you'll probably want to prepend $d.
+# $1: absolute path of file to link to -- you'll probably want to prepend $d.
 # $2: absolute path to symlink to be made.
 # $3: human-friendly name of the thing being symlinked, for messages.
 #
@@ -104,11 +104,12 @@ title symlinking dotfiles...
 dotfile bashrc
 dotfile gdbinit
 dotfile gitconfig       "$(config-home)/git/config"
-dotfile local/gitconfig "$(config-home)/git/local.gitconfig"
-dotfile local/gitignore "$(config-home)/git/ignore"
 dotfile tmux.conf       "$(config-home)/tmux/tmux.conf"
 dotfile vimrc
 dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
+
+dotfile local/gitconfig "$(config-home)/git/local.gitconfig" 2>/dev/null
+dotfile local/gitignore "$(config-home)/git/ignore"          2>/dev/null
 echo
 
 
