@@ -200,7 +200,7 @@ echo "* run :PluginInstall in vim to install plugins"
 echo "* run <prefix>+I in tmux to install plugins"
 echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
 
-if [[ ! $(tmux -V) =~ "tmux 3" ]]; then
+if [[ $(tmux -V) =~ ^tmux\ (0\.|1\.|2\.|3\.0) ]]; then
     echo
     warn-pref "your tmux is too old to understand \$XDG_CONFIG_HOME."
     echo "      best thing is to make bash/local/tmux.bash, with this line:"

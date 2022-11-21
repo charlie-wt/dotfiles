@@ -73,7 +73,6 @@ set textwidth=88
 set colorcolumn=+1
 set completeopt=menu,menuone,noinsert,noselect
 set shortmess+=F
-" let g:gruvbox_contrast_dark = 'black'
 silent! colo gruvbox
 " highlight visual selections with only a slightly lighter background
 " TODO #bug: gruvbox hard-coded
@@ -197,7 +196,6 @@ nnoremap <leader>tsp :call Todo("speed")<cr>
 nnoremap <leader>ttm :call Todo("temp")<cr>
 nnoremap <leader>tts :call Todo("test")<cr>
 nnoremap <leader>tvf :call Todo("verify")<cr>
-
 
 " toggle the location list
 function! ToggleLocList()
@@ -507,16 +505,21 @@ let g:lsc_server_commands = {
 \    'log_level': -1,
 \    'suppress_stderr': v:true,
 \  },
+\  'lua': {
+\   'command': 'lua-language-server',
+\   'log_level': -1,
+\   'suppres_stderr': v:true,
+\  },
+\  'python': {
+\    'command': 'pylsp',
+\    'log_level': -1,
+\    'suppress_stderr': v:true,
+\  },
 \  'rust': {
 \    'command': 'rustup run stable rust-analyzer',
 \    'log_level': -1,
 \    'suppress_stderr': v:true,
 \  },
-\  'lua': {
-\   'command': 'lua-language-server',
-\   'log_level': -1,
-\   'suppres_stderr': v:true,
-\  }
 \}
 let g:lsc_auto_map = {
 \  'GoToDefinition': 'gd',
@@ -541,6 +544,7 @@ let g:lsc_trace_level          = 'off'
 let g:python_highlight_space_errors = v:false
 
 let g:oscyank_silent = v:true
+
 
 " === Local config =====================================================================
 " `personal{-local}` is a symlink to `dotfiles/{local/}vim`
