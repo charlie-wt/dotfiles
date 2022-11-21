@@ -1,7 +1,9 @@
-set confirm off
+set confirm on
 set history save on
 set pagination off
 set print pretty on
+set python print-stack full
+set verbose off
 
 
 # don't step into the standard library
