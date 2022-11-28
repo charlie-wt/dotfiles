@@ -124,10 +124,10 @@ mkrn () {
     case ${1##*.} in
        c)             gcc -Wall -g            -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
        C|cc|cpp|cxx)  g++ -Wall -g -std=c++17 -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
-       hs)            ghc --make ${1%.*} && ./${1%.*}                      ;;
-       js)            node "$1"                                            ;;
-       py)            python3 "$1"                                         ;;
-       rs)            rustc "$1" && ./${1%.*}                              ;;
+       hs)            ghc --make ${1%.*} && ./${1%.*} "${@:2}"             ;;
+       js)            node "$@"                                            ;;
+       py)            python3 "$@"                                         ;;
+       rs)            rustc "$1" && ./${1%.*} "${@:2}"                     ;;
        *)
            [[ -f "Cargo.toml" ]] && cargo run || echo "unknown filetype '${1##*.}'." ;;
     esac
