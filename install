@@ -100,7 +100,7 @@ function dotfile {
     return $?
 }
 
-title symlinking dotfiles...
+title "symlinking dotfiles..."
 dotfile bashrc
 dotfile gdbinit
 dotfile gitconfig       "$(config-home)/git/config"
@@ -138,24 +138,18 @@ function install-script {
 
 title "symlinking scripts..."
 install-script update-kitty
-
-# install local scripts, if-present
-if [ -x "$d/local/install-scripts" ]; then
-    script_root="$d/local/scripts"
-    . "$d/local/install-scripts"
-fi
 echo
 
 
 # === Symlinking other directories =====================================================
-title symlinking other files...
+title "symlinking other files..."
 [ -e "$d/vim" ]       && symlink "$d/vim"       "$HOME/.vim/personal"       "vim personal dir"
 [ -e "$d/local/vim" ] && symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
 echo
 
 
 # === Other bits =======================================================================
-title doing other misc stuff...
+title "doing other misc stuff..."
 
 # make directories for vim swapfiles & backups
 mkdir -p "$(state-home)/vim/backups"
@@ -192,13 +186,31 @@ elif [ "$default_choice" != false ]; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
     fi
 fi
+echo
 
+
+# === Local ============================================================================
+title "doing local install"
+# do local install, if present
+if [ -x "$d/local/install" ]; then
+    script_root="$d/local/scripts"
+    . "$d/local/install"
+elif [ -f "$d/local/install" ]; then
+    warn-pref "found a local/install, but it wasn't marked as executable; skipping"
+else
+    unimportant "didn't find a local/install; skipping"
+fi
+echo
+
+
+# === Finish ===========================================================================
 # reminders for manual bits i've not automated yet
 echo
 echo "$(info DONE). remember to do these too:"
 echo "* run :PluginInstall in vim to install plugins"
 echo "* run <prefix>+I in tmux to install plugins"
 echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
+echo "* set the user.name & user.email for this repo correctly"
 
 if [[ $(tmux -V) =~ ^tmux\ (0\.|1\.|2\.|3\.0) ]]; then
     echo
