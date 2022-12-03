@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# install all the repo contents, & some other machine setup. aims to be idempotent.
+
 
 # === Basic setup ======================================================================
 d=$(dirname "$(readlink -e "$0")")  # directory of this script
@@ -43,35 +45,30 @@ function symlink {
     if [ -L "$link_name" ]; then
         existing_target=$(readlink -f "$link_name")
 
-        if [ -e "$target" ] && [ "$existing_target" = "$target" ]; then
+        if [ "$existing_target" = "$target" ]; then
             unimportant "$name already set correctly; skipping"
             return 0
         fi
 
-        if [ -e "$target" ]; then
-            if [ -e "$existing_target" ]; then
-                if confirm-action "$(warn-pref "'$link_name' is already a symlink, so did not make a link.")" \
-                                  "$(warn "$name"): '$link_name' already points to '$existing_target'; replace it?" \
-                                  y; then
-                    echo "replacing old $(info "$name")"
-                    rm "$link_name"
-                else
-                    return 1
-                fi
-            else
-                if confirm-action "$(warn-pref "'$link_name' exists as a dead link; did not make a new link.")" \
-                                  "$(warn "$name"): '$link_name' exists as a dead link -- replace it?" \
-                                  y; then
-                    echo "replacing dead link for $(info "$name")"
-                    rm "$link_name"
-                else
-                    return 1
-                fi
-            fi
+        # link exists -- confirm whether to replace it
+        local prompt="$(warn "$name"): '$link_name' exists as a dead link -- replace it?"
+        local def_msg="$(warn-pref "'$link_name' exists as a dead link; did not make a new link.")"
+        local link_status="dead"
+        if [ -e "$existing_target" ]; then
+            prompt="$(warn "$name"): '$link_name' already points to '$existing_target'; replace it?"
+            def_msg="$(warn-pref "'$link_name' is already a symlink, so did not make a link.")"
+            link_status="old"
+        fi
+
+        if confirm-action "$prompt" "$def_msg" y; then
+            echo "replacing $link_status link for $(info "$name")"
+            rm "$link_name"
+        else
+            return 1
         fi
     elif [ -e "$link_name" ]; then
-        if confirm-action "$(warn-pref "'$link_name' already exists, so did not make a link.")" \
-                          "$(warn "$name"): a file at '$link_name' already exists; replace it?" \
+        if confirm-action "$(warn "$name"): a file at '$link_name' already exists; replace it?" \
+                          "$(warn-pref "'$link_name' already exists, so did not make a link.")" \
                           n; then
             echo "replacing old $(info "$name")"
             rm "$link_name"
@@ -104,6 +101,7 @@ title "symlinking dotfiles..."
 dotfile bashrc
 dotfile gdbinit
 dotfile gitconfig       "$(config-home)/git/config"
+dotfile profile
 dotfile tmux.conf       "$(config-home)/tmux/tmux.conf"
 dotfile vimrc
 dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"

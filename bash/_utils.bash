@@ -91,12 +91,12 @@ function yesno {
 # $default_choice variable. if $default_choice is `true` or `false`, the yesno prompt is
 # not presented.
 #
-# $1: a message to print if $default_choice is `false`.
-# $2: yesno prompt
+# $1: yesno prompt
+# $2: a message to print if $default_choice is `false`.
 # $3: yesno default (ie. [Yn] vs. [yN] vs. [yn])
 function confirm-action {
-    local default_false_message="$1"
-    local prompt="$2"
+    local prompt="$1"
+    local default_false_message="$2"
     local yesno_default="$3"
 
     local default="$default_choice"
