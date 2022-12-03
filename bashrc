@@ -5,7 +5,6 @@ export DOTFILES=$(dirname "$(readlink -f ~/.bashrc)")
 # source automatically generated bashrc if there is one
 [ -f $DOTFILES/bashrc.auto ] && source $DOTFILES/bashrc.auto
 
-# TODO #cleanup: gets sourced twice
 source $DOTFILES/bash/_utils.bash
 
 
@@ -15,6 +14,9 @@ export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
+
+# add user bin dirs to PATH if they exist
+[ -d "$(bin-home)" ] && PATH="$(bin-home):$PATH"
 
 # add color in less (for manpages)
 export LESS_TERMCAP_mb=$'\E[01;31m'
@@ -29,8 +31,6 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
 export COLORTERM=truecolor
 export VISUAL=vim EDITOR=vim
-# export HISTSIZE=100000
-# export HISTFILESIZE=$HISTSIZE
 
 
 # === Aliases ==========================================================================

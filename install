@@ -115,7 +115,6 @@ echo
 
 # === Install scripts ==================================================================
 # general function
-install_location="$HOME/.local/bin"
 script_root="$d/scripts"
 # wrapper around `symlink`, specifically for scripts.
 #
@@ -127,7 +126,7 @@ function install-script {
     local script_name="${2:-$(basename $script_path)}"
 
     local target="$script_root/$script_path"
-    local link_name="$install_location/$script_name"
+    local link_name="$(bin-home)/$script_name"
 
     symlink "$target" "$link_name" "$script_path script"
 

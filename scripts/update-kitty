@@ -1,6 +1,6 @@
-#!/bin/env sh
+#!/bin/env bash
 
-d="/home/$USER/Applications"
+d="$HOME/Applications"
 
 curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh -s -- dest="$d" launch=n
 
@@ -16,3 +16,11 @@ sed -i "s|Exec=kitty|Exec=$d/kitty.app/bin/kitty|g" "$apps_dir"/kitty*.desktop
 # terminfo
 mkdir -p "$TERMINFO"
 cp -r "$d"/kitty.app/share/terminfo/* "$TERMINFO"
+
+# for the first time: register to $PATH
+install_loc="$HOME/.local/bin"
+[ -n "$(type -t bin-home)" ] && install_loc="$(bin-home)"
+if ! [[ -L "$install_loc/kitty" &&
+        "$(readlink "$install_loc/kitty")" = "$d/kitty.app/bin/kitty" ]]; then
+    ln -s "$d/kitty.app/bin/kitty" "$install_loc/kitty"
+fi

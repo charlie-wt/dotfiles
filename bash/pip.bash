@@ -1,5 +1,6 @@
-base_dir="$HOME/.local/bin"
+base_dir="$(data-home)/python"
+export PYTHONUSERBASE=$base_dir
 [ ! -e "$base_dir" ] && return 1
 
-export PATH=$PATH:"$base_dir"
+export PATH=$PATH:"$base_dir/bin"
 
