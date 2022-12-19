@@ -3,6 +3,6 @@
 export CARGO_HOME="$(data-home)/cargo"
 export RUSTUP_HOME="$(data-home)/rustup"
 
-export PATH=$PATH:$CARGO_HOME/bin
+export PATH=$CARGO_HOME/bin:$PATH
 
 source "$CARGO_HOME/env"
