@@ -161,3 +161,16 @@ function bin-home {
     echo "$HOME/.local/bin"
 }
 
+
+# is the first given version number at least that of the second? returns 0 if true.
+#
+# strips out any bad chars from the inputs, so you can pipe in eg. $(tmux -V).
+#
+# $1: version number to compare.
+# $2: version number to compare against.
+function at-least-version {
+    fst="$(echo "$1" | sed 's/[^0-9\.]//g')"
+    snd="$(echo "$2" | sed 's/[^0-9\.]//g')"
+
+    [ $(printf "$fst\n$snd" | sort -Vr | head -n 1) = "$fst" ] && return 0 || return 1
+}
