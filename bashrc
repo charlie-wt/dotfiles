@@ -57,9 +57,6 @@ alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
 # quick name for ranger (and when it exits, bash gets put into wherever ranger was)
 alias ra='. ranger'
 alias rf=rifle
-# python 2 :'(((
-# alias python='/usr/bin/env python3'
-# alias pip='/usr/bin/env pip3'
 # update flatpaks
 alias fpu='flatpak update -y && flatpak uninstall --unused -y'
 

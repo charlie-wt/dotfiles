@@ -29,7 +29,6 @@ Plug 'junegunn/fzf.vim'
 Plug 'natebosch/vim-lsc'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 " background
-Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'andymass/vim-matchup'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-repeat'
@@ -38,6 +37,8 @@ Plug 'wellle/targets.vim'
 Plug 'junegunn/goyo.vim'
 
 call plug#end()
+
+packadd termdebug
 
 
 " === General ==========================================================================
@@ -49,6 +50,7 @@ set ignorecase smartcase
 set copyindent
 set background=dark
 set mouse=a
+set ttymouse=sgr
 set showcmd
 set nostartofline
 set wildmenu wildmode=list:longest,full
@@ -57,6 +59,7 @@ set nofoldenable
 set binary noendofline
 set encoding=utf-8 nobomb
 set noerrorbells
+set laststatus=2  " (needed by airline)
 set list listchars=tab:\|\ ,extends:▶,precedes:◀
 if exists('&breakindent')
     set breakindent
@@ -145,6 +148,8 @@ nnoremap Q @@
 " 'true' lines
 nnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
 nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
+vnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
+vnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
 " toggle NERDTree
 noremap <silent> <f3> :NERDTreeToggle<cr>
 " reload vimrc easily
@@ -486,11 +491,9 @@ augroup end
 
 
 " === Plugin config ====================================================================
-" airline
-set laststatus=2
-
 " vim-pandoc
 let g:pandoc#modules#disabled = ["folding"]
+let g:pandoc#keyboard#display_motions = 0  " this messes with my j & k maps
 
 " goyo
 let g:goyo_width = 89
