@@ -153,7 +153,7 @@ function data-home {
 function state-home {
     is-defined "$XDG_STATE_HOME" && [ -d "$XDG_STATE_HOME" ] \
         && echo "$XDG_STATE_HOME" \
-        || echo "$HOME/.state"
+        || echo "$HOME/.local/state"
 }
 
 function bin-home {
