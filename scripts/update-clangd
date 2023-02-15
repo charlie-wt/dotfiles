@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+
+repo="clangd/clangd"
+destination="$HOME/src/bun"
+
+# get version number
+json_version_tag="tag_name"
+
+info="$(curl -S https://api.github.com/repos/$repo/releases/latest)"
+if [ $? -ne 0 ]; then
+    >&2 echo error getting latest version info via curl.
+    exit 1
+fi
+
+echo $info | wc -c
+echo $info
+version="$(echo $info | grep $json_version_tag | sed 's/.*"'$json_version_tag'": "\([0-9A-Za-z_\.]\+\)".*/\1/')"
+echo $version
+
+# download release to temp dir
+filename="clangd-linux-$version"
+
+tmpdir=$(mktemp -d)
+
+url="https://github.com/$repo/releases/download/$version/$filename.zip"
+wget "$url" --directory-prefix="$tmpdir" -nv >/dev/null
+if [ $? -ne 0 ]; then
+    >&2 echo "error downloading package"
+    rm -r "$tmpdir"
+    exit 1
+fi
+
+# extract the release to the right place
+mkdir -p "$destination"
+
+zip_file="$tmpdir/$filename.zip"
+unzip -q "$zip_file" -d "$tmpdir"
+if [ $? -ne 0 ]; then
+    >&2 echo "error unzipping package from $zip_file"
+    rm -r "$tmpdir"
+    exit 1
+fi
+
+[ -d "$destination/clangd" ] && rm -r "$destination/clangd"
+mv "$tmpdir/clangd_$version" "$destination/clangd"
+
+rm -r "$tmpdir"
