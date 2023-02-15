@@ -1,21 +1,24 @@
 #!/usr/bin/env sh
 
 repo="clangd/clangd"
-destination="$HOME/src/bun"
+destination="$HOME/src/bin"
 
 # get version number
 json_version_tag="tag_name"
 
-info="$(curl -S https://api.github.com/repos/$repo/releases/latest)"
+info="$(curl -s -S https://api.github.com/repos/$repo/releases/latest)"
 if [ $? -ne 0 ]; then
     >&2 echo error getting latest version info via curl.
     exit 1
 fi
 
-echo $info | wc -c
-echo $info
-version="$(echo $info | grep $json_version_tag | sed 's/.*"'$json_version_tag'": "\([0-9A-Za-z_\.]\+\)".*/\1/')"
-echo $version
+rate_limit_msg="API rate limit exceeded"
+if echo $info | grep "$rate_limit_msg" >/dev/null 2>&1; then
+    >&2 echo GitHub API rate limit exceeded.
+    exit 1
+fi
+
+version="$(echo $info | grep $json_version_tag | sed 's/.*"'$json_version_tag'":\s*"\([0-9A-Za-z_\.]\+\)".*/\1/')"
 
 # download release to temp dir
 filename="clangd-linux-$version"
@@ -23,9 +26,10 @@ filename="clangd-linux-$version"
 tmpdir=$(mktemp -d)
 
 url="https://github.com/$repo/releases/download/$version/$filename.zip"
-wget "$url" --directory-prefix="$tmpdir" -nv >/dev/null
+wget "$url" --directory-prefix="$tmpdir" -o "$tmpdir/wget_log"
 if [ $? -ne 0 ]; then
-    >&2 echo "error downloading package"
+    >&2 echo "error downloading package:"
+    >&2 cat "$tmpdir/wget_log"
     rm -r "$tmpdir"
     exit 1
 fi

@@ -134,6 +134,7 @@ function install-script {
 }
 
 title "symlinking scripts..."
+install-script update-clangd
 install-script update-kitty
 echo
 
