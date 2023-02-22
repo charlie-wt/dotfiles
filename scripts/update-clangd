@@ -13,7 +13,7 @@ if [ $? -ne 0 ]; then
 fi
 
 rate_limit_msg="API rate limit exceeded"
-if echo $info | grep "$rate_limit_msg" >/dev/null 2>&1; then
+if echo "$info" | grep "$rate_limit_msg" >/dev/null 2>&1; then
     >&2 echo GitHub API rate limit exceeded.
     exit 1
 fi
