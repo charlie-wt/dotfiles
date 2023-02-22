@@ -15,6 +15,10 @@ elif [ "$1" = "-n" ]; then
     default_choice=false
 fi
 
+function skip {
+    unimportant "$@; skipping"
+}
+
 # general function to symlink a file, presenting prompts under various scenarios.
 # responds to $default_choice ("true", "false", "").
 #
@@ -46,7 +50,7 @@ function symlink {
         existing_target=$(readlink -f "$link_name")
 
         if [ "$existing_target" = "$target" ]; then
-            unimportant "$name already set correctly; skipping"
+            skip "$name already set correctly"
             return 0
         fi
 
@@ -157,7 +161,7 @@ mkdir -p "$(state-home)/vim/undo"
 # basic setup for vim plugin manager
 vim_plug_loc="$HOME/.vim/autoload/plug.vim"
 if [ -e "$vim_plug_loc" ]; then
-    unimportant "plug.vim already exists in $vim_plug_loc; skipping"
+    skip "plug.vim already exists in $vim_plug_loc"
 else
     curl -fLo "$vim_plug_loc" --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -166,7 +170,7 @@ fi
 # setup tmux plugin manager
 tpm_dir="$(config-home)/tmux/plugins/tpm"
 if [ -e "$tpm_dir" ]; then
-    unimportant "tpm already exists in $tpm_dir; skipping"
+    skip "tpm already exists in $tpm_dir"
 else
     git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
 fi
@@ -175,7 +179,7 @@ fi
 rustup_dir="$(data-home)/rustup"
 cargo_dir="$(data-home)/cargo"
 if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
-    unimportant "rustup & cargo already exist in $rustup_dir & $cargo_dir; skipping"
+    skip "rustup & cargo already exist in $rustup_dir & $cargo_dir"
 elif [ "$default_choice" != false ]; then
     if [ "$default_choice" = true ] ||
        yesno "do you want to install rust & cargo?"; then
@@ -183,6 +187,13 @@ elif [ "$default_choice" != false ]; then
         export CARGO_HOME=$cargo_dir
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
     fi
+fi
+
+# python lsp
+if have-cmd pylsp; then
+    skip "pylsp already installed"
+elif have-cmd pip; then
+    confirm-action "install pylsp?" && pip install --user python-lsp-server
 fi
 echo
 
@@ -196,7 +207,7 @@ if [ -x "$d/local/install" ]; then
 elif [ -f "$d/local/install" ]; then
     warn-pref "found a local/install, but it wasn't marked as executable; skipping"
 else
-    unimportant "didn't find a local/install; skipping"
+    skip "didn't find a local/install"
 fi
 echo
 

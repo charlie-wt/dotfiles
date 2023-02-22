@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 
-repo="clangd/clangd"
+github_repo="clangd/clangd"
 destination="$HOME/src/bin"
 
 # get version number
 json_version_tag="tag_name"
 
-info="$(curl -s -S https://api.github.com/repos/$repo/releases/latest)"
+info="$(curl -s -S https://api.github.com/repos/$github_repo/releases/latest)"
 if [ $? -ne 0 ]; then
     >&2 echo error getting latest version info via curl.
     exit 1
@@ -25,7 +25,7 @@ filename="clangd-linux-$version"
 
 tmpdir=$(mktemp -d)
 
-url="https://github.com/$repo/releases/download/$version/$filename.zip"
+url="https://github.com/$github_repo/releases/download/$version/$filename.zip"
 wget "$url" --directory-prefix="$tmpdir" -o "$tmpdir/wget_log"
 if [ $? -ne 0 ]; then
     >&2 echo "error downloading package:"

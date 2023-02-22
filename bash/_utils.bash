@@ -49,6 +49,11 @@ function is-defined {
     [ -z ${1+x} ] && return 1 || return 0
 }
 
+# does the command `$1` exist?
+function have-cmd {
+    [ -z "$(type -t $1)" ] && return 1 || return 0
+}
+
 
 # yes/no prompt
 # $1: the prompt string
@@ -108,7 +113,7 @@ function confirm-action {
     fi
 
     if [ "$default" = false ]; then
-        >&2 echo "$default_false_message"
+        [ -n "$default_false_message" ] && >&2 echo "$default_false_message"
         return 1
     elif [ "$default" = "" ] && ! yesno "$prompt" "$yesno_default"; then
         return 1
