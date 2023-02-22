@@ -161,13 +161,13 @@ noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
 " NOTE: this is a function executed below in a `vimenter` autocmd, because otherwise it
 " would run before plugins had loaded so we wouldn't be able to check for vim-oscyank
 function! SetupSystemClipboard()
-    if has("clipboard")
+    if exists('g:loaded_oscyank')
+        " use osc 52 escape code (only supported in some terminals)
+        vnoremap <c-c> :OSCYank<cr>:<backspace>
+    elseif has("clipboard")
         " use built-in system clipboard support
         vnoremap <c-c> "+y
         noremap <c-p> "+p
-    elseif exists('g:loaded_oscyank')
-        " use osc 52 escape code (only supported in some terminals)
-        vnoremap <c-c> :OSCYank<cr>:<backspace>
     elseif executable("xsel") && system("xsel") !~ 'Can''t open display'
         " use the (external) xsel package (can only copy whole lines)
         vnoremap <c-c> :w !xsel -i -b<cr><cr>
