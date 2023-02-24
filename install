@@ -5,7 +5,8 @@
 
 # === Basic setup ======================================================================
 d=$(dirname "$(readlink -e "$0")")  # directory of this script
-source "$d/bash/_utils.bash"
+root="$d"
+source "$root/bash/_utils.bash"
 
 # -y or -n options to always pick yes/no at prompts
 default_choice=""
@@ -26,7 +27,7 @@ function skip {
 #
 # will make any necessary directories that the symlink will sit in.
 #
-# $1: absolute path of file to link to -- you'll probably want to prepend $d.
+# $1: absolute path of file to link to -- you'll probably want to prepend $root.
 # $2: absolute path to symlink to be made.
 # $3: human-friendly name of the thing being symlinked, for messages.
 #
@@ -35,7 +36,7 @@ function skip {
 # 1: if the symlink does not now exist (if there was a conflict, and the user cancelled)
 # 2: on error
 #
-# example: `symlink "$d/vimrc" "$HOME/.vimrc" "my vimrc"
+# example: `symlink "$root/vimrc" "$HOME/.vimrc" "my vimrc"
 function symlink {
     local target="$1"
     local link_name="$2"
@@ -90,14 +91,14 @@ function symlink {
 # === Symlinking dotfiles ==============================================================
 # wrapper around `symlink`, specifically for dotfiles.
 #
-# $1: name of the file to link to (relative path, from $d)
+# $1: name of the file to link to (relative to $root)
 # $2: name of symlink (absolute path) -- optional, defaults to ~/.$1
 function dotfile {
     # params
     local dotfile_name="$1"
     local link_name="${2:-$HOME/.$dotfile_name}"
 
-    symlink "$d/$dotfile_name" "$link_name" "dotfile $dotfile_name"
+    symlink "$root/$dotfile_name" "$link_name" "dotfile $dotfile_name"
     return $?
 }
 
@@ -105,35 +106,30 @@ title "symlinking dotfiles..."
 dotfile bashrc
 dotfile gdbinit
 dotfile gitconfig       "$(config-home)/git/config"
+dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
 dotfile profile
 dotfile tmux.conf       "$(config-home)/tmux/tmux.conf"
 dotfile vimrc
-dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
-
-dotfile local/gitconfig "$(config-home)/git/local.gitconfig" 2>/dev/null
-dotfile local/gitignore "$(config-home)/git/ignore"          2>/dev/null
 echo
 
 
 # === Install scripts ==================================================================
-# general function
-script_root="$d/scripts"
 # wrapper around `symlink`, specifically for scripts.
 #
-# $1: name of file to link to (relative to $script_root)
+# $1: name of file to link to (relative to $root)
 # $1: (optional) installed name of the script. defaults to that of the linked-to file
 function install-script {
     # params
     local script_path="$1"
     local script_name="${2:-$(basename $script_path)}"
 
-    local target="$script_root/$script_path"
+    local target="$root/scripts/$script_path"
     local link_name="$(bin-home)/$script_name"
 
     symlink "$target" "$link_name" "$script_path script"
 
     res=$?
-    [ $res -eq 2 ] && >&2 echo "(looking in $script_root for scripts; have you set \$script_root correctly?)"
+    [ $res -eq 2 ] && >&2 echo "(looking in $root/scripts for scripts; have you set \$root correctly?)"
     return $res
 }
 
@@ -143,10 +139,9 @@ install-script update-kitty
 echo
 
 
-# === Symlinking other directories =====================================================
-title "symlinking other files..."
-[ -e "$d/vim" ]       && symlink "$d/vim"       "$HOME/.vim/personal"       "vim personal dir"
-[ -e "$d/local/vim" ] && symlink "$d/local/vim" "$HOME/.vim/personal-local" "vim personal local dir"
+# === Other symlinks ===================================================================
+title "making other symlinks..."
+[ -e "$root/vim" ]       && symlink "$root/vim"       "$HOME/.vim/personal"       "vim personal dir"
 echo
 
 
@@ -201,10 +196,11 @@ echo
 # === Local ============================================================================
 title "doing local install"
 # do local install, if present
-if [ -x "$d/local/install" ]; then
-    script_root="$d/local/scripts"
-    . "$d/local/install"
-elif [ -f "$d/local/install" ]; then
+if [ -x "$root/local/install" ]; then
+    root="$d/local"
+    . "$root/install"
+    root="$d"
+elif [ -f "$root/local/install" ]; then
     warn-pref "found a local/install, but it wasn't marked as executable; skipping"
 else
     skip "didn't find a local/install"
