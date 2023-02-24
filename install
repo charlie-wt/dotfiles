@@ -116,7 +116,7 @@ echo
 # === Install scripts ==================================================================
 # wrapper around `symlink`, specifically for scripts.
 #
-# $1: name of file to link to (relative to $root)
+# $1: name of file to link to (relative to $root/scripts)
 # $1: (optional) installed name of the script. defaults to that of the linked-to file
 function install-script {
     # params
