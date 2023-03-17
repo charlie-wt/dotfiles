@@ -10,7 +10,6 @@ __utils_included=1
 
 
 # for printing with some colours
-# TODO #feature: add a with-colour, or something?
 function title {
     echo -e "\e[32m""$@""\e[0m"
 }
