@@ -163,7 +163,7 @@ noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
 function! SetupSystemClipboard()
     if exists('g:loaded_oscyank')
         " use osc 52 escape code (only supported in some terminals)
-        vnoremap <c-c> :OSCYank<cr>:<backspace>
+        vnoremap <c-c> :OSCYankVisual<cr>:<backspace>
     elseif has("clipboard")
         " use built-in system clipboard support
         vnoremap <c-c> "+y

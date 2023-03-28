@@ -45,19 +45,30 @@ venv-on () {
 venv-ls () {
     [ ! -d "$VENV_HOME" ] && return
 
-    local str=$(
-        for d in $(ls "$VENV_HOME"); do
-            [ -d "$VENV_HOME/$d" ] && [ -f "$VENV_HOME/$d/bin/activate" ] && echo $d;
-        done)
+    local str=$(for d in $(ls "$VENV_HOME"); do is-a-known-venv "$d" && echo $d; done)
 
-    # if running interactively, concat onto one line & pad with 3 spaces
-    [ -t 1 ] && str="${str//$'\n'/   }"
+    # if running interactively & not too many venvs, concat onto one line & pad with
+    # spaces
+    if [ -t 1 ]; then
+        oneline="${str//$'\n'/   }"
+        (( "$(printf "$oneline" | wc -c)" < "$(tput cols)" )) && str="$oneline"
+    fi
 
     printf "$str\n"
 }
 
 venv-new () {
     verify-name-supplied "$1" || return 1
+
+    if is-a-known-venv "$1"; then
+        if yesno "venv $1 already exists; replace it?" n; then
+            venv-rm "$1"
+            echo "making new $1"
+        else
+            echo "did not make a new venv"
+            return 1
+        fi
+    fi
 
     local venv_name="$1"
     python3 -m venv "$VENV_HOME/$venv_name"
@@ -70,7 +81,7 @@ venv-rm () {
 
     # if given a regex instead of an exact name, confirm if we're about to remove the
     # right venv.
-    if ! $(verify-is-a-known-venv "$1" 2>/dev/null); then
+    if ! is-a-known-venv "$1"; then
         ! yesno "remove matching venv "$name"?" y && return 1
     else
         echo removing "$name"
@@ -93,6 +104,10 @@ venv-unset () {
 }
 
 # utils
+is-a-known-venv () {
+    [ -d "$VENV_HOME/$1" ] && [ -f "$VENV_HOME/$1/bin/activate" ] && return || return 1
+}
+
 verify-name-supplied () {
     if [ -z "$1" ]; then
         >&2 echo please specify a venv.
@@ -102,7 +117,7 @@ verify-name-supplied () {
 
 verify-is-a-known-venv () {
     verify-name-supplied "$1" || return 1
-    if [ ! -d "$VENV_HOME/$1" ]; then
+    if ! is-a-known-venv "$1"; then
         >&2 echo "unknown venv $1 -- available venvs:"
         >&2 venv-ls
         return 1
@@ -116,7 +131,7 @@ get-unique-name-match () {
 
     # if they've given an exact match, go with it -- otherwise, if you've got a venv
     # with a name that's a subset of another venv's name, there's no way to refer to it.
-    if verify-is-a-known-venv "$1" 2>/dev/null; then
+    if is-a-known-venv "$1"; then
         echo "$1"
         return
     fi
