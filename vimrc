@@ -111,8 +111,10 @@ noremap H ^
 noremap L $
 " Y yanks to end of line, consistent with D & C
 nnoremap Y y$
-" easier-to-reach way of moving to the previous tabpage
+" easier-to-reach way of switching tabs
 noremap gy gT
+nnoremap <tab> gt
+nnoremap <s-tab> gT
 " don't make { and } add to the jumplist
 nnoremap <silent> } :<c-u>execute 'keepjumps norm! ' . v:count1 . '}'<cr>
 nnoremap <silent> { :<c-u>execute 'keepjumps norm! ' . v:count1 . '{'<cr>
@@ -128,14 +130,16 @@ nnoremap du :diffupdate<cr>
 " set current directory (all windows) to directory of current file
 nnoremap <silent> <leader>cd :cd %:p:h<cr>
 " quickly view a diff of unsaved changes
-command! Diff execute 'w !git diff --no-index % -'
+command! Unsaved execute 'w !git diff --no-index % -'
+nnoremap <leader>u :Unsaved<cr>
 " for if you copy something in written in windows, adding an extra empty line for every
 " real one
 command! UnWindows execute ':g/^/+d'
 " replace all instances of the keyword under the cursor.
 nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
+nnoremap <leader>S :%s/<c-r><c-a>//g<left><left>
 " strip trailing whitespace
-nnoremap <silent> <leader>w :let _s=@/<bar>:%s/\s\+$//e<bar>:let @/=_s<bar><cr>
+nnoremap <silent> <leader>w :let _s=@/ <bar> :%s/\s\+$//e <bar> :let @/=_s<cr>
 " fzf, for finding files & text
 noremap <leader>f :Files<cr>
 noremap <leader>r :Rg<cr>
