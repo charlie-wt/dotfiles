@@ -148,3 +148,30 @@ get-unique-name-match () {
 
     echo $match
 }
+
+# completion
+__venv_completion () {
+    local cur prev
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    case "${COMP_CWORD}" in
+        1)
+            COMPREPLY=($(compgen -W "on ls list show new mk make add rm delete remove uninstall set workon go in unset deactivate out help" -- ${cur}))
+            ;;
+        2)
+            case ${prev} in
+                rm|del*|remove|uninstall|set|workon|go|in)
+                    COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
+                    ;;
+                *)
+                    COMPREPLY=()
+                    ;;
+            esac
+            ;;
+        *)
+            COMPREPLY=()
+            ;;
+    esac
+}
+complete -F __venv_completion venv
