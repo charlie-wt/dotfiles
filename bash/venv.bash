@@ -50,7 +50,7 @@ venv-ls () {
     # if running interactively & not too many venvs, concat onto one line & pad with
     # spaces
     if [ -t 1 ]; then
-        oneline="${str//$'\n'/   }"
+        local oneline="${str//$'\n'/   }"
         (( "$(printf "$oneline" | wc -c)" < "$(tput cols)" )) && str="$oneline"
     fi
 
@@ -76,7 +76,7 @@ venv-new () {
 }
 
 venv-rm () {
-    name="$(get-unique-name-match "$1")"
+    local name="$(get-unique-name-match "$1")"
     [ -z "$name" ] && return 1
 
     # if given a regex instead of an exact name, confirm if we're about to remove the
@@ -93,7 +93,7 @@ venv-rm () {
 }
 
 venv-set () {
-    name="$(get-unique-name-match "$1")"
+    local name="$(get-unique-name-match "$1")"
     [ -z "$name" ] && return 1
 
     source "$VENV_HOME/$name/bin/activate"
@@ -151,27 +151,22 @@ get-unique-name-match () {
 
 # completion
 __venv_completion () {
-    local cur prev
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
+    COMPREPLY=()
     case "${COMP_CWORD}" in
         1)
             COMPREPLY=($(compgen -W "on ls list show new mk make add rm delete remove uninstall set workon go in unset deactivate out help" -- ${cur}))
             ;;
         2)
             case ${prev} in
-                rm|del*|remove|uninstall|set|workon|go|in)
-                    COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
-                    ;;
-                *)
-                    COMPREPLY=()
-                    ;;
+                rm|del*|remove|uninstall|set|workon|go|in)        ;;
+                *)                                         return ;;
             esac
+            COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
             ;;
-        *)
-            COMPREPLY=()
-            ;;
+        *)  ;;
     esac
 }
 complete -F __venv_completion venv

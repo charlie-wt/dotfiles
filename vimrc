@@ -113,8 +113,6 @@ noremap L $
 nnoremap Y y$
 " easier-to-reach way of switching tabs
 noremap gy gT
-nnoremap <tab> gt
-nnoremap <s-tab> gT
 " don't make { and } add to the jumplist
 nnoremap <silent> } :<c-u>execute 'keepjumps norm! ' . v:count1 . '}'<cr>
 nnoremap <silent> { :<c-u>execute 'keepjumps norm! ' . v:count1 . '{'<cr>
