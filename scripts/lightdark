@@ -25,7 +25,7 @@ kitty-current () {
         exit 77
     fi
 
-    current_theme=""
+    local current_theme=""
     [ "$current_file" = "$dark_file" ] && current_theme=dark
     [ "$current_file" = "$light_file" ] && current_theme=light
 
@@ -53,7 +53,7 @@ determine-desired () {
     current="$(kitty-current)"
 
     # choose file & set theme
-    desired=dark
+    local desired=dark
     [ "$current" = dark ] && desired=light
 
     echo "$desired"
