@@ -134,6 +134,7 @@ function install-script {
 }
 
 title "symlinking scripts..."
+install-script lightdark
 install-script update-clangd
 install-script update-kitty
 echo
@@ -192,6 +193,13 @@ elif have-cmd pip; then
 fi
 echo
 
+# kitty theme
+kitty_conf_dir="$(config-home)/kitty"
+kitty_theme_dest="$kitty_conf_dir/theme.conf"
+if [[ -e "$kitty_conf_dir" && ! -e "$kitty_theme_dest" ]]; then
+    local file="$dotfiles/other/gruvbox/kitty/dark.conf"
+    ln -s "$file" "$kitty_theme_dest"
+fi
 
 # === Local ============================================================================
 title "doing local install"

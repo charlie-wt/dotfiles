@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+dotfiles=$(dirname $(dirname "$(readlink -e "$0")"))  # dotfiles directory
+source "$dotfiles/bash/_utils.bash"
+
+requested="$1"
+
+# make it so that `exit 77` will always exit the whole script, even if done
+# from a subshell
+set -E
+trap '[ "$?" -ne 77 ] || exit 77' ERR
+
+kitty-current () {
+    local light_file="$dotfiles/other/gruvbox/kitty/light.conf"
+    local dark_file="$dotfiles/other/gruvbox/kitty/dark.conf"
+    local destination="$(config-home)/kitty/theme.conf"
+    local current_file="$(readlink -e "$destination")"
+
+    # optionally exit if in an unexpected state
+    if [ -e "$destination" ] &&
+       [ "$current_file" != "$dark_file" ] &&
+       [ "$current_file" != "$light_file" ] &&
+       ! yesno "$(config-home)/kitty/theme.conf is set to something unexpected; delete & overwrite it anyway?" n; then
+        >&2 echo did not change theme
+        exit 77
+    fi
+
+    current_theme=""
+    [ "$current_file" = "$dark_file" ] && current_theme=dark
+    [ "$current_file" = "$light_file" ] && current_theme=light
+
+    echo "$current_theme"
+}
+
+verify-requested () {
+    if [ -n "$requested" ] &&
+       [ "$requested" != dark ] &&
+       [ "$requested" != light ]; then
+        >&2 echo "unknown argument $requested; please request either 'dark' or 'light'"
+        exit 77
+    fi
+}
+
+determine-desired () {
+    if [ -n "$requested" ]; then
+        verify-requested
+        echo "$requested"
+        return
+    fi
+
+    # note: kitty determines all
+    local current
+    current="$(kitty-current)"
+
+    # choose file & set theme
+    desired=dark
+    [ "$current" = dark ] && desired=light
+
+    echo "$desired"
+}
+
+toggle-kitty () {
+    # re: two-line assignment: see https://stackoverflow.com/a/66449015
+    # tldr: local x=$(command) breaks the exit codes of `command`, since it
+    # treats the exit code of the whole line as that of the `local` command.
+    # this breaks signal traps, too.
+    local desired
+    desired="$(determine-desired)"
+
+    local file="$dotfiles/other/gruvbox/kitty/$desired.conf"
+    local destination="$(config-home)/kitty/theme.conf"
+
+    [ -e "$destination" ] && rm "$destination"
+    ln -s "$file" "$destination"
+
+    echo "kitty theme set; you may need to reload some terminal configs"
+
+    # TODO #bug: neither of these work
+    # for pid in $(pgrep kitty); do
+    #     echo "found $pid"
+    #     kill -SIGUSR1 $pid
+    # done
+    # kitty @ signal-child --match all SIGUSR1
+    # ...this works, but only in the current window. the symlink will sort
+    # things for newly-opened instances, but any already-open instances other
+    # than the current one won't change. also, all the `kitty @` commands are
+    # broken when using tmux.
+    # kitty @ set-colors -a -c "$file" &
+}
+
+toggle-vim () {
+    # TODO #finish: closest is https://arslan.io/2021/02/15/automatic-dark-mode-for-terminal-applications/
+    # ...but has issues with triggering the autocmd. solution was to look through all
+    # vim processes in tmux windows and send keys to them, but that won't work outside
+    # tmux...
+    local desired
+    desired="$(determine-desired)"
+
+    for pid in $(pgrep vim); do
+        echo "found $pid"
+        kill -SIGUSR1 $pid
+    done
+}
+
+toggle-kitty
