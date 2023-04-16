@@ -194,11 +194,9 @@ fi
 echo
 
 # kitty theme
-kitty_conf_dir="$(config-home)/kitty"
-kitty_theme_dest="$kitty_conf_dir/theme.conf"
-if [[ -e "$kitty_conf_dir" && ! -e "$kitty_theme_dest" ]]; then
-    local file="$dotfiles/other/gruvbox/kitty/dark.conf"
-    ln -s "$file" "$kitty_theme_dest"
+kitty_theme_dest="$(config-home)/kitty/theme.conf"
+if [ ! -e "$kitty_theme_dest" ]; then
+    ln -s "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest"
 fi
 
 # === Local ============================================================================
