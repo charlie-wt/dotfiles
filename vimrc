@@ -548,6 +548,7 @@ let g:lsc_trace_level          = 'off'
 " (for the 'vim-python/python-syntax' plugin used by vim-polyglot)
 let g:python_highlight_space_errors = v:false
 
+" vim-oscyank
 let g:oscyank_silent = v:true
 let g:oscyank_term = 'default'
 
