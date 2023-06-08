@@ -26,7 +26,7 @@ Plug 'tpope/vim-surround'
 Plug 'ajh17/VimCompletesMe'
 Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
-Plug 'natebosch/vim-lsc'
+Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 " background
 Plug 'andymass/vim-matchup'
@@ -503,46 +503,38 @@ let g:goyo_width = 89
 " vim-tmux-navigator
 let g:tmux_navigator_disable_when_zoomed = 1
 
-" vim-lsc
-let g:lsc_server_commands = {
-\  'cpp': {
-\    'command': 'ccls',
-\    'log_level': -1,
-\    'suppress_stderr': v:true,
-\  },
-\  'lua': {
-\   'command': 'lua-language-server',
-\   'log_level': -1,
-\   'suppres_stderr': v:true,
-\  },
-\  'python': {
-\    'command': 'pylsp',
-\    'log_level': -1,
-\    'suppress_stderr': v:true,
-\  },
-\  'rust': {
-\    'command': 'rustup run stable rust-analyzer',
-\    'log_level': -1,
-\    'suppress_stderr': v:true,
-\  },
+" LanguageClient-neovim
+function! s:on_lsp_buffer_enabled() abort
+    if has_key(g:LanguageClient_serverCommands, &filetype)
+        echo 'hello world'
+
+        set formatexpr=LanguageClient#textDocument_rangeFormatting_sync()
+        nmap <buffer> gd <plug>(lcn-definition)
+        " nmap <buffer> gs <plug>(lcn-document-symbol-search)
+        " nmap <buffer> gS <plug>(lcn-workspace-symbol-search)
+        nmap <buffer> gr <plug>(lcn-references)
+        nmap <buffer> gI <plug>(lcn-implementation)
+        nmap <buffer> gR <plug>(lcn-rename)
+        nmap <buffer> <c-n> <plug>(lcn-diagnostics-next)
+        nmap <buffer> <c-p> <plug>(lcn-diagnostics-previous)
+        " nmap <buffer> gm <plug>(lcn-signature-help)
+        nmap <buffer> K <plug>(lcn-hover)
+    endif
+endfunction
+" call s:on_lsp_buffer_enabled()
+
+augroup lsp_install
+    au!
+    " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+    au filetype * call s:on_lsp_buffer_enabled()
+"     au User LanguageClientStarted call s:on_lsp_buffer_enabled()
+augroup END
+
+let g:LanguageClient_serverCommands = {
+\  'cpp': [ 'clangd', '--limit-references=0', '--background-index' ],
+\  'python': [ 'pylsp' ],
 \}
-let g:lsc_auto_map = {
-\  'GoToDefinition': 'gd',
-\  'FindReferences': 'gr',
-\  'NextReference': '<c-n>',
-\  'PreviousReference': '<c-p>',
-\  'Rename': 'gR',
-\  'ShowHover': v:true,
-\  'FindImplementations': 'gI',
-\  'FindCodeActions': 'gA',
-\  'Completion': 'omnifunc',
-\  'SignatureHelp': 'gm',
-\}
-let g:lsc_enable_autocomplete  = v:true
-let g:lsc_enable_diagnostics   = v:false
-let g:lsc_reference_highlights = v:true
-let g:lsc_enable_popup_syntax  = v:true
-let g:lsc_trace_level          = 'off'
+
 
 " i already highlight trailing whitespace, & this messes it up
 " (for the 'vim-python/python-syntax' plugin used by vim-polyglot)
