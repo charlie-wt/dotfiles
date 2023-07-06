@@ -161,7 +161,6 @@ function state-home {
 }
 
 function bin-home {
-    # not xdg, but used for stuff
     echo "$HOME/.local/bin"
 }
 

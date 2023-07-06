@@ -142,7 +142,7 @@ echo
 
 # === Other symlinks ===================================================================
 title "making other symlinks..."
-[ -e "$root/vim" ]       && symlink "$root/vim"       "$HOME/.vim/personal"       "vim personal dir"
+symlink "$root/vim" "$HOME/.vim/personal" "vim personal dir"
 echo
 
 
@@ -198,6 +198,7 @@ kitty_theme_dest="$(config-home)/kitty/theme.conf"
 if [ ! -e "$kitty_theme_dest" ]; then
     ln -s "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest"
 fi
+
 
 # === Local ============================================================================
 title "doing local install"
