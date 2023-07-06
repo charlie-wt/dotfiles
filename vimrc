@@ -540,7 +540,6 @@ let g:lsp_diagnostics_signs_enabled = 0
 let g:lsp_diagnostics_signs_insert_mode_enabled = 0
 let g:lsp_diagnostics_virtual_text_enabled = 0
 let g:lsp_document_code_action_signs_enabled = 0
-let g:lsp_log_verbose = 1
 let g:lsp_async_completion = 1
 
 " i already highlight trailing whitespace, & this messes it up
