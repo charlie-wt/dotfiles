@@ -148,7 +148,7 @@ todos () {
 
     have-cmd rg && local cmd=rg || local cmd="grep -EInr --color=auto"
 
-    $cmd "(#|//|/\*|\"|<!--|--|;)\sTODO\s*#$tag\b"
+    $cmd "(#|//|/\*|\"|<!--|--|;)\sTODO\s*#$tag\b" ${@:2}
 }
 
 
