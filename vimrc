@@ -365,6 +365,7 @@ function! ToPrevFile()
         end
     endwhile
 endfunction
+" TODO #finish: ToNextFile
 
 " TODO #finish: add an option, for whether to focus on the shunted or underlying window?
 function! ShuntRight()

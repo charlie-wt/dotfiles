@@ -60,9 +60,6 @@ alias rf=rifle
 # update flatpaks
 alias fpu='flatpak update -y && flatpak uninstall --unused -y'
 
-# quickly list tagged todo comments as made by the corresponding vimrc functions
-alias todos='grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#"'
-
 # TODO #temp: need to explicitly tell sudo to keep $TERMINFO, to keep xterm-kitty;
 # without it, exiting vim won't clear the screen of it properly. doing `sudo visudo` and
 # adding `Defaults env_keep += "TERM TERMINFO"` works for `sudo vim`, but not `sudo -E
@@ -131,8 +128,8 @@ mkrn () {
 }
 
 # get size of current directory (and size of constituent directories).
-# by default also lists the top 25 constituent directories. can give it a number
-# argument to list that many directories, or 'all', to list every constituent directory.
+# $1: number of constituent directories to list, or `all` for all of them. Optional;
+#     defaults to 25.
 # NOTE: suppresses error messages, since they're usually 'permission denied' clutter
 size () {
     [ $# -ge 1 ] && local size=$1 || local size=25
@@ -142,6 +139,14 @@ size () {
     else
         du -ahd1 2>/dev/null | sort -hr | head -n $((size+1))
     fi
+}
+
+# quickly list tagged todo comments as made by the corresponding vimrc functions
+# $1 : specific tag to search for (optional; defaults to all tags)
+todos () {
+    [ $# -ge 1 ] && local suffix="$1" || local suffix="\w+"
+
+    grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#${suffix}:"
 }
 
 
