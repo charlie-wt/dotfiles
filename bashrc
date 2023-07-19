@@ -141,12 +141,14 @@ size () {
     fi
 }
 
-# quickly list tagged todo comments as made by the corresponding vimrc functions
+# quickly list tagged todo comments as made by the corresponding vimrc functions.
 # $1 : specific tag to search for (optional; defaults to all tags)
 todos () {
-    [ $# -ge 1 ] && local suffix="$1" || local suffix="\w+"
+    [ $# -ge 1 ] && local tag="$1" || local tag="\w+"
 
-    grep -EInr "\s*(#|//|/\*|\"|<!--)\sTODO\s*#${suffix}:"
+    have-cmd rg && local cmd=rg || local cmd="grep -EInr --color=auto"
+
+    $cmd "(#|//|/\*|\"|<!--|--|;)\sTODO\s*#$tag\b"
 }
 
 
