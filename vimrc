@@ -316,7 +316,7 @@ set tabline=%!Tabline()
 function! ToPrevLoc()
     " TODO #cleanup: want(ed) to move back to the previous file in the jumplist that
     " isn't the current one. prob best to do by parsing the jumplist directly; however,
-    " :jumps has a 'file/text' column, which has the either text of the line to jump to
+    " :jumps has a 'file/text' column, which has either the text of the line to jump to
     " (if it's in the current file), or the name of the file to jump to. could just look
     " for when that column has a valid filename, but you could have a case (unlikely)
     " where the text of the line to jump to in the current file also happens to be a
@@ -351,6 +351,9 @@ function! ToPrevLoc()
     " maybe the answer is just to make it persistent, with `set undofile undodir`
     :execute "normal! \<c-o>"
 endfunction
+function! ToNextLoc()
+    :execute "normal! 1\<c-i>"
+endfunction
 function! ToPrevFile()
     let l:current_file = expand('%:p')
     let l:new_file = l:current_file
@@ -360,12 +363,25 @@ function! ToPrevFile()
         :call ToPrevLoc()
         let l:new_file = expand('%:p')
         if match(execute(':jumps', 'silent!'), 'file/text\n>') != -1
+            " reached the start of the jumplist
+            break
+        end
+    endwhile
+endfunction
+function! ToNextFile()
+    let l:current_file = expand('%:p')
+    let l:new_file = l:current_file
+
+    " keep jumping forwards until the current filename changes
+    while l:new_file == l:current_file
+        :call ToNextLoc()
+        let l:new_file = expand('%:p')
+        if match(matchstr(execute(':jumps', 'silent!'), '\n[^\n]*$'), '\n>') != -1
             " reached the end of the jumplist
             break
         end
     endwhile
 endfunction
-" TODO #finish: ToNextFile
 
 " TODO #finish: add an option, for whether to focus on the shunted or underlying window?
 function! ShuntRight()
@@ -413,6 +429,7 @@ function! ShuntTab()
 endfunction
 
 nnoremap <leader><c-o> :call ToPrevFile()<cr>
+nnoremap <leader><c-i> :call ToNextFile()<cr>
 nnoremap <leader><c-h> :call ShuntLeft()<cr>
 nnoremap <leader><c-l> :call ShuntRight()<cr>
 nnoremap <leader><c-j> :call ShuntDown()<cr>
