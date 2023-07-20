@@ -151,6 +151,21 @@ todos () {
     $cmd "(#|//|/\*|\"|<!--|--|;)\sTODO\s*#$tag\b" ${@:2}
 }
 
+# checkout a pull request
+pr () {
+    if [ -z "$1" ]; then
+        >&2 echo "please provide a pull request index"
+        return
+    fi
+
+    local idx="$1"
+
+    local branch_name="pr-$1"
+    [ -n "$2" ] && branch_name="$2"
+
+    git fetch upstream pull/"$idx"/head:"$branch_name" && git checkout "$branch_name"
+}
+
 
 # === Other ============================================================================
 # when terminal is frozen by ^s, allow unfreezing with any key.

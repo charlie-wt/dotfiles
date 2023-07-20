@@ -428,13 +428,13 @@ function! ShuntTab()
     call ToPrevLoc()
 endfunction
 
-nnoremap <leader><c-o> :call ToPrevFile()<cr>
-nnoremap <leader><c-i> :call ToNextFile()<cr>
-nnoremap <leader><c-h> :call ShuntLeft()<cr>
-nnoremap <leader><c-l> :call ShuntRight()<cr>
-nnoremap <leader><c-j> :call ShuntDown()<cr>
-nnoremap <leader><c-k> :call ShuntUp()<cr>
-nnoremap <leader><c-t> :call ShuntTab()<cr>
+nnoremap <silent> <leader><c-o> :call ToPrevFile()<cr>
+nnoremap <silent> <leader><c-i> :call ToNextFile()<cr>
+nnoremap <silent> <leader><c-h> :call ShuntLeft()<cr>
+nnoremap <silent> <leader><c-l> :call ShuntRight()<cr>
+nnoremap <silent> <leader><c-j> :call ShuntDown()<cr>
+nnoremap <silent> <leader><c-k> :call ShuntUp()<cr>
+nnoremap <silent> <leader><c-t> :call ShuntTab()<cr>
 
 " == Disabled commands
 " Ctrl+Z -> background the vim process
