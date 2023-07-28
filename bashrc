@@ -116,8 +116,8 @@ extract () {
 # quick way to do simple compilations & run, for small bits of (normally) test code.
 mkrn () {
     case ${1##*.} in
-       c)             gcc -Wall -g            -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
-       C|cc|cpp|cxx)  g++ -Wall -g -std=c++17 -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
+       c)             gcc -Wall -g3            -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
+       C|cc|cpp|cxx)  g++ -Wall -g3 -std=c++17 -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
        hs)            ghc --make ${1%.*} && ./${1%.*} "${@:2}"             ;;
        js)            node "$@"                                            ;;
        py)            python3 "$@"                                         ;;
