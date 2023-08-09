@@ -151,7 +151,9 @@ todos () {
     $cmd "(#|//|/\*|\"|<!--|--|;)\sTODO\s*#$tag\b" ${@:2}
 }
 
-# checkout a pull request
+# checkout a github pull request
+# $1: pull request index
+# $2: (optional) name of local branch to make; defaults to `pr-$1`
 pr () {
     if [ -z "$1" ]; then
         >&2 echo "please provide a pull request index"

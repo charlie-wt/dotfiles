@@ -135,6 +135,8 @@ nnoremap <leader>u :Unsaved<cr>
 " for if you copy something in written in windows, adding an extra empty line for every
 " real one
 command! UnWindows execute ':g/^/+d'
+" format json into a human-readable form
+command! Json execute ':%!python -m json.tool'
 " replace all instances of the keyword under the cursor.
 nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
 nnoremap <leader>S :%s/<c-r><c-a>//g<left><left>
@@ -516,6 +518,12 @@ augroup end
 " vim-pandoc
 let g:pandoc#modules#disabled = ["folding"]
 let g:pandoc#keyboard#display_motions = 0  " this messes with my j & k maps
+" vim-pandoc-syntax is broken when a nested list item (ie. >= 4 spaces of indentation)
+" has multiple lines, and one of the continuation lines starts with a ` (or a few other
+" things) -- it treats everything after it in the paragraph as a code block. i never use
+" code blocks anyway, so just disable them. TODO: try to fix the plugin
+let g:pandoc#syntax#protect#codeblocks = 0
+let g:pandoc#syntax#use_definition_lists = 0 " don't use these; apparently improves perf
 
 " goyo
 let g:goyo_width = 89
