@@ -23,7 +23,7 @@ Plug 'ojroques/vim-oscyank', { 'branch': 'main' }
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 " ide
-Plug 'ajh17/VimCompletesMe'
+Plug 'https://git.sr.ht/~ackyshake/VimCompletesMe.vim'
 Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'prabirshrestha/vim-lsp'

@@ -43,7 +43,7 @@ function info-pref {
 }
 
 
-# is the environment variable `$1` defined?
+# is the environment variable `$1` defined? (note: do not pass $1 in double-quotes)
 function is-defined {
     [ -z ${1+x} ] && return 1 || return 0
 }
@@ -137,27 +137,19 @@ function debugger {
 
 # echo xdg vars
 function cache-home {
-    is-defined "$XDG_CACHE_HOME" && [ -d "$XDG_CACHE_HOME" ] \
-        && echo "$XDG_CACHE_HOME" \
-        || echo "$HOME/.cache"
+    [ -n "$XDG_CACHE_HOME" ] && echo "$XDG_CACHE_HOME" || echo "$HOME/.cache"
 }
 
 function config-home {
-    is-defined "$XDG_CONFIG_HOME" && [ -d "$XDG_CONFIG_HOME" ] \
-        && echo "$XDG_CONFIG_HOME" \
-        || echo "$HOME/.config"
+    [ -n "$XDG_CONFIG_HOME" ] && echo "$XDG_CONFIG_HOME" || echo "$HOME/.config"
 }
 
 function data-home {
-    is-defined "$XDG_DATA_HOME" && [ -d "$XDG_DATA_HOME" ] \
-        && echo "$XDG_DATA_HOME" \
-        || echo "$HOME/.local/share"
+    [ -n "$XDG_DATA_HOME" ] && echo "$XDG_DATA_HOME" || echo "$HOME/.local/share"
 }
 
 function state-home {
-    is-defined "$XDG_STATE_HOME" && [ -d "$XDG_STATE_HOME" ] \
-        && echo "$XDG_STATE_HOME" \
-        || echo "$HOME/.local/state"
+    [ -n "$XDG_STATE_HOME" ] && echo "$XDG_STATE_HOME" || echo "$HOME/.local/state"
 }
 
 function bin-home {
