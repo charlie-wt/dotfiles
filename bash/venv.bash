@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# some basic tools to centralise python virtual environments, roughly replicating the
-# virtualenvwrapper tool
+# tool for centralising python virtual environments.
 
 
 export VENV_HOME="$HOME/.local/var/venv"
