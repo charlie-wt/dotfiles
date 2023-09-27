@@ -56,7 +56,7 @@ venv-ls () {
     # if running interactively & not too long, concat onto one line & pad with spaces
     if [ -t 1 ]; then
         local oneline="${str//$'\n'/   }"
-        (( "$(printf "$oneline" | wc -c)" < "$(tput cols)" )) && str="$oneline"
+        [ "$(printf "$oneline" | wc -c)" -lt "$(tput cols)" ] && str="$oneline"
     fi
 
     printf "$str\n"
@@ -76,7 +76,7 @@ venv-new () {
             fi
         fi
 
-        echo python3 -m venv "$VENV_HOME/$name"
+        python3 -m venv "$VENV_HOME/$name"
     done
 
     [ "$#" == 1 ] && venv-set "$1"
