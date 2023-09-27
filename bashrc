@@ -59,6 +59,8 @@ alias ra='. ranger'
 alias rf=rifle
 # update flatpaks
 alias fpu='flatpak update -y && flatpak uninstall --unused -y'
+# push a new branch to `origin`
+alias push-branch='git push --set-upstream origin "$(git branch --show-current)"'
 
 # TODO #temp: need to explicitly tell sudo to keep $TERMINFO, to keep xterm-kitty;
 # without it, exiting vim won't clear the screen of it properly. doing `sudo visudo` and

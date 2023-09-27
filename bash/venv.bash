@@ -19,12 +19,18 @@ venv () {
         help|-h)
             echo "commands:"
             echo " ls | list | show:                      list venvs"
-            echo " new | mk | make | add \$ENV:            make a new venv"
-            echo " rm | del* | remove | uninstall \$ENV:   remove a venv"
+            echo " new | mk | make | add \$ENV:            make a new venv or list of venvs"
+            echo " rm | del* | remove | uninstall \$ENV:   remove a venv or list of venvs"
             echo " set | workon | go | in \$ENV:           enter a venv"
             echo " unset | deac* | out:                   leave current venv"
             echo " [nothing] | on:                        print current venv"
             echo " help | -h:                             print this message"
+            echo
+            echo "note: when adding or removing venvs, you can supply a list of names; if "
+            echo "adding multiple venvs, you won't be put into any created venv."
+            echo
+            echo "note: when removing venvs, you can give a regex in the place of an name; if so,"
+            echo "you'll be prompted for each matching venv you're about to remove."
             ;;
         *)
             echo "unknown command $1; commands:"
@@ -45,7 +51,7 @@ venv-on () {
 venv-ls () {
     [ ! -d "$VENV_HOME" ] && return
 
-    local str=$(for d in $(ls "$VENV_HOME"); do is-a-known-venv "$d" && echo $d; done)
+    local str=$(find "$VENV_HOME" -mindepth 1 -maxdepth 1 -printf "%f\n" | while read f; do is-a-known-venv "$f" && echo "$f"; done)
 
     # if running interactively & not too many venvs, concat onto one line & pad with
     # spaces
@@ -60,36 +66,45 @@ venv-ls () {
 venv-new () {
     verify-name-supplied "$1" || return 1
 
-    if is-a-known-venv "$1"; then
-        if yesno "venv $1 already exists; replace it?" n; then
-            venv-rm "$1"
-            echo "making new $1"
-        else
-            echo "did not make a new venv"
-            return 1
+    for name in "$@"; do
+        if is-a-known-venv "$name"; then
+            if yesno "venv $name already exists; replace it?" n; then
+                venv-rm "$name"
+                echo "making new $name"
+            else
+                echo "did not make a new venv"
+                return 1
+            fi
         fi
-    fi
 
-    local venv_name="$1"
-    python3 -m venv "$VENV_HOME/$venv_name"
-    venv-set $venv_name
+        python3 -m venv "$VENV_HOME/$name"
+    done
+
+    [ "$#" == 1 ] && venv-set "$1"
 }
 
 venv-rm () {
-    local name="$(get-unique-name-match "$1")"
-    [ -z "$name" ] && return 1
+    verify-name-supplied "$1" || return 1
 
-    # if given a regex instead of an exact name, confirm if we're about to remove the
-    # right venv.
-    if ! is-a-known-venv "$1"; then
-        ! yesno "remove matching venv "$name"?" y && return 1
-    else
-        echo removing "$name"
-    fi
+    for arg in "$@"; do
+        local matches="$(get-any-name-match "$arg")"
 
-    [ "$(venv-on)" == "$name" ] && venv-unset
+        echo "$matches" | while read -r name; do
+            [ -z "$name" ] && continue
 
-    rm -rf "$VENV_HOME/$name"
+            # if given a regex instead of an exact name, confirm if we're about to
+            # remove the right venv.
+            if ! is-a-known-venv "$arg"; then
+                ! yesno "remove matching venv $name?" y && continue
+            else
+                echo "removing $name"
+            fi
+
+            [ "$(venv-on)" == "$name" ] && venv-unset
+
+            rm -rf "$VENV_HOME/$name"
+        done
+    done
 }
 
 venv-set () {
@@ -124,13 +139,13 @@ verify-is-a-known-venv () {
     fi
 }
 
-# echoes the name of the single venv that matches the regex `$1`, or nothing with a
-# stderr msg if that can't be done.
-get-unique-name-match () {
+# echoes the name of any venv that matches the regex `$1`, or nothing with a stderr msg
+# if there are no matches.
+get-any-name-match () {
     verify-name-supplied "$1" || return 1
 
-    # if they've given an exact match, go with it -- otherwise, if you've got a venv
-    # with a name that's a subset of another venv's name, there's no way to refer to it.
+    # if given an exact match, go with it -- otherwise, if you've got a venv with a name
+    # that's a subset of another venv's name, there's no way to refer to it.
     if is-a-known-venv "$1"; then
         echo "$1"
         return
@@ -139,14 +154,30 @@ get-unique-name-match () {
     # check for valid env to switch to
     local match=$(venv-ls | grep "$1")
 
-    if [ -z "$match" ] ||  # even if no matches, assigning to `match` makes 1 empty line
-       [ "$(echo "$match" | wc -l)" -ne 1 ]; then
-        >&2 echo unknown or ambiguous venv \'"$1"\'. available:
+    if [ -z "$match" ]; then
+        >&2 echo "'$1' does not match any venvs. available:"
         >&2 venv-ls
         return 1
     fi
 
-    echo $match
+    echo "$match"
+}
+
+# echoes the name of the single venv that matches the regex `$1`, or nothing with a
+# stderr msg if that can't be done.
+get-unique-name-match () {
+    # check for valid env to switch to
+    local match
+    match="$(get-any-name-match "$1")" || return 1
+    local matches="$(num-lines "$match")"
+
+    if [ "$matches" -ne 1 ]; then
+        >&2 echo "'$1' does not match a single venv (matches $matches). available:"
+        >&2 venv-ls
+        return 1
+    fi
+
+    echo "$match"
 }
 
 # completion

@@ -53,6 +53,11 @@ function have-cmd {
     [ -z "$(type -t $1)" ] && return 1 || return 0
 }
 
+# get the number of lines in a string
+function num-lines {
+    echo -n "$1" | grep -c ^
+}
+
 
 # yes/no prompt
 # $1: the prompt string
@@ -62,8 +67,8 @@ function have-cmd {
 #             echo did the thing!
 #         fi`
 function yesno {
-    local qn=$1
-    local default=$2
+    local qn="$1"
+    local default="$2"
 
     # set our default based on input
     local opts="[y/n]"
@@ -75,7 +80,7 @@ function yesno {
 
     while true; do
         # read input
-        read -p "$qn $opts " -n 1 -s -r input
+        read -p "$qn $opts " -n 1 -s -r input < /dev/tty
         echo ${input}
 
         # if nothing entered and have a default, return it
