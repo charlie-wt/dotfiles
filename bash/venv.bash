@@ -17,7 +17,7 @@ venv () {
         set|workon|go|in)          venv-set   "${@:2}" ;;
         unset|deac*|out)           venv-unset "${@:2}" ;;
         help|-h)
-            echo "commands:"
+            echo "Commands:"
             echo " ls | list | show:                      list venvs"
             echo " new | mk | make | add \$ENV:            make a new venv or list of venvs"
             echo " rm | del* | remove | uninstall \$ENV:   remove a venv or list of venvs"
@@ -26,11 +26,12 @@ venv () {
             echo " [nothing] | on:                        print current venv"
             echo " help | -h:                             print this message"
             echo
-            echo "note: when adding or removing venvs, you can supply a list of names; if "
+            echo "Note: When adding or removing venvs, you can supply a list of names; if "
             echo "adding multiple venvs, you won't be put into any created venv."
             echo
-            echo "note: when removing venvs, you can give a regex in the place of an name; if so,"
-            echo "you'll be prompted for each matching venv you're about to remove."
+            echo "Note: When removing venvs, you can give a regex in the place of an name; if so,"
+            echo "you'll be prompted for each matching venv you're about to remove. You can pass "
+            echo "a regex to 'set' too, but it must have a unique match."
             ;;
         *)
             echo "unknown command $1; commands:"
@@ -53,8 +54,7 @@ venv-ls () {
 
     local str=$(find "$VENV_HOME" -mindepth 1 -maxdepth 1 -printf "%f\n" | while read f; do is-a-known-venv "$f" && echo "$f"; done)
 
-    # if running interactively & not too many venvs, concat onto one line & pad with
-    # spaces
+    # if running interactively & not too long, concat onto one line & pad with spaces
     if [ -t 1 ]; then
         local oneline="${str//$'\n'/   }"
         (( "$(printf "$oneline" | wc -c)" < "$(tput cols)" )) && str="$oneline"
@@ -77,7 +77,7 @@ venv-new () {
             fi
         fi
 
-        python3 -m venv "$VENV_HOME/$name"
+        echo python3 -m venv "$VENV_HOME/$name"
     done
 
     [ "$#" == 1 ] && venv-set "$1"
@@ -169,10 +169,10 @@ get-unique-name-match () {
     # check for valid env to switch to
     local match
     match="$(get-any-name-match "$1")" || return 1
-    local matches="$(num-lines "$match")"
+    local num_matches="$(num-lines "$match")"
 
-    if [ "$matches" -ne 1 ]; then
-        >&2 echo "'$1' does not match a single venv (matches $matches). available:"
+    if [ "$num_matches" -ne 1 ]; then
+        >&2 echo "'$1' does not match a single venv (matches $num_matches). available:"
         >&2 venv-ls
         return 1
     fi
