@@ -97,7 +97,7 @@ note () {
 
 # easy way to extract archives
 extract () {
-    [ ! -f "$1" ] && echo "'$1' is not a valid file!" && return 1
+    [ ! -f "$1" ] && >&2 echo "'$1' is not a valid file!" && return 1
 
     case "$1" in
         *.tar.bz2)   tar xvjf "$1"    ;;
@@ -111,7 +111,7 @@ extract () {
         *.zip)       unzip "$1"       ;;
         *.Z)         uncompress "$1"  ;;
         *.7z)        7z x "$1"        ;;
-        *)           echo "don't know how to extract '$1'..." ;;
+        *)           >&2 echo "don't know how to extract '$1'..." ;;
     esac
 }
 
@@ -125,7 +125,7 @@ mkrn () {
        py)            python3 "$@"                                         ;;
        rs)            rustc "$1" && ./${1%.*} "${@:2}"                     ;;
        *)
-           [[ -f "Cargo.toml" ]] && cargo run || echo "unknown filetype '${1##*.}'." ;;
+           [[ -f "Cargo.toml" ]] && cargo run || >&2 echo "unknown filetype '${1##*.}'." ;;
     esac
 }
 

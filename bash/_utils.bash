@@ -53,7 +53,7 @@ function have-cmd {
     [ -z "$(type -t $1)" ] && return 1 || return 0
 }
 
-# get the number of lines in a string
+# get the number of lines in `$1`
 function num-lines {
     echo -n "$1" | grep -c ^
 }
