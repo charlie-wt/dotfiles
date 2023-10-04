@@ -88,8 +88,10 @@ profile_path="$dconfdir/$uuid"
 dconf write "$profile_path"use-theme-colors "false"
 
 # Set foreground and background color
-dconf write "$profile_path"foreground-color "'#FBF1C7'"
-dconf write "$profile_path"background-color "'#282828'"
+foreground="$(cat $PWD/fg)"
+background="$(cat $PWD/bg)"
+dconf write "$profile_path"foreground-color "$foreground"
+dconf write "$profile_path"background-color "$background"
 
 # Set bold color to be same as foreground color
 # (I'm not really sure where this color appears)
@@ -97,8 +99,8 @@ dconf write "$profile_path"bold-color-same-as-fg "true"
 
 # Set cursor color
 dconf write "$profile_path"cursor-colors-set "true"
-dconf write "$profile_path"cursor-foreground-color "'#282828'"
-dconf write "$profile_path"cursor-background-color "'#FBF1C7'"
+dconf write "$profile_path"cursor-foreground-color "$background"
+dconf write "$profile_path"cursor-background-color "$foreground"
 
 # Set highlight color (highlight colors are reverse
 # of foreground and background by default)
