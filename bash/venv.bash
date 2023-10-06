@@ -65,21 +65,27 @@ venv-ls () {
 venv-new () {
     verify-name-supplied "$1" || return 1
 
+    let num_made=0
+    local first_made=""
+
     for name in "$@"; do
         if is-a-known-venv "$name"; then
             if yesno "venv $name already exists; replace it?" n; then
                 venv-rm "$name"
                 echo "making new $name"
             else
-                echo "did not make a new venv"
-                return 1
+                echo "did not make $name"
+                continue
             fi
         fi
 
         python3 -m venv "$VENV_HOME/$name"
+
+        let num_made++
+        [ -z "$first_made" ] && first_made="$name"
     done
 
-    [ "$#" == 1 ] && venv-set "$1"
+    [ "$num_made" == 1 ] && venv-set "$first_made"
 }
 
 venv-rm () {
@@ -88,21 +94,21 @@ venv-rm () {
     for arg in "$@"; do
         local matches="$(get-any-name-match "$arg")"
 
-        echo "$matches" | while read -r name; do
+        while read -r name; do
             [ -z "$name" ] && continue
 
-            # if given a regex instead of an exact name, confirm if we're about to
-            # remove the right venv.
-            if ! is-a-known-venv "$arg"; then
-                ! yesno "remove matching venv $name?" y && continue
-            else
+            if is-a-known-venv "$arg"; then
                 echo "removing $name"
+            else
+                # if given a regex instead of an exact name, confirm if we're about to
+                # remove the right venv.
+                ! yesno "remove matching venv $name?" y && continue
             fi
 
             [ "$(venv-on)" == "$name" ] && venv-unset
 
             rm -rf "$VENV_HOME/$name"
-        done
+        done <<< "$matches"
     done
 }
 
@@ -119,23 +125,11 @@ venv-unset () {
 
 # utils
 is-a-known-venv () {
-    [ -d "$VENV_HOME/$1" ] && [ -f "$VENV_HOME/$1/bin/activate" ] && return || return 1
+    [ -f "$VENV_HOME/$1/bin/activate" ] && return || return 1
 }
 
 verify-name-supplied () {
-    if [ -z "$1" ]; then
-        >&2 echo please specify a venv.
-        return 1
-    fi
-}
-
-verify-is-a-known-venv () {
-    verify-name-supplied "$1" || return 1
-    if ! is-a-known-venv "$1"; then
-        >&2 echo "unknown venv $1 -- available venvs:"
-        >&2 venv-ls
-        return 1
-    fi
+    [ -z "$1" ] && >&2 echo please specify a venv. && return 1
 }
 
 # echoes the name of any venv that matches the regex `$1`, or nothing with a stderr msg

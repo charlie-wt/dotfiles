@@ -133,7 +133,7 @@ function confirm-action {
 function debugger {
     echo "[DBG] Press ^D to resume, or ^C to abort."
     local line
-    while read -r -p "> " line; do
+    while read -r -p "> " line < /dev/tty; do
         eval "$line"
     done
     echo
