@@ -29,6 +29,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'puremourning/vimspector'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 " background
 Plug 'andymass/vim-matchup'
@@ -489,13 +490,13 @@ augroup my_autocmds
     au filetype cpp,glsl noremap <silent> <leader>ok :FSSplitAbove<cr>
     au filetype cpp,glsl noremap <silent> <leader>oj :FSSplitBelow<cr>
     au filetype cpp,glsl noremap <silent> <leader>ot :FSTab<cr>
-    " 'compile' certain files (markdown, latex) TODO use :make
-    au filetype markdown,pandoc noremap <f5> :!mdpdf "%" & disown<cr><cr>
-    au filetype tex noremap <f5> :!xelatex "%"<cr><cr>
-    " turn markdown into beamer slides (instead of normal latex doc)
-    au filetype markdown,pandoc noremap <f6> :!mdsl "%" & disown<cr><cr>
-    " turn markdown into report
-    au filetype markdown,pandoc noremap <f7> :!mdrep "%"<cr><cr>
+    " " 'compile' certain files (markdown, latex) TODO use :make
+    " au filetype markdown,pandoc noremap <f5> :!mdpdf "%" & disown<cr><cr>
+    " au filetype tex noremap <f5> :!xelatex "%"<cr><cr>
+    " " turn markdown into beamer slides (instead of normal latex doc)
+    " au filetype markdown,pandoc noremap <f6> :!mdsl "%" & disown<cr><cr>
+    " " turn markdown into report
+    " au filetype markdown,pandoc noremap <f7> :!mdrep "%"<cr><cr>
     " leader+o to open the corresponding pdf to this file
     au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
 
@@ -575,6 +576,9 @@ let g:python_highlight_space_errors = v:false
 " vim-oscyank
 let g:oscyank_silent = v:true
 let g:oscyank_term = 'default'
+
+" vimspector
+let g:vimspector_enable_mappings = 'HUMAN'
 
 
 " === Local config =====================================================================

@@ -142,7 +142,7 @@ echo
 
 # === Other symlinks ===================================================================
 title "making other symlinks..."
-symlink "$root/vim" "$HOME/.vim/personal" "vim personal dir"
+[ -d "$root/vim" ] && symlink "$root/vim" "$HOME/.vim/personal" "vim personal dir"
 echo
 
 
