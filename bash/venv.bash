@@ -91,11 +91,11 @@ venv-rm () {
         while read -r name; do
             [ -z "$name" ] && continue
 
-            if is-a-known-venv "$arg"; then
+            if [ "$arg" == "$matches" ]; then
+                # exact match
                 echo "removing $name"
             else
-                # if given a regex instead of an exact name, confirm if we're about to
-                # remove the right venv.
+                # inexact match: confirm we're about to remove the right venv.
                 ! yesno "remove matching venv $name?" y && continue
             fi
 

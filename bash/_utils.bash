@@ -149,6 +149,8 @@ print-list () {
 
 # echoes the name of any option in `$1` that matches the regex `$2`, or nothing with a
 # stderr msg if there are no matches.
+# note: if the supplied query is an exact match of an option that's a subset of another,
+# both options will be returned.
 # $1: list of options, one per line
 # $2: supplied name to try to match to an option
 # $3: (optional) name of what the options represent, for error messages
@@ -160,16 +162,6 @@ get-any-name-match () {
     if [ -z "$2" ]; then
         >&2 echo "please specify a $label."
         return 1
-    fi
-
-    # if given an exact match, go with it -- otherwise, if you've got an option with a
-    # name that's a subset of another option's name, there's no way to refer to it.
-    # could potentially move this to `get-unique-name-match`, but still think it's
-    # valuable here (eg. want to remove a venv with a name that's a subset, without
-    # removing the venv with the superset name too).
-    if [ -n "$(printf "$options" | grep -Fx "$query")" ]; then
-        echo "$query"
-        return
     fi
 
     # check for an inexact regex match
@@ -193,6 +185,13 @@ get-unique-name-match () {
     local options="$1"
     local query="$2"
     local label="${3:-name}"
+
+    # if given an exact match, go with it -- otherwise, if you've got an option with a
+    # name that's a subset of another option's name, there's no way to refer to it.
+    if [ -n "$(printf "$options" | grep -Fx "$query")" ]; then
+        echo "$query"
+        return
+    fi
 
     local match
     match="$(get-any-name-match "$options" "$query" "$label")" || return 1
