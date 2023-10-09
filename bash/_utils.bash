@@ -127,6 +127,87 @@ function confirm-action {
 }
 
 
+# prints a list (line-separated string), but concat onto one line & pad with spaces if
+# running interactively
+# $1: list to print
+# $2: (optional) single-line padding string to use; defaults to four spaces
+# $3: (optional) label for the list, to print as a prefix
+print-list () {
+    str="$1"
+    padding="${2:-"    "}"
+
+    [ -n "$3" ] && str="$3:  $str"
+
+    if [ -t 1 ]; then
+        local oneline="${str//$"\n"/$padding}"
+        oneline="${oneline//$'\n'/$padding}"
+        [ "$(printf "$oneline" | wc -c)" -lt "$(tput cols)" ] && str="$oneline"
+    fi
+
+    printf "$str\n"
+}
+
+# echoes the name of any option in `$1` that matches the regex `$2`, or nothing with a
+# stderr msg if there are no matches.
+# $1: list of options, one per line
+# $2: supplied name to try to match to an option
+# $3: (optional) name of what the options represent, for error messages
+get-any-name-match () {
+    local options="$1"
+    local query="$2"
+    local label="${3:-name}"
+
+    if [ -z "$2" ]; then
+        >&2 echo "please specify a $label."
+        return 1
+    fi
+
+    # if given an exact match, go with it -- otherwise, if you've got an option with a
+    # name that's a subset of another option's name, there's no way to refer to it.
+    # could potentially move this to `get-unique-name-match`, but still think it's
+    # valuable here (eg. want to remove a venv with a name that's a subset, without
+    # removing the venv with the superset name too).
+    if [ -n "$(printf "$options" | grep -Fx "$query")" ]; then
+        echo "$query"
+        return
+    fi
+
+    # check for an inexact regex match
+    local match=$(printf "$options" | grep "$query")
+
+    if [ -z "$match" ]; then
+        >&2 echo "'$query' does not match any $label. available:"
+        >&2 print-list "$options"
+        return 1
+    fi
+
+    echo "$match"
+}
+
+# echoes the name of the single option in `$1` that matches the regex `$2`, or nothing
+# with a stderr msg if that can't be done.
+# $1: list of options, one per line
+# $2: supplied name to try to match to an option
+# $3: (optional) name of what the options represent, for error messages
+get-unique-name-match () {
+    local options="$1"
+    local query="$2"
+    local label="${3:-name}"
+
+    local match
+    match="$(get-any-name-match "$options" "$query" "$label")" || return 1
+
+    local num_matches="$(num-lines "$match")"
+    if [ "$num_matches" -ne 1 ]; then
+        >&2 echo "'$query' does not match a single $label (matches $num_matches). available:"
+        >&2 print-list "$options"
+        return 1
+    fi
+
+    echo "$match"
+}
+
+
 # insert a call to this into a script, to 'break' there and be able to type `echo`
 # (etc.) to see what's going on.
 # from: https://blog.jez.io/bash-debugger/

@@ -53,13 +53,7 @@ venv-ls () {
 
     local str=$(find "$VENV_HOME" -mindepth 1 -maxdepth 1 -printf "%f\n" | while read f; do is-a-known-venv "$f" && echo "$f"; done)
 
-    # if running interactively & not too long, concat onto one line & pad with spaces
-    if [ -t 1 ]; then
-        local oneline="${str//$'\n'/   }"
-        [ "$(printf "$oneline" | wc -c)" -lt "$(tput cols)" ] && str="$oneline"
-    fi
-
-    printf "$str\n"
+    print-list "$str"
 }
 
 venv-new () {
@@ -92,7 +86,7 @@ venv-rm () {
     verify-name-supplied "$1" || return 1
 
     for arg in "$@"; do
-        local matches="$(get-any-name-match "$arg")"
+        local matches="$(get-any-name-match "$(venv-ls)" "$arg" venv)"
 
         while read -r name; do
             [ -z "$name" ] && continue
@@ -113,7 +107,7 @@ venv-rm () {
 }
 
 venv-set () {
-    local name="$(get-unique-name-match "$1")"
+    local name="$(get-unique-name-match "$(venv-ls)" "$1" venv)"
     [ -z "$name" ] && return 1
 
     source "$VENV_HOME/$name/bin/activate"
@@ -129,48 +123,10 @@ is-a-known-venv () {
 }
 
 verify-name-supplied () {
-    [ -z "$1" ] && >&2 echo please specify a venv. && return 1
-}
-
-# echoes the name of any venv that matches the regex `$1`, or nothing with a stderr msg
-# if there are no matches.
-get-any-name-match () {
-    verify-name-supplied "$1" || return 1
-
-    # if given an exact match, go with it -- otherwise, if you've got a venv with a name
-    # that's a subset of another venv's name, there's no way to refer to it.
-    if is-a-known-venv "$1"; then
-        echo "$1"
-        return
-    fi
-
-    # check for valid env to switch to
-    local match=$(venv-ls | grep "$1")
-
-    if [ -z "$match" ]; then
-        >&2 echo "'$1' does not match any venvs. available:"
-        >&2 venv-ls
+    if [ -z "$1" ]; then
+        >&2 echo please specify a venv.
         return 1
     fi
-
-    echo "$match"
-}
-
-# echoes the name of the single venv that matches the regex `$1`, or nothing with a
-# stderr msg if that can't be done.
-get-unique-name-match () {
-    # check for valid env to switch to
-    local match
-    match="$(get-any-name-match "$1")" || return 1
-    local num_matches="$(num-lines "$match")"
-
-    if [ "$num_matches" -ne 1 ]; then
-        >&2 echo "'$1' does not match a single venv (matches $num_matches). available:"
-        >&2 venv-ls
-        return 1
-    fi
-
-    echo "$match"
 }
 
 # completion
