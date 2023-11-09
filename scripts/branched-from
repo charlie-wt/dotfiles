@@ -77,15 +77,10 @@ def get_branched_from(ref: str, logs: list[str]) -> str | None:
         # branch.
         bn = branch_name(line)
 
-        if bn == "origin/HEAD":
-            continue  # Not a real branch
-
-        branch_section = line.split('[')[0]
-
-        if branch_section[branch_idx] == ' ':
+        if bn in ["origin/HEAD", ref]:
             continue
 
-        if line[line.find('[') + 1:].startswith(ref):
+        if line.split('[')[0][branch_idx] == ' ':
             continue
 
         return bn

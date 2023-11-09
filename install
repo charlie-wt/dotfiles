@@ -134,6 +134,7 @@ function install-script {
 }
 
 title "symlinking scripts..."
+install-script branched-from
 install-script lightdark
 install-script update-clangd
 install-script update-kitty
