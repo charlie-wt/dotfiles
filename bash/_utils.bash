@@ -187,7 +187,7 @@ get-unique-name-match () {
     local label="${3:-name}"
 
     # if given an exact match, go with it -- otherwise, if you've got an option with a
-    # name that's a subset of another option's name, there's no way to refer to it.
+    # name that's a subset of another option's name, it's inconvenient to refer to it.
     if [ -n "$(printf "$options" | grep -Fx "$query")" ]; then
         echo "$query"
         return
@@ -210,7 +210,7 @@ get-unique-name-match () {
 # insert a call to this into a script, to 'break' there and be able to type `echo`
 # (etc.) to see what's going on.
 # from: https://blog.jez.io/bash-debugger/
-function debugger {
+function breakpoint {
     echo "[DBG] Press ^D to resume, or ^C to abort."
     local line
     while read -r -p "> " line < /dev/tty; do

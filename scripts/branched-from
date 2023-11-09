@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+
+import re
+import subprocess
+import sys
+
+
+def stdout(*cmd: str) -> str:
+    proc = subprocess.run(cmd, capture_output=True, check=True)
+    return proc.stdout.decode("utf-8").strip()
+
+
+def get_logs_from_git() -> list[str]:
+    return str(stdout("git", "show-branch", "-a")).splitlines()
+
+
+def get_logs_from_file(filename: str) -> list[str]:
+    with open(filename, "r") as f:
+        return f.read().splitlines()
+
+
+def get_current_branch_name() -> str:
+    return stdout("git", "rev-parse", "--abbrev-ref", "HEAD")
+
+
+BRANCH_NAME_PAT = re.compile(r"^[ \*\+]+\[([^\]]*)\].*")
+
+BRANCH_NAME_SUFFIX_PAT = re.compile(r".*(\^|~\d+)$")
+
+def branch_name(line: str) -> str | None:
+    ''' get the name of the branch from a line in the second section. '''
+
+    # Try to get the contents of the square brackets
+    m = re.match(BRANCH_NAME_PAT, line)
+    if m is None:
+        return None
+
+    full = m.group(1)
+
+    # Try to filter out any `^`/`~123` suffix from the previous match
+    suffix_m = re.match(BRANCH_NAME_SUFFIX_PAT, full)
+    return full[:-len(suffix_m.group(1))] if suffix_m else full
+
+
+# TODO #correctness: in cases where there's another branch that's fully merged into
+#                    `ref`, it'll report that merged-in branch as the result which
+#                    doesn't feel like it's always right. could handle this by, after
+#                    thinking we have a result, going back through the second section
+#                    again and finding out if there are any revisions on our 'candidate'
+#                    that *aren't* on `ref`. seems like it'd be a pain, though.
+def get_branched_from(ref: str, logs: list[str]) -> str | None:
+    ''' get the name of the branch that `ref` branched from, where `logs` is the
+        linewise output of `git show-branch -a`. '''
+    branch_pat = re.compile(r"^\s*[\*!] \[" + ref + r"\]")
+
+    branch_idx = -1
+    second_section = False
+
+    for line in logs:
+        # In the first section: find the line containing the requested revision
+        # & use it to get the index of the `+`s we need to look for in the
+        # second section.
+        if branch_idx == -1:
+            if re.match(branch_pat, line):
+                branch_idx = len(line) - len(line.lstrip())
+                continue
+
+        if not second_section:
+            if len(line) == line.count('-'):
+                second_section = True
+                # we should have found our reference branch by now
+                assert branch_idx != -1
+                continue
+
+        # In the second section: Look for the most recent revision that shares a
+        # commit with the reference branch, but which isn't on the reference
+        # branch.
+        bn = branch_name(line)
+
+        if bn == "origin/HEAD":
+            continue  # Not a real branch
+
+        branch_section = line.split('[')[0]
+
+        if branch_section[branch_idx] == ' ':
+            continue
+
+        if line[line.find('[') + 1:].startswith(ref):
+            continue
+
+        return bn
+
+
+def main():
+    logs: list[str] = get_logs_from_git()
+    # logs: list[str] = get_logs_from_file("/home/charliew/revs")
+    ref: str = sys.argv[1] if len(sys.argv) > 1 else get_current_branch_name()
+
+    result = get_branched_from(ref, logs)
+
+    if result:
+        print(result)
+    else:
+        print(f'({ref} wasn\'t branched from anything)', file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()
