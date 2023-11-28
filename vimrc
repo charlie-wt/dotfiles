@@ -31,6 +31,8 @@ Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'puremourning/vimspector'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
 " background
 Plug 'andymass/vim-matchup'
 Plug 'christoomey/vim-tmux-navigator'
@@ -162,29 +164,29 @@ noremap <silent> <f3> :NERDTreeToggle<cr>
 " reload vimrc easily
 " * extra :e! is needed as for some reason sourcing the vimrc adds an empty unsaved edit
 noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
+" get the url you'd go to with :GBrowse, and copy it to the clipboard instead. useful
+" when working on servers.
+nnoremap <silent> <leader>gb :call OSCYank(execute("GBrowse!"))<cr>
+vnoremap <silent> <leader>gb :call OSCYank(execute("'<,'>GBrowse!"))<cr>
+" system clipboard access with Ctrl+C/P:
+" NOTE: not a general heuristic; just that kitty supports osc 52, but not vte or konsole
+if $TERM == 'xterm-kitty'
+    " use osc 52 escape code (works over servers)
+    vnoremap <c-c> :OSCYankVisual<cr>:<backspace>
+elseif has("clipboard")
+    " use built-in system clipboard support
+    vnoremap <c-c> "+y
+    noremap <c-p> "+p
+elseif executable("xsel") && system("xsel") !~ 'Can''t open display'
+    " use the (external) xsel package (can only copy whole lines)
+    vnoremap <c-c> :w !xsel -i -b<cr><cr>
+    noremap <c-p> :r !xsel -o -b<cr><cr>
+else
+    " (<c-u> removes the automatically added '<,'> that'd make the `echo` error)
+    vnoremap <c-c> :<c-u>echo 'no known system clipboard access'<cr>
+endif
 
 " == Functions
-" system clipboard access with Ctrl+C/P:
-" NOTE: this is a function executed below in a `vimenter` autocmd, because otherwise it
-" would run before plugins had loaded so we wouldn't be able to check for vim-oscyank
-function! SetupSystemClipboard()
-    if exists('g:loaded_oscyank')
-        " use osc 52 escape code (only supported in some terminals)
-        vnoremap <c-c> :OSCYankVisual<cr>:<backspace>
-    elseif has("clipboard")
-        " use built-in system clipboard support
-        vnoremap <c-c> "+y
-        noremap <c-p> "+p
-    elseif executable("xsel") && system("xsel") !~ 'Can''t open display'
-        " use the (external) xsel package (can only copy whole lines)
-        vnoremap <c-c> :w !xsel -i -b<cr><cr>
-        noremap <c-p> :r !xsel -o -b<cr><cr>
-    else
-        " <c-u> removes the automatically added '<,'> that'd make the `echo` error
-        vnoremap <c-c> :<c-u>echo 'no known system clipboard access'<cr>
-    endif
-endfunction
-
 " insert TODO comments above the current line, with tags defined by a:tag. NOTE: relies
 " on the commentary plugin
 function! Todo(tag)
@@ -509,16 +511,14 @@ augroup my_autocmds
     " extra syntax highlighting
     " normal aliases to primitive numeric types
     au syntax c,cpp syn keyword cType u8 u16 u32 u64 s8 s16 s32 s64 f32 f64
-
-    " set up ability to copy to the system clipboard
-    au vimenter * call SetupSystemClipboard()
 augroup end
 
 
 " === Plugin config ====================================================================
 " vim-pandoc
-let g:pandoc#modules#disabled = ["folding"]
+let g:pandoc#hypertext#create_if_no_alternates_exists = 1
 let g:pandoc#keyboard#display_motions = 0  " this messes with my j & k maps
+let g:pandoc#modules#disabled = ["folding"]
 " vim-pandoc-syntax is broken when a nested list item (ie. >= 4 spaces of indentation)
 " has multiple lines, and one of the continuation lines starts with a ` (or a few other
 " things) -- it treats everything after it in the paragraph as a code block. i never use
