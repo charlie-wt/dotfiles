@@ -11,7 +11,7 @@ def stdout(*cmd: str) -> str:
 
 
 def get_logs_from_git() -> list[str]:
-    return str(stdout("git", "show-branch", "-a")).splitlines()
+    return stdout("git", "show-branch", "-a").splitlines()
 
 
 def get_logs_from_file(filename: str) -> list[str]:
@@ -88,7 +88,6 @@ def get_branched_from(ref: str, logs: list[str]) -> str | None:
 
 def main():
     logs: list[str] = get_logs_from_git()
-    # logs: list[str] = get_logs_from_file("/home/charliew/revs")
     ref: str = sys.argv[1] if len(sys.argv) > 1 else get_current_branch_name()
 
     result = get_branched_from(ref, logs)
