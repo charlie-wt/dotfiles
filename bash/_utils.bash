@@ -30,6 +30,10 @@ function unimportant {
     echo -e "\e[90m""$@""\e[0m"
 }
 
+function skip {
+    unimportant "$@; skipping"
+}
+
 function error-pref {
     echo "$(error ERROR):" "$@"
 }
@@ -96,6 +100,7 @@ function yesno {
     done
 }
 
+
 # confirm whether to do an action, with a yesno prompt, but also responding to a
 # $default_choice variable. if $default_choice is `true` or `false`, the yesno prompt is
 # not presented.
@@ -124,6 +129,145 @@ function confirm-action {
     fi
 
     return 0
+}
+
+
+# interactive function to symlink a file, presenting prompts under various scenarios.
+# responds to $default_choice ("true", "false", "").
+#
+# fails with an error message if the file to link to doesn't exist.
+#
+# will make any necessary directories that the symlink will sit in.
+#
+# $1: absolute path of file to link to.
+# $2: absolute path to symlink to be made.
+# $3: (optional) human-friendly name of the thing being symlinked, for messages.
+#
+# returns:
+# 0: if the symlink now exists (including if it was already set correctly)
+# 1: if the symlink does not now exist (if there was a conflict, and the user cancelled)
+# 2: on error
+#
+# example: `symlink "$root/vimrc" "$HOME/.vimrc" "my vimrc"
+function symlink {
+    local target="$1"
+    local link_name="$2"
+    local name="${3:-$(basename "$target")}"
+
+    if [ ! -e "$target" ]; then
+        >&2 echo "$(error "$name"): can't find target $target to symlink"
+        return 2
+    fi
+
+    if [ -L "$link_name" ]; then
+        existing_target="$(readlink -f "$link_name")"
+
+        if [ "$existing_target" = "$target" ]; then
+            skip "$name already set correctly"
+            return 0
+        fi
+
+        # link exists -- confirm whether to replace it
+        local prompt="$(warn "$name"): '$link_name' exists as a dead link -- replace it?"
+        local def_msg="$(warn-pref "'$link_name' exists as a dead link; did not make a new link.")"
+        local link_status="dead"
+        if [ -e "$existing_target" ]; then
+            prompt="$(warn "$name"): '$link_name' already points to '$existing_target'; replace it?"
+            def_msg="$(warn-pref "'$link_name' is already a symlink, so did not make a link.")"
+            link_status="old"
+        fi
+
+        if confirm-action "$prompt" "$def_msg" y; then
+            echo "replacing $link_status link for $(info "$name")"
+            rm "$link_name"
+        else
+            return 1
+        fi
+    elif [ -e "$link_name" ]; then
+        if confirm-action "$(warn "$name"): a file at '$link_name' already exists; replace it?" \
+                          "$(warn-pref "'$link_name' already exists, so did not make a link.")" \
+                          n; then
+            echo "replacing old $(info "$name")"
+            rm "$link_name"
+        else
+            return 1
+        fi
+    fi
+
+    # make a new symlink
+    mkdir -p $(dirname "$link_name")
+    ln -s "$target" "$link_name"
+}
+
+# interactive function to mount a device, presenting prompts under various scenarios.
+# responds to $default_choice ("true", "false", ""). doesn't deal with all edge cases.
+#
+# fails with an error message if the device to mount to doesn't exist.
+#
+# will make any necessary directories that the mount point will sit in.
+#
+# $1: absolute path of device.
+# $2: absolute path to mount point.
+# $3: (optional) human-friendly name of the thing being mounted, for messages.
+#
+# returns:
+# 0: if the device is now mounted at the given mountpoint (including if it was already
+#    set correctly)
+# 1: if the device is not now mounted at the given mountpoint (if there was a conflict,
+#    and the user cancelled)
+# 2: on error
+#
+# example: `do-mount "/dev/vde" "/work" "work block device"
+function do-mount {
+    local device="$1"
+    local mountpoint="$2"
+    local name="${3:-"$device"}"
+
+    if ! lsblk "$device" >/dev/null 2>&1; then
+        >&2 echo "$(error "$name"): $device is not a mountable device"
+        return 2
+    fi
+
+    local existing_mountpoints="$(findmnt "$device" -n -o "TARGET")"
+    if [ -n $(echo "$existing_mountpoints" | grep "^$mountpoint$") ]; then
+        skip "$name already mounted correctly"
+        return 0
+    elif [ -n "$existing_mountpoints" ]; then
+        >&2 warn-pref "$device is already mounted in the following locations:"
+        >&2 echo -e "$existing_mountpoints"
+        if ! confirm-action "continue?" "$device is already mounted" n; then
+            return 1
+        fi
+    fi
+
+    if [ -e "$mountpoint" ]; then
+        # mountpoint already exists as a file
+        local prompt="$(warn "$name"): a file at '$mountpoint' already exists; replace it?"
+        local def_msg="$(warn-pref "'$mountpoint' already exists, so did not mount.")"
+
+        existing_devices="$(findmnt -n -o "SOURCE" -M "$mountpoint")"
+        if [ -n "$existing_devices" ]; then
+            # mountpoint already exists as a mountpoint for another device(s)
+            echo "existing_devices: $existing_devices"
+            prompt="$(warn "$name"): '$mountpoint' already mounts '$existing_devices'; continue?"
+            def_msg="$(warn-pref "'$mountpoint' already mounts some devices, so did not mount.")"
+
+            if ! confirm-action "$prompt" "$def_msg" y; then
+                return 1
+            fi
+        fi
+
+        if confirm-action "$prompt" "$def_msg" n; then
+            echo "replacing old $(info "$name")"
+            rm -r "$mountpoint"
+        else
+            return 1
+        fi
+    fi
+
+    # make a new symlink
+    sudo mkdir -p "$mountpoint"
+    sudo mount "$device" "$mountpoint"
 }
 
 
