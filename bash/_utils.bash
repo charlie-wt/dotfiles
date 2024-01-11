@@ -229,7 +229,7 @@ function do-mount {
     fi
 
     local existing_mountpoints="$(findmnt "$device" -n -o "TARGET")"
-    if [ -n $(echo "$existing_mountpoints" | grep "^$mountpoint$") ]; then
+    if [ -n "$(echo "$existing_mountpoints" | grep "^$mountpoint$")" ]; then
         skip "$name already mounted correctly"
         return 0
     elif [ -n "$existing_mountpoints" ]; then
