@@ -17,6 +17,7 @@
     st = stash
     trunk = log --first-parent master
     unstage = reset HEAD --
+    when-deleted = rev-list -n 1 @ --
 [merge]
     tool = vimdiff
 [mergetool "vimdiff"]
