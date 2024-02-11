@@ -61,12 +61,16 @@ alias rf=rifle
 alias fpu='flatpak update -y && flatpak uninstall --unused -y'
 # push a new branch to `origin`
 alias push-branch='git push --set-upstream origin "$(git branch --show-current)"'
+# copy stdin to system clipboard using osc-52
+alias osc='printf "\033]52;c;$(printf "$(cat -)" | base64)\a"'
 
 # TODO #temp: need to explicitly tell sudo to keep $TERMINFO, to keep xterm-kitty;
 # without it, exiting vim won't clear the screen of it properly. doing `sudo visudo` and
 # adding `Defaults env_keep += "TERM TERMINFO"` works for `sudo vim`, but not `sudo -E
 # vim`.
 alias sv='sudo -E TERMINFO="$TERMINFO" vim'
+alias se='sudo -E TERMINFO="$TERMINFO"'
+
 
 
 # === Functions ========================================================================
@@ -119,7 +123,7 @@ extract () {
 mkrn () {
     case ${1##*.} in
        c)             gcc -Wall -g3            -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
-       C|cc|cpp|cxx)  g++ -Wall -g3 -std=c++17 -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
+       C|cc|cpp|cxx)  g++ -Wall -g3 -std=c++20 -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
        hs)            ghc --make ${1%.*} && ./${1%.*} "${@:2}"             ;;
        js)            node "$@"                                            ;;
        py)            python3 "$@"                                         ;;

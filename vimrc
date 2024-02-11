@@ -562,6 +562,14 @@ if executable('pylsp')
         \ })
 endif
 
+if executable('lua-language-server')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'lua-language-server',
+        \ 'cmd': {server_info->['lua-language-server']},
+        \ 'allowlist': ['lua'],
+        \ })
+endif
+
 let g:lsp_diagnostics_enabled = 0
 let g:lsp_diagnostics_signs_enabled = 0
 let g:lsp_diagnostics_signs_insert_mode_enabled = 0
