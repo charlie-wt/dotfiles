@@ -132,7 +132,7 @@ verify-name-supplied () {
 # completion
 __venv_completion () {
     local cur="${COMP_WORDS[COMP_CWORD]}"
-    local prev="${COMP_WORDS[COMP_CWORD-1]}"
+    local cmd="${COMP_WORDS[1]}"
 
     COMPREPLY=()
     case "${COMP_CWORD}" in
@@ -140,13 +140,19 @@ __venv_completion () {
             COMPREPLY=($(compgen -W "on ls list show new mk make add rm delete remove uninstall set workon go in unset deactivate out help" -- ${cur}))
             ;;
         2)
-            case ${prev} in
+            case ${cmd} in
                 rm|del*|remove|uninstall|set|workon|go|in)        ;;
                 *)                                         return ;;
             esac
             COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
             ;;
-        *)  ;;
+        *)
+            case ${cmd} in
+                rm|del*|remove|uninstall)        ;;
+                *)                        return ;;
+            esac
+            COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
+            ;;
     esac
 }
 complete -F __venv_completion venv
