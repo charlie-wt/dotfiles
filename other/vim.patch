@@ -1,0 +1,76 @@
+diff --git a/src/Makefile b/src/Makefile
+index 33903d3d3..8a968c2cf 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -318,7 +318,7 @@ CClink = $(CC)
+ # Uncomment this line when you don't want to get the GUI version, although you
+ # have GTK and/or Motif.  Also use --without-x if you don't want X11
+ # at all.
+-#CONF_OPT_GUI = --disable-gui
++CONF_OPT_GUI = --disable-gui
+ 
+ # Uncomment one of these lines if you have that GUI but don't want to use it.
+ # The automatic check will use another one that can be found.
+@@ -389,7 +389,7 @@ CClink = $(CC)
+ # This requires at least "normal" features, "tiny" doesn't work.
+ #CONF_OPT_LUA = --enable-luainterp
+ #CONF_OPT_LUA = --enable-luainterp=dynamic
+-#CONF_OPT_LUA = --enable-luainterp --with-luajit
++CONF_OPT_LUA = --enable-luainterp --with-luajit
+ #CONF_OPT_LUA = --enable-luainterp=dynamic --with-luajit
+ # Lua installation dir (when not set uses $LUA_PREFIX or defaults to /usr)
+ #CONF_OPT_LUA_PREFIX = --with-lua-prefix=/usr/local
+@@ -438,7 +438,7 @@ CClink = $(CC)
+ #CONF_OPT_PYTHON = --enable-pythoninterp
+ #CONF_OPT_PYTHON = --enable-pythoninterp --with-python-command=python2.7
+ #CONF_OPT_PYTHON = --enable-pythoninterp=dynamic
+-#CONF_OPT_PYTHON3 = --enable-python3interp
++CONF_OPT_PYTHON3 = --enable-python3interp
+ #CONF_OPT_PYTHON3 = --enable-python3interp --with-python3-command=python3.6
+ #CONF_OPT_PYTHON3 = --enable-python3interp=dynamic
+ 
+@@ -467,7 +467,7 @@ CClink = $(CC)
+ # NETBEANS - NetBeans interface. Only works with Motif, GTK, and gnome.
+ # Motif version must have XPM libraries (see |netbeans-xpm|).
+ # Uncomment this when you do not want the netbeans interface.
+-#CONF_OPT_NETBEANS = --disable-netbeans
++CONF_OPT_NETBEANS = --disable-netbeans
+ 
+ # CHANNEL - inter process communication. Same conditions as NetBeans.
+ # Uncomment this when you do not want inter process communication.
+@@ -523,7 +523,7 @@ CClink = $(CC)
+ # libcanberra - For sound support.  Default is on for huge features.
+ # Uncomment one of the two to chose otherwise.
+ # CONF_OPT_CANBERRA = --enable-canberra
+-# CONF_OPT_CANBERRA = --disable-canberra
++CONF_OPT_CANBERRA = --disable-canberra
+ 
+ # libsodium - For enhanced encryption.  Default is on.
+ # Uncomment the next line to not use libsodium
+@@ -534,7 +534,7 @@ CClink = $(CC)
+ # The default is "huge" for most systems.
+ #CONF_OPT_FEAT = --with-features=tiny
+ #CONF_OPT_FEAT = --with-features=normal
+-#CONF_OPT_FEAT = --with-features=huge
++CONF_OPT_FEAT = --with-features=huge
+ 
+ # COMPILED BY - For including a specific e-mail address for ":version".
+ #CONF_OPT_COMPBY = "--with-compiledby=John Doe <JohnDoe@yahoo.com>"
+@@ -544,7 +544,7 @@ CClink = $(CC)
+ # Also disable the GUI above, otherwise it will be included anyway.
+ # When both GUI and X11 have been disabled this may save about 15% of the
+ # code and make Vim startup quicker.
+-#CONF_OPT_X = --without-x
++CONF_OPT_X = --without-x
+ 
+ # X WINDOWS DIRECTORY - specify X directories
+ # If configure can't find you X stuff, or if you have multiple X11 derivatives
+@@ -558,7 +558,7 @@ CClink = $(CC)
+ # Vim will try to use XSMP to catch the user logging out if there are unsaved
+ # files.  Uncomment this line to disable that (it prevents vim trying to open
+ # communications with the session manager).
+-#CONF_OPT_XSMP = --disable-xsmp
++CONF_OPT_XSMP = --disable-xsmp
+ 
+ # You may wish to include xsmp but use exclude xsmp-interact if the logout
+ # XSMP functionality does not work well with your session-manager (at time of
