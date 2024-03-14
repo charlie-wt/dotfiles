@@ -3,17 +3,48 @@
 source "$DOTFILES/bash/_utils.bash"
 
 d="$HOME/src/bin/vim"
-cd $d
 
-# check if makefile has been customised
-git diff --exit-code "$d/src/Makefile" >/dev/null 2>&1
-makefile_changed="$?"
+makefile_changed=0
+pull_return_code=0
+compile_needed=1
 
-# update
-git stash
-git pull
-pull_return_code="$?"
-git stash pop
+# get sources up-to-date
+if [ ! -d "$d" ]; then
+    # clone repo if not present
+    if ! yesno "$(info-pref "vim not yet cloned; clone now?")"; then
+        echo did not clone.
+        exit 0
+    fi
+
+    parent="$(dirname "$d")"
+    mkdir -p "$parent"
+    if [ "$?" != 0 ]; then
+        >&2 error-pref "failed to create directory $parent for vim clone; exiting"
+        exit 1
+    fi
+    cd "$parent"
+
+    git clone "https://github.com/vim/vim.git"
+    pull_return_code="$?"
+    cd "$d"
+else
+    # pull repo if present
+    cd "$d"
+
+    # check if makefile has been customised
+    git diff --exit-code "$d/src/Makefile" >/dev/null 2>&1
+    makefile_changed="$?"
+
+    hash_before="$(git rev-parse HEAD)"
+
+    # update
+    git stash
+    git pull
+    pull_return_code="$?"
+    git stash pop
+
+    [ "$hash_before" == "$(git rev-parse HEAD)" ] && compile_needed=0
+fi
 
 if [ "$pull_return_code" != 0 ]; then
     >&2 error-pref "git pull failed; not re-making"
@@ -28,5 +59,5 @@ if [ "$makefile_changed" == 0 ]; then
     [ -f "$to_apply" ] && git apply "$to_apply"
 fi
 
-# rebuild
-make
+# rebuild if needed
+[ "$compile_needed" == 1 ] && make || info-pref "already up-to-date; didn't rebuild"
