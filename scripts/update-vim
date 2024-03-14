@@ -52,12 +52,18 @@ if [ "$pull_return_code" != 0 ]; then
 fi
 
 # apply makefile customisation if needed
-if [ "$makefile_changed" == 0 ]; then
+if [ "$makefile_changed" == 1 ]; then
+    skip "Makefile already changed, so not applying patch"
+else
     to_apply="$DOTFILES/local/other/vim.patch"
     [ ! -f "$to_apply" ] && to_apply="$DOTFILES/other/vim.patch"
 
-    [ -f "$to_apply" ] && git apply "$to_apply"
+    [ -f "$to_apply" ] && git apply "$to_apply" && compile_needed=1
 fi
 
 # rebuild if needed
-[ "$compile_needed" == 1 ] && make || info-pref "already up-to-date; didn't rebuild"
+if [ "$compile_needed" == 1 ]; then
+    make reconfig && make
+else
+    info-pref "already up-to-date; didn't rebuild"
+fi

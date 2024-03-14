@@ -31,7 +31,7 @@ function unimportant {
 }
 
 function skip {
-    unimportant "$@; skipping"
+    unimportant "skipped: $@"
 }
 
 function error-pref {
