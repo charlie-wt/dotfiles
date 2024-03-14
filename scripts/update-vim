@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+source "$DOTFILES/bash/_utils.bash"
+
+d="$HOME/src/bin/vim"
+cd $d
+
+# check if makefile has been customised
+git diff --exit-code "$d/src/Makefile" >/dev/null 2>&1
+makefile_changed="$?"
+
+# update
+git stash
+git pull
+pull_return_code="$?"
+git stash pop
+
+if [ "$pull_return_code" != 0 ]; then
+    >&2 error-pref "git pull failed; not re-making"
+    exit "$pull_return_code"
+fi
+
+# apply makefile customisation if needed
+if [ "$makefile_changed" == 0 ]; then
+    to_apply="$DOTFILES/local/other/vim.patch"
+    [ ! -f "$to_apply" ] && to_apply="$DOTFILES/other/vim.patch"
+
+    [ -f "$to_apply" ] && git apply "$to_apply"
+fi
+
+# rebuild
+make

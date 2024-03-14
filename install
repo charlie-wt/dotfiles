@@ -67,6 +67,7 @@ install-script branched-from
 install-script lightdark
 install-script update-clangd
 install-script update-kitty
+install-script update-vim
 echo
 
 

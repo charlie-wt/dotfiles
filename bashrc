@@ -1,11 +1,11 @@
 # === Init =============================================================================
 # export dotfiles dir as directory ~/.bashrc is symlinked into
-export DOTFILES=$(dirname "$(readlink -f ~/.bashrc)")
+export DOTFILES="$(dirname "$(readlink -f ~/.bashrc)")"
 
 # source automatically generated bashrc if there is one
 [ -f $DOTFILES/bashrc.auto ] && source $DOTFILES/bashrc.auto
 
-source $DOTFILES/bash/_utils.bash
+source "$DOTFILES/bash/_utils.bash"
 
 
 # === Environment Variables ============================================================
