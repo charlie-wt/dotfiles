@@ -73,6 +73,7 @@ toggle-kitty () {
     [ -e "$destination" ] && rm "$destination"
     ln -s "$file" "$destination"
 
+    # TODO #verify: try new kitty @ load-config
     echo "kitty theme set; you may need to reload some terminal configs"
 
     # TODO #bug: neither of these work

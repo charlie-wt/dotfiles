@@ -7,6 +7,7 @@ d="$HOME/src/bin/vim"
 makefile_changed=0
 pull_return_code=0
 compile_needed=1
+reconfig_needed=0
 
 # get sources up-to-date
 if [ ! -d "$d" ]; then
@@ -34,6 +35,8 @@ else
     # check if makefile has been customised
     git diff --exit-code "$d/src/Makefile" >/dev/null 2>&1
     makefile_changed="$?"
+    # not perfect logic as the unstash bumps the date, but good enough for our purposes?
+    when_installed_changed="$(date -r src/Makefile +%s)"
 
     hash_before="$(git rev-parse HEAD)"
 
@@ -52,18 +55,30 @@ if [ "$pull_return_code" != 0 ]; then
 fi
 
 # apply makefile customisation if needed
-if [ "$makefile_changed" == 1 ]; then
-    skip "Makefile already changed, so not applying patch"
-else
-    to_apply="$DOTFILES/local/other/vim.patch"
-    [ ! -f "$to_apply" ] && to_apply="$DOTFILES/other/vim.patch"
+to_apply="$DOTFILES/local/other/vim.patch"
+[ ! -f "$to_apply" ] && to_apply="$DOTFILES/other/vim.patch"
+if [ -f "$to_apply" ]; then
+    if [ "$makefile_changed" == 0 ]; then
+        should_apply=1
+    else
+        when_dotfiles_changed="$(git -C "${to_apply%/other/vim.patch}" log -1 --pretty="format:%ct" "$to_apply")"
+        if [ "$when_dotfiles_changed" -ge "$when_installed_changed" ]; then
+            yesno "$(warn "dotfiles makefile newer than your modifications; overwrite from dotfiles?")" \
+            && should_apply=1
+        fi
+    fi
 
-    [ -f "$to_apply" ] && git apply "$to_apply" && compile_needed=1
+    [ "$should_apply" == 1 ] \
+    && git checkout @ -- src/Makefile \
+    && git apply "$to_apply" \
+    && reconfig_needed=1
 fi
 
 # rebuild if needed
-if [ "$compile_needed" == 1 ]; then
+if [ "$reconfig_needed" == 1 ]; then
     make reconfig && make
+elif [ "$compile_needed" == 1 ]; then
+    make
 else
     info "already up-to-date; didn't rebuild"
 fi
