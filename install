@@ -21,7 +21,7 @@ fi
 # wrapper around `symlink`, specifically for dotfiles.
 #
 # $1: name of the file to link to (relative to $root)
-# $2: name of symlink (absolute path) -- optional, defaults to ~/.$1
+# $2: (optional) name of symlink (absolute path). defaults to ~/.$1
 function dotfile {
     # params
     local dotfile_name="$1"
@@ -139,7 +139,7 @@ if [ -x "$root/local/install" ]; then
     . "$root/install"
     root="$d"
 elif [ -f "$root/local/install" ]; then
-    warn-pref "found a local/install, but it wasn't marked as executable; skipping"
+    warn "found a local/install, but it wasn't marked as executable; skipping"
 else
     skip "didn't find a local/install"
 fi
@@ -149,7 +149,7 @@ echo
 # === Finish ===========================================================================
 # reminders for manual bits i've not automated yet
 echo
-echo "$(info DONE). remember to do these too:"
+echo "$(info-col DONE). remember to do these too:"
 echo "* run :PluginInstall in vim to install plugins"
 echo "* run <prefix>+I in tmux to install plugins"
 echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
@@ -157,7 +157,7 @@ echo "* set the user.name & user.email for this repo correctly"
 
 if [[ $(tmux -V) =~ ^tmux\ (0\.|1\.|2\.|3\.0) ]]; then
     echo
-    warn-pref "your tmux is too old to understand \$XDG_CONFIG_HOME."
+    warn "your tmux is too old to understand \$XDG_CONFIG_HOME."
     echo "      best thing is to make bash/local/tmux.bash, with this line:"
     echo
     echo 'alias tmux="tmux -f ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf"'

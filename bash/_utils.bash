@@ -14,36 +14,36 @@ function title {
     echo -e "\e[32m""$@""\e[0m"
 }
 
-function error {
+function error-col {
     echo -e "\e[31m""$@""\e[0m"
 }
 
-function warn {
+function warn-col {
     echo -e "\e[33m""$@""\e[0m"
 }
 
-function info {
+function info-col {
     echo -e "\e[36m""$@""\e[0m"
 }
 
-function unimportant {
+function unimportant-col {
     echo -e "\e[90m""$@""\e[0m"
 }
 
 function skip {
-    unimportant "skipped: $@"
+    unimportant-col "skipped: $@"
 }
 
-function error-pref {
-    echo "$(error ERROR):" "$@"
+function error {
+    echo "$(error-col ERROR):" "$@"
 }
 
-function warn-pref {
-    echo "$(warn WARN):" "$@"
+function warn {
+    echo "$(warn-col WARN):" "$@"
 }
 
-function info-pref {
-    echo "$(info INFO):" "$@"
+function info {
+    echo "$(info-col INFO):" "$@"
 }
 
 
@@ -117,7 +117,7 @@ function confirm-action {
     if [[ "$default_choice" != true && \
           "$default_choice" != false && \
           "$default_choice" != "" ]]; then
-        >&2 echo "$(error internal error): unknown \$default_choice '$default_choice'"
+        >&2 echo "$(error-col internal error): unknown \$default_choice '$default_choice'"
         default=""
     fi
 
@@ -148,14 +148,14 @@ function confirm-action {
 # 1: if the symlink does not now exist (if there was a conflict, and the user cancelled)
 # 2: on error
 #
-# example: `symlink "$root/vimrc" "$HOME/.vimrc" "my vimrc"
+# example: `symlink "$DOTFILES/vimrc" "$HOME/.vimrc" "my vimrc"
 function symlink {
     local target="$1"
     local link_name="$2"
     local name="${3:-$(basename "$target")}"
 
     if [ ! -e "$target" ]; then
-        >&2 echo "$(error "$name"): can't find target $target to symlink"
+        >&2 echo "$(error-col "$name"): can't find target $target to symlink"
         return 2
     fi
 
@@ -168,26 +168,26 @@ function symlink {
         fi
 
         # link exists -- confirm whether to replace it
-        local prompt="$(warn "$name"): '$link_name' exists as a dead link -- replace it?"
-        local def_msg="$(warn-pref "'$link_name' exists as a dead link; did not make a new link.")"
+        local prompt="$(warn-col "$name"): '$link_name' exists as a dead link -- replace it?"
+        local def_msg="$(warn "'$link_name' exists as a dead link; did not make a new link.")"
         local link_status="dead"
         if [ -e "$existing_target" ]; then
-            prompt="$(warn "$name"): '$link_name' already points to '$existing_target'; replace it?"
-            def_msg="$(warn-pref "'$link_name' is already a symlink, so did not make a link.")"
+            prompt="$(warn-col "$name"): '$link_name' already points to '$existing_target'; replace it?"
+            def_msg="$(warn "'$link_name' is already a symlink, so did not make a link.")"
             link_status="old"
         fi
 
         if confirm-action "$prompt" "$def_msg" y; then
-            echo "replacing $link_status link for $(info "$name")"
+            echo "replacing $link_status link for $(info-col "$name")"
             rm "$link_name"
         else
             return 1
         fi
     elif [ -e "$link_name" ]; then
-        if confirm-action "$(warn "$name"): a file at '$link_name' already exists; replace it?" \
-                          "$(warn-pref "'$link_name' already exists, so did not make a link.")" \
+        if confirm-action "$(warn-col "$name"): a file at '$link_name' already exists; replace it?" \
+                          "$(warn "'$link_name' already exists, so did not make a link.")" \
                           n; then
-            echo "replacing old $(info "$name")"
+            echo "replacing old $(info-col "$name")"
             rm "$link_name"
         else
             return 1
@@ -195,8 +195,7 @@ function symlink {
     fi
 
     # make a new symlink
-    mkdir -p $(dirname "$link_name")
-    ln -s "$target" "$link_name"
+    mkdir -p $(dirname "$link_name") && ln -s "$target" "$link_name"
 }
 
 # interactive function to mount a device, presenting prompts under various scenarios.
@@ -224,7 +223,7 @@ function do-mount {
     local name="${3:-"$device"}"
 
     if ! lsblk "$device" >/dev/null 2>&1; then
-        >&2 echo "$(error "$name"): $device is not a mountable device"
+        >&2 echo "$(error-col "$name"): $device is not a mountable device"
         return 2
     fi
 
@@ -233,7 +232,7 @@ function do-mount {
         skip "$name already mounted correctly"
         return 0
     elif [ -n "$existing_mountpoints" ]; then
-        >&2 warn-pref "$device is already mounted in the following locations:"
+        >&2 warn "$device is already mounted in the following locations:"
         >&2 echo -e "$existing_mountpoints"
         if ! confirm-action "continue?" "$device is already mounted" n; then
             return 1
@@ -242,15 +241,15 @@ function do-mount {
 
     if [ -e "$mountpoint" ]; then
         # mountpoint already exists as a file
-        local prompt="$(warn "$name"): a file at '$mountpoint' already exists; replace it?"
-        local def_msg="$(warn-pref "'$mountpoint' already exists, so did not mount.")"
+        local prompt="$(warn-col "$name"): a file at '$mountpoint' already exists; replace it?"
+        local def_msg="$(warn "'$mountpoint' already exists, so did not mount.")"
 
         existing_devices="$(findmnt -n -o "SOURCE" -M "$mountpoint")"
         if [ -n "$existing_devices" ]; then
             # mountpoint already exists as a mountpoint for another device(s)
             echo "existing_devices: $existing_devices"
-            prompt="$(warn "$name"): '$mountpoint' already mounts '$existing_devices'; continue?"
-            def_msg="$(warn-pref "'$mountpoint' already mounts some devices, so did not mount.")"
+            prompt="$(warn-col "$name"): '$mountpoint' already mounts '$existing_devices'; continue?"
+            def_msg="$(warn "'$mountpoint' already mounts some devices, so did not mount.")"
 
             if ! confirm-action "$prompt" "$def_msg" y; then
                 return 1
@@ -258,7 +257,7 @@ function do-mount {
         fi
 
         if confirm-action "$prompt" "$def_msg" n; then
-            echo "replacing old $(info "$name")"
+            echo "replacing old $(info-col "$name")"
             rm -r "$mountpoint"
         else
             return 1

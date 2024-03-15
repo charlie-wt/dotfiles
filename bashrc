@@ -50,8 +50,8 @@ alias gdb='gdb -q'
 
 alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 alias tma="tmux attach -t"
-# there's already a fd on ubuntu
-alias fd='fdfind'
+# there's already a fd in apt
+have-cmd fdfind && alias fd='fdfind'
 # rg in c(++) code only
 alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
 # quick name for ranger (and when it exits, bash gets put into wherever ranger was)
@@ -129,12 +129,12 @@ mkrn () {
        py)            python3 "$@"                                         ;;
        rs)            rustc "$1" && ./${1%.*} "${@:2}"                     ;;
        *)
-           [[ -f "Cargo.toml" ]] && cargo run || >&2 echo "unknown filetype '${1##*.}'." ;;
+           [ -f "Cargo.toml" ] && cargo run || >&2 echo "unknown filetype '${1##*.}'." ;;
     esac
 }
 
 # get size of current directory (and size of constituent directories).
-# $1: number of constituent directories to list, or `all` for all of them. Optional;
+# $1: (optional) number of constituent directories to list, or `all` for all of them.
 #     defaults to 25.
 # NOTE: suppresses error messages, since they're usually 'permission denied' clutter
 size () {
@@ -148,7 +148,7 @@ size () {
 }
 
 # quickly list tagged todo comments as made by the corresponding vimrc functions.
-# $1 : specific tag to search for (optional; defaults to all tags)
+# $1 : (optional) specific tag to search for. defaults to all tags.
 todos () {
     [ $# -ge 1 ] && local tag="$1" || local tag="\w+"
 
@@ -157,18 +157,14 @@ todos () {
     $cmd "(#|//|/\*|\"|<!--|--|;)\sTODO\s*#$tag\b" ${@:2}
 }
 
-# checkout a github pull request
-# $1: pull request index
-# $2: (optional) name of local branch to make; defaults to `pr-$1`
+# checkout a github pull request.
+# $1: pull request index.
+# $2: (optional) name of local branch to make. defaults to `pr-$1`.
 pr () {
-    if [ -z "$1" ]; then
-        >&2 echo "please provide a pull request index"
-        return
-    fi
+    [ -z "$1" ] && >&2 error "please provide a pull request index." && return 1
 
     local idx="$1"
-
-    local branch_name="pr-$1"
+    local branch_name="pr-$idx"
     [ -n "$2" ] && branch_name="$2"
 
     git fetch upstream pull/"$idx"/head:"$branch_name" && git checkout "$branch_name"
@@ -184,5 +180,5 @@ pr () {
 # source other files (eg. for setup-specific stuff, or for external programs)
 for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do source $f ; done
 # explicitly source machine-local files afterwards, so they can override earlier config
-[[ -d $DOTFILES/local/bash ]] && \
+[ -d "$DOTFILES/local/bash" ] && \
     for f in $(find $DOTFILES/local/bash/ -maxdepth 1 -type f) ; do source $f ; done

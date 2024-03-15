@@ -11,7 +11,7 @@ compile_needed=1
 # get sources up-to-date
 if [ ! -d "$d" ]; then
     # clone repo if not present
-    if ! yesno "$(info-pref "vim not yet cloned; clone now?")"; then
+    if ! yesno "$(info "vim not yet cloned; clone now?")"; then
         echo did not clone.
         exit 0
     fi
@@ -19,7 +19,7 @@ if [ ! -d "$d" ]; then
     parent="$(dirname "$d")"
     mkdir -p "$parent"
     if [ "$?" != 0 ]; then
-        >&2 error-pref "failed to create directory $parent for vim clone; exiting"
+        >&2 error "failed to create directory $parent for vim clone; exiting"
         exit 1
     fi
     cd "$parent"
@@ -47,7 +47,7 @@ else
 fi
 
 if [ "$pull_return_code" != 0 ]; then
-    >&2 error-pref "git pull failed; not re-making"
+    >&2 error "git pull failed; not re-making"
     exit "$pull_return_code"
 fi
 
@@ -65,5 +65,5 @@ fi
 if [ "$compile_needed" == 1 ]; then
     make reconfig && make
 else
-    info-pref "already up-to-date; didn't rebuild"
+    info "already up-to-date; didn't rebuild"
 fi

@@ -1,4 +1,6 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+source "$DOTFILES/bash/_utils.bash"
 
 github_repo="clangd/clangd"
 destination="$HOME/src/bin"
@@ -8,17 +10,25 @@ json_version_tag="tag_name"
 
 info="$(curl -s -S https://api.github.com/repos/$github_repo/releases/latest)"
 if [ $? -ne 0 ]; then
-    >&2 echo error getting latest version info via curl.
+    >&2 error "error getting latest version info via curl."
     exit 1
 fi
 
 rate_limit_msg="API rate limit exceeded"
 if echo "$info" | grep "$rate_limit_msg" >/dev/null 2>&1; then
-    >&2 echo GitHub API rate limit exceeded.
+    >&2 error "GitHub API rate limit exceeded."
     exit 1
 fi
 
-version="$(echo $info | grep $json_version_tag | sed 's/.*"'$json_version_tag'":\s*"\([0-9A-Za-z_\.]\+\)".*/\1/')"
+version="$(echo "$info" | grep "$json_version_tag" | sed 's/.*"'$json_version_tag'":\s*"\([0-9A-Za-z_\.]\+\)".*/\1/')"
+if have-cmd clangd; then
+    local_version="$(clangd --version | head -n 1 | sed 's/clangd version \([0-9\.]\+\) .*/\1/')"
+fi
+
+if [ "$version" == "$local_version" ]; then
+    info "latest version $version matches locally-installed version; not downloading."
+    exit 0
+fi
 
 # download release to temp dir
 filename="clangd-linux-$version"
@@ -49,3 +59,9 @@ fi
 mv "$tmpdir/clangd_$version" "$destination/clangd"
 
 rm -r "$tmpdir"
+
+if [ -n "$local_version" ]; then
+    echo "updated $(info-col "$local_version") -> $(info-col "$version")"
+else
+    echo "installed clangd $(info-col "$version")"
+fi
