@@ -1,6 +1,6 @@
 ! have-cmd rustup && return 1
 
-completion_dir="$HOME/.local/share/bash-completion/completions"
+completion_dir="$(data-home)/bash-completion/completions"
 
 ensure-completions () {
     local name="$1"
@@ -22,5 +22,6 @@ ensure-completions () {
 }
 ensure-completions rustup
 ensure-completions cargo
-unset -f ensure-completions
 
+unset -f ensure-completions
+unset completion_dir
