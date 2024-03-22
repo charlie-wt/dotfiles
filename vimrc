@@ -570,6 +570,14 @@ if executable('lua-language-server')
         \ })
 endif
 
+if executable('haskell-language-server-wrapper')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'haskell-language-server',
+        \ 'cmd': {server_info->['haskell-language-server-wrapper', '--lsp']},
+        \ 'allowlist': ['haskell', 'lhaskell'],
+        \ })
+endif
+
 let g:lsp_diagnostics_enabled = 0
 let g:lsp_diagnostics_signs_enabled = 0
 let g:lsp_diagnostics_signs_insert_mode_enabled = 0
