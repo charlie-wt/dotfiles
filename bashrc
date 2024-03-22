@@ -1,6 +1,4 @@
 # === Init =============================================================================
-TIMING=1
-__total_start_time=$(date +%s%3N)
 # export dotfiles dir as directory ~/.bashrc is symlinked into
 export DOTFILES="$(dirname "$(readlink -f ~/.bashrc)")"
 
@@ -181,10 +179,7 @@ if [[ $- == *i* ]]; then
     # when terminal is frozen by ^s, allow unfreezing with any key.
     stty ixany
 
-    # append to the history file, don't overwrite it
-    shopt -s histappend
-    # check window size after each command and, if necessary, update LINES and COLUMNS.
-    shopt -s checkwinsize
+    shopt -s histappend checkwinsize globstar
     # make less more friendly for non-text input files, see lesspipe(1)
     have-cmd lesspipe && eval "$(SHELL=/bin/sh lesspipe)"
     # do some standard colour setup for ls
@@ -193,7 +188,6 @@ if [[ $- == *i* ]]; then
     # NOTE(slow) enable programmable completion features (you don't need to enable this,
     # if it's already enabled in /etc/bash.bashrc and /etc/profile sources
     # /etc/bash.bashrc).
-    __completions_start_time=$(date +%s%3N)
     if ! shopt -oq posix; then
       if [ -f /usr/share/bash-completion/bash_completion ]; then
         . /usr/share/bash-completion/bash_completion
@@ -201,38 +195,12 @@ if [[ $- == *i* ]]; then
         . /etc/bash_completion
       fi
     fi
-    [ -n $TIMING ] && echo "$(($(date +%s%3N) - __completions_start_time))"$'\tcompletions\n'
 fi
 
 
 # === End ==============================================================================
 # source other files (eg. for setup-specific stuff, or for external programs)
-if [ -n $TIMING ]; then
-    __bash_start_time=$(date +%s%3N)
-    timeses=""
-    for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do
-        __cmd_start_time=$(date +%s%3N)
-        source $f
-        [ "$?" != 2 ] && timeses="$timeses"$'\n'"$(($(date +%s%3N) - __cmd_start_time))"$'\t'"$(basename "$f")"
-    done
-    echo "$(($(date +%s%3N) - __bash_start_time))"$'\tbash/'
-    printf "\n$timeses" | sort -nr
-else
-    for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do source $f ; done
-fi
+for f in $(find "$DOTFILES/bash" -maxdepth 1 -type f) ; do source $f ; done
 # explicitly source machine-local files afterwards, so they can override earlier config
-if [ -n $TIMING ]; then
-    __local_bash_start_time=$(date +%s%3N)
-    timeses=""
-    [ -d "$DOTFILES/local/bash" ] && for f in $(find $DOTFILES/local/bash -maxdepth 1 -type f) ; do
-        __cmd_start_time=$(date +%s%3N)
-        source $f
-        [ "$?" != 2 ] && timeses="$timeses"$'\n'"$(($(date +%s%3N) - __cmd_start_time))"$'\t'"$(basename "$f")"
-    done
-    echo "$(($(date +%s%3N) - __local_bash_start_time))"$'\tlocal/bash/'
-    printf "\n$timeses" | sort -nr
-else
-    [ -d "$DOTFILES/local/bash" ] && \
-        for f in $(find $DOTFILES/local/bash -maxdepth 1 -type f) ; do source $f ; done
-fi
-[ -n $TIMING ] && echo "$(($(date +%s%3N) - __total_start_time))"$'\tTOTAL'
+[ -d "$DOTFILES/local/bash" ] && \
+    for f in $(find "$DOTFILES/local/bash" -maxdepth 1 -type f) ; do source $f ; done
