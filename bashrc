@@ -179,7 +179,7 @@ if [[ $- == *i* ]]; then
     # when terminal is frozen by ^s, allow unfreezing with any key.
     stty ixany
 
-    shopt -s histappend checkwinsize globstar
+    shopt -s checkwinsize globstar histappend
     # make less more friendly for non-text input files, see lesspipe(1)
     have-cmd lesspipe && eval "$(SHELL=/bin/sh lesspipe)"
     # do some standard colour setup for ls
@@ -200,7 +200,7 @@ fi
 
 # === End ==============================================================================
 # source other files (eg. for setup-specific stuff, or for external programs)
-for f in $(find "$DOTFILES/bash" -maxdepth 1 -type f) ; do source $f ; done
+for f in $(find "$DOTFILES/bash" -maxdepth 1 -type f) ; do source "$f" ; done
 # explicitly source machine-local files afterwards, so they can override earlier config
 [ -d "$DOTFILES/local/bash" ] && \
-    for f in $(find "$DOTFILES/local/bash" -maxdepth 1 -type f) ; do source $f ; done
+    for f in $(find "$DOTFILES/local/bash" -maxdepth 1 -type f) ; do source "$f" ; done
