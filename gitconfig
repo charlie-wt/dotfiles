@@ -10,17 +10,24 @@
     d  = diff
     dc = diff --cached
     l  = log --graph --oneline --abbrev-commit --decorate --all
-    last = log -1 HEAD
+    last = log -1 @
     ll = log --graph --decorate --all
     mg = merge
     s  = status
+    smu = !git submodule sync --recursive && git submodule update --init --recursive
     st = stash
     trunk = log --first-parent master
-    unstage = reset HEAD --
+    unstage = reset @ --
     when-deleted = rev-list -n 1 @ --
+[diff]
+    submodule = log
 [merge]
     tool = vimdiff
 [mergetool "vimdiff"]
     cmd = "vimdiff -O $LOCAL $MERGED $REMOTE"
 [pull]
     rebase = true
+[status]
+    submodulesummary = true
+[submodule]
+    recurse = true

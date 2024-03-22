@@ -21,9 +21,7 @@ if echo "$info" | grep "$rate_limit_msg" >/dev/null 2>&1; then
 fi
 
 version="$(echo "$info" | grep "$json_version_tag" | sed 's/.*"'$json_version_tag'":\s*"\([0-9A-Za-z_\.]\+\)".*/\1/')"
-if have-cmd clangd; then
-    local_version="$(clangd --version | head -n 1 | sed 's/clangd version \([0-9\.]\+\) .*/\1/')"
-fi
+have-cmd clangd && local_version="$(clangd --version | head -n 1 | sed 's/clangd version \([0-9\.]\+\) .*/\1/')"
 
 if [ "$version" == "$local_version" ]; then
     info "latest version $version matches locally-installed version; not downloading."
@@ -36,9 +34,8 @@ filename="clangd-linux-$version"
 tmpdir=$(mktemp -d)
 
 url="https://github.com/$github_repo/releases/download/$version/$filename.zip"
-wget "$url" --directory-prefix="$tmpdir" -o "$tmpdir/wget_log"
-if [ $? -ne 0 ]; then
-    >&2 echo "error downloading package:"
+if ! wget "$url" --directory-prefix="$tmpdir" -o "$tmpdir/wget_log"; then
+    >&2 error "error downloading package:"
     >&2 cat "$tmpdir/wget_log"
     rm -r "$tmpdir"
     exit 1
@@ -48,9 +45,8 @@ fi
 mkdir -p "$destination"
 
 zip_file="$tmpdir/$filename.zip"
-unzip -q "$zip_file" -d "$tmpdir"
-if [ $? -ne 0 ]; then
-    >&2 echo "error unzipping package from $zip_file"
+if ! unzip -q "$zip_file" -d "$tmpdir"; then
+    >&2 error "error unzipping package from $zip_file"
     rm -r "$tmpdir"
     exit 1
 fi

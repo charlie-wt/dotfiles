@@ -20,9 +20,9 @@ fi
 # === Symlinking dotfiles ==============================================================
 # wrapper around `symlink`, specifically for dotfiles.
 #
-# $1: name of the file to link to (relative to $root)
-# $2: (optional) name of symlink (absolute path). defaults to ~/.$1
-function dotfile {
+# $1: name of the file to link to (relative to $root).
+# $2: (optional) name of symlink (absolute path). defaults to ~/.$1.
+dotfile () {
     # params
     local dotfile_name="$1"
     local link_name="${2:-$HOME/.$dotfile_name}"
@@ -45,9 +45,9 @@ echo
 # === Install scripts ==================================================================
 # wrapper around `symlink`, specifically for scripts.
 #
-# $1: name of file to link to (relative to $root/scripts)
-# $1: (optional) installed name of the script. defaults to that of the linked-to file
-function install-script {
+# $1: name of file to link to (relative to $root/scripts).
+# $2: (optional) installed name of the script. defaults to that of the linked-to file.
+install-script () {
     # params
     local script_path="$1"
     local script_name="${2:-$(basename $script_path)}"
@@ -133,7 +133,7 @@ fi
 
 # === Local ============================================================================
 title "doing local install"
-# do local install, if present
+
 if [ -x "$root/local/install" ]; then
     root="$d/local"
     . "$root/install"

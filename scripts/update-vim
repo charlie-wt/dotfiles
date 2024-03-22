@@ -5,7 +5,6 @@ source "$DOTFILES/bash/_utils.bash"
 d="$HOME/src/bin/vim"
 
 makefile_changed=0
-pull_return_code=0
 compile_needed=1
 reconfig_needed=0
 
@@ -18,23 +17,22 @@ if [ ! -d "$d" ]; then
     fi
 
     parent="$(dirname "$d")"
-    mkdir -p "$parent"
-    if [ "$?" != 0 ]; then
+    if ! mkdir -p "$parent"; then
         >&2 error "failed to create directory $parent for vim clone; exiting"
         exit 1
     fi
     cd "$parent"
 
-    git clone "https://github.com/vim/vim.git"
-    pull_return_code="$?"
+    if ! git clone "https://github.com/vim/vim.git"; then
+        >&2 error "git pull failed; not building" && exit 1
+    fi
     cd "$d"
 else
     # pull repo if present
     cd "$d"
 
     # check if makefile has been customised
-    git diff --exit-code "$d/src/Makefile" >/dev/null 2>&1
-    makefile_changed="$?"
+    makefile_changed="$(exit-code git diff --exit-code src/Makefile)"
     # not perfect logic as the unstash bumps the date, but good enough for our purposes?
     when_installed_changed="$(date -r src/Makefile +%s)"
 
@@ -46,12 +44,9 @@ else
     pull_return_code="$?"
     git stash pop
 
-    [ "$hash_before" == "$(git rev-parse HEAD)" ] && compile_needed=0
-fi
+    [ "$pull_return_code" != 0 ] && >&2 error "git pull failed; not rebuilding" && exit 1
 
-if [ "$pull_return_code" != 0 ]; then
-    >&2 error "git pull failed; not re-making"
-    exit "$pull_return_code"
+    [ "$hash_before" == "$(git rev-parse HEAD)" ] && compile_needed=0
 fi
 
 # apply makefile customisation if needed

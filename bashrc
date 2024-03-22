@@ -52,8 +52,9 @@ alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 alias tma="tmux attach -t"
 # there's already a fd in apt
 have-cmd fdfind && alias fd='fdfind'
-# rg in c(++) code only
+# rg for certain filetypes
 alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
+alias rgp="rg -g '*.py'"
 # quick name for ranger (and when it exits, bash gets put into wherever ranger was)
 alias ra='. ranger'
 alias rf=rifle

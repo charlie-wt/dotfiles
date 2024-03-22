@@ -10,56 +10,72 @@ __utils_included=1
 
 
 # for printing with some colours
-function title {
+title () {
     echo -e "\e[32m""$@""\e[0m"
 }
 
-function error-col {
+error-col () {
     echo -e "\e[31m""$@""\e[0m"
 }
 
-function warn-col {
+warn-col () {
     echo -e "\e[33m""$@""\e[0m"
 }
 
-function info-col {
+info-col () {
     echo -e "\e[36m""$@""\e[0m"
 }
 
-function unimportant-col {
+unimportant-col () {
     echo -e "\e[90m""$@""\e[0m"
 }
 
-function skip {
+skip () {
     unimportant-col "skipped: $@"
 }
 
-function error {
+error () {
     echo "$(error-col ERROR):" "$@"
 }
 
-function warn {
+warn () {
     echo "$(warn-col WARN):" "$@"
 }
 
-function info {
+info () {
     echo "$(info-col INFO):" "$@"
 }
 
 
 # is the environment variable `$1` defined? (note: do not pass $1 in double-quotes)
-function is-defined {
+is-defined () {
     [ -z ${1+x} ] && return 1 || return 0
 }
 
 # does the command `$1` exist?
-function have-cmd {
+have-cmd () {
     [ -z "$(type -t $1)" ] && return 1 || return 0
 }
 
 # get the number of lines in `$1`
-function num-lines {
+num-lines () {
     echo -n "$1" | grep -c ^
+}
+
+# echo the exit code of the given command invocation
+# $1: if `-p` ('passthrough'), will not suppress stdout & stderr of the given command.
+# usage: `$ exit-code ls directory_that_exists
+#         0`
+#        `$ exit-code -p ls directory_that_doesnt_exist
+#         ls: cannot access 'directory_that_doesnt_exist': No such file or directory
+#         2`
+exit-code () {
+    if [ "$1" == "-p" ]; then
+        ${@:2}
+    else
+        $@ >/dev/null 2>&1
+    fi
+    echo "$?"
 }
 
 
@@ -70,7 +86,7 @@ function num-lines {
 # usage: `if yesno "wanna do the thing?" y; then
 #             echo did the thing!
 #         fi`
-function yesno {
+yesno () {
     local qn="$1"
     local default="$2"
 
@@ -108,7 +124,7 @@ function yesno {
 # $1: yesno prompt
 # $2: a message to print if $default_choice is `false`.
 # $3: yesno default (ie. [Yn] vs. [yN] vs. [yn])
-function confirm-action {
+confirm-action () {
     local prompt="$1"
     local default_false_message="$2"
     local yesno_default="$3"
@@ -149,7 +165,7 @@ function confirm-action {
 # 2: on error
 #
 # example: `symlink "$DOTFILES/vimrc" "$HOME/.vimrc" "my vimrc"
-function symlink {
+symlink () {
     local target="$1"
     local link_name="$2"
     local name="${3:-$(basename "$target")}"
@@ -217,7 +233,7 @@ function symlink {
 # 2: on error
 #
 # example: `do-mount "/dev/vde" "/work" "work block device"
-function do-mount {
+do-mount () {
     local device="$1"
     local mountpoint="$2"
     local name="${3:-"$device"}"
@@ -353,7 +369,7 @@ get-unique-name-match () {
 # insert a call to this into a script, to 'break' there and be able to type `echo`
 # (etc.) to see what's going on.
 # from: https://blog.jez.io/bash-debugger/
-function breakpoint {
+breakpoint () {
     echo "[DBG] Press ^D to resume, or ^C to abort."
     local line
     while read -r -p "> " line < /dev/tty; do
@@ -364,23 +380,23 @@ function breakpoint {
 
 
 # echo xdg vars
-function cache-home {
+cache-home () {
     [ -n "$XDG_CACHE_HOME" ] && echo "$XDG_CACHE_HOME" || echo "$HOME/.cache"
 }
 
-function config-home {
+config-home () {
     [ -n "$XDG_CONFIG_HOME" ] && echo "$XDG_CONFIG_HOME" || echo "$HOME/.config"
 }
 
-function data-home {
+data-home () {
     [ -n "$XDG_DATA_HOME" ] && echo "$XDG_DATA_HOME" || echo "$HOME/.local/share"
 }
 
-function state-home {
+state-home () {
     [ -n "$XDG_STATE_HOME" ] && echo "$XDG_STATE_HOME" || echo "$HOME/.local/state"
 }
 
-function bin-home {
+bin-home () {
     echo "$HOME/.local/bin"
 }
 
@@ -391,7 +407,7 @@ function bin-home {
 #
 # $1: version number to compare.
 # $2: version number to compare against.
-function at-least-version {
+at-least-version () {
     fst="$(echo "$1" | sed 's/[^0-9\.]//g')"
     snd="$(echo "$2" | sed 's/[^0-9\.]//g')"
 
