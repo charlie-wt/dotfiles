@@ -1,5 +1,5 @@
-base_dir=~/src/bin/fzf
-[ ! -e "$base_dir" ] && return 1
+base_dir="$HOME/src/bin/fzf"
+[ -e "$base_dir" ] || return 2
 
 # Setup fzf
 # ---------

@@ -1,7 +1,5 @@
 # if running bash
-if [ -n "$BASH_VERSION" ]; then
-    [ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"
-fi
+[ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"
 
 # enable core dumps
 ulimit -c unlimited

@@ -1,15 +1,18 @@
-# !! Contents within this block are managed by 'mamba init' !!
-export MAMBA_EXE='/nethome/charliew/.local/share/micromamba/micromamba';
-[ ! -x "$MAMBA_EXE" ] && return 1
+export MAMBA_ROOT_PREFIX="$(data-home)/micromamba";
+export MAMBA_EXE="$MAMBA_ROOT_PREFIX/micromamba";
+[ -x "$MAMBA_EXE" ] || return 2
 
-export MAMBA_ROOT_PREFIX='/nethome/charliew/.local/share/micromamba';
-__mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__mamba_setup"
+__setup_file="$MAMBA_ROOT_PREFIX/setup.bash"
+if [ "$MAMBA_EXE" -nt "$__setup_file" ]; then
+    "$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" > "$__setup_file" 2>/dev/null
+fi
+if [ -f "$__setup_file" ]; then
+    source "$__setup_file"
 else
     alias micromamba="$MAMBA_EXE"  # Fallback on help from mamba activate
 fi
-unset __mamba_setup
+unset __setup_file
+
 
 
 # MINE: allow directly running bins from the `global` environment, & register manpages

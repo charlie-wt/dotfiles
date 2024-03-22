@@ -1,4 +1,4 @@
-[[ ! -e "$(data-home)/cargo" && ! -e "$(data-home)/rustup" ]] && return 1
+[ -e "$(data-home)/cargo" ] && [ -e "$(data-home)/rustup" ] || return 2
 
 export CARGO_HOME="$(data-home)/cargo"
 export RUSTUP_HOME="$(data-home)/rustup"

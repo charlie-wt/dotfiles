@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-have-cmd tmuxinator || return 1
+have-cmd tmuxinator || return 2
 
 _tmuxinator() {
     COMPREPLY=()

@@ -1,9 +1,8 @@
 # === Init =============================================================================
+TIMING=1
+__total_start_time=$(date +%s%3N)
 # export dotfiles dir as directory ~/.bashrc is symlinked into
 export DOTFILES="$(dirname "$(readlink -f ~/.bashrc)")"
-
-# source automatically generated bashrc if there is one
-[ -f $DOTFILES/bashrc.auto ] && source $DOTFILES/bashrc.auto
 
 source "$DOTFILES/bash/_utils.bash"
 
@@ -27,6 +26,9 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
+# don't put duplicate lines or lines starting with space in the history.
+export HISTCONTROL=ignoreboth
+
 # other
 export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
 export COLORTERM=truecolor
@@ -34,6 +36,7 @@ export VISUAL=vim EDITOR=vim
 
 
 # === Aliases ==========================================================================
+alias ls='ls --color=auto'
 alias l='ls -GF'
 alias la='ls -AGF'
 alias ll='ls -lhAGF'
@@ -47,6 +50,7 @@ alias gs='git status'
 alias gd='git diff'
 alias gdc='git dc'
 alias gdb='gdb -q'
+alias grep='grep --color=auto'
 
 alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 alias tma="tmux attach -t"
@@ -173,13 +177,48 @@ pr () {
 
 
 # === Other ============================================================================
-# when terminal is frozen by ^s, allow unfreezing with any key.
-[[ $- == *i* ]] && stty ixany
+if [[ $- == *i* ]]; then
+    # when terminal is frozen by ^s, allow unfreezing with any key.
+    stty ixany
+
+    # append to the history file, don't overwrite it
+    shopt -s histappend
+    # check window size after each command and, if necessary, update LINES and COLUMNS.
+    shopt -s checkwinsize
+    # make less more friendly for non-text input files, see lesspipe(1)
+    have-cmd lesspipe && eval "$(SHELL=/bin/sh lesspipe)"
+    # do some standard colour setup for ls
+    have-cmd dircolors && eval "$(dircolors -b)"
+
+    # NOTE(slow) enable programmable completion features (you don't need to enable this,
+    # if it's already enabled in /etc/bash.bashrc and /etc/profile sources
+    # /etc/bash.bashrc).
+    if ! shopt -oq posix; then
+      if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+      elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+      fi
+    fi
+fi
 
 
 # === End ==============================================================================
 # source other files (eg. for setup-specific stuff, or for external programs)
-for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do source $f ; done
+if [ -n $TIMING ]; then
+    __total_start_time=$(date +%s%3N)
+    timeses=""
+    for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do
+        __cmd_start_time=$(date +%s%3N)
+        source $f
+        [ "$?" != 2 ] && timeses="$timeses"$'\n'"$(($(date +%s%3N) - __cmd_start_time))"$'\t'"$(basename "$f")"
+    done
+    echo "$(($(date +%s%3N) - __total_start_time))"$'\tbash/'
+    printf "\n$timeses" | sort -nr
+else
+    for f in $(find $DOTFILES/bash -maxdepth 1 -type f) ; do source $f ; done
+fi
 # explicitly source machine-local files afterwards, so they can override earlier config
 [ -d "$DOTFILES/local/bash" ] && \
     for f in $(find $DOTFILES/local/bash/ -maxdepth 1 -type f) ; do source $f ; done
+[ -n $TIMING ] && echo "$(($(date +%s%3N) - __total_start_time))"$'\tTOTAL'
