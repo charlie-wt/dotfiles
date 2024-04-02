@@ -456,11 +456,11 @@ augroup my_autocmds
     au!
 
     " set some filetypes
-    au vimenter,bufenter,winenter ~/notes/* setlocal filetype=pandoc
-    au vimenter,bufenter,winenter *.p8 setlocal filetype=lua
+    au vimenter,bufenter,winenter *.bash setlocal filetype=bash " defaults to sh (which can break on `while <<<`)
     au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
     au vimenter,bufenter,winenter *.gdb setlocal filetype=gdb
+    au vimenter,bufenter,winenter *.p8 setlocal filetype=lua
 
     " TODO #test: keep the viewport when reloading a file
     " https://stackoverflow.com/a/4255960
