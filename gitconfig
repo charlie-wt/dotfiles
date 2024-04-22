@@ -29,5 +29,3 @@
     rebase = true
 [status]
     submodulesummary = true
-[submodule]
-    recurse = true
