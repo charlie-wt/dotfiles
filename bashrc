@@ -173,6 +173,24 @@ pr () {
     git fetch upstream pull/"$idx"/head:"$branch_name" && git checkout "$branch_name"
 }
 
+# get the location of coredumps
+dumploc () {
+    local corepat="/proc/sys/kernel/core_pattern"
+    # check if coredumps are disabled
+    [ ! -f "$corepat" ] || [ "$(wc -l "$corepat")" = 0 ] && [ "$(cat /proc/sys/kernel/core_uses_pid)" = 0 ]
+    local noname="$?"
+    [ "$(ulimit -c)" = 0 ] || [ "$noname" = 0 ] && >&2 echo "(coredumps disabled)" && return 1
+    # try and get a location
+    local handler=core
+    [ -f "$corepat" ] && handler="$(cat "$corepat" | sed 's/\([^\]\) .*/\1/g')"
+    case "$handler" in
+        \|*apport) echo "/var/lib/apport/coredump"                  ;;
+        \|*)       >&2 echo "piped to unknown program ${handler#|}" ;;
+        */*)      echo "$handler"                                   ;;
+        *)        pwd                                               ;;
+    esac
+}
+
 
 # === Other ============================================================================
 if [[ $- == *i* ]]; then
