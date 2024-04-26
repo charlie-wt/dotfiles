@@ -179,7 +179,7 @@ dumploc () {
     # check if coredumps are disabled
     [ ! -f "$corepat" ] || [ "$(wc -l "$corepat")" = 0 ] && [ "$(cat /proc/sys/kernel/core_uses_pid)" = 0 ]
     local noname="$?"
-    [ "$(ulimit -c)" = 0 ] || [ "$noname" = 0 ] && >&2 echo "(coredumps disabled)" && return 1
+    [ "$(ulimit -c)" = 0 ] || [ "$noname" = 0 ] && >&2 echo "(coredumps disabled)"
     # try and get a location
     local handler=core
     [ -f "$corepat" ] && handler="$(cat "$corepat" | sed 's/\([^\]\) .*/\1/g')"
