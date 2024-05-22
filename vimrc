@@ -591,6 +591,7 @@ let g:tmux_navigator_disable_when_zoomed = 1
 augroup lsp
     au!
     function! s:on_lsp_enabled() abort
+        " config
         call LspOptionsSet(#{
             \ autoHighlightDiags: v:false,
             \ highlightDiagInline: v:false,
@@ -602,11 +603,21 @@ augroup lsp
             \ showDiagWithSign: v:false,
             \ showDiagWithVirutalText: v:false,
         \ })
-        if executable('pylsp')
-            call LspAddServer([
-                \ #{ name: 'pylsp', filetype: 'python', path: 'pylsp', args: [] }
-            \ ])
-        endif
+        " add servers
+        let l:expect_servers = [
+            \ #{ name: 'pylsp', filetype: 'python' },
+            \ #{ name: 'lua-language-server', filetype: 'lua-language-server' },
+            \ #{ name: 'haskell-language-server', filetype: 'haskell-language-server' },
+        \ ]
+        let l:servers = []
+        for s in l:expect_servers
+            if executable(s.name)
+                let l:to_add = s->deepcopy()
+                let l:to_add.path = l:to_add.name
+                call add(l:servers, l:to_add)
+            endif
+        endfor
+        call LspAddServer(l:servers)
     endfunction
     autocmd User LspSetup call s:on_lsp_enabled()
 
