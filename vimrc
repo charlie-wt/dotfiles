@@ -477,7 +477,7 @@ augroup my_autocmds
     au vimenter,bufenter,winenter * :match ErrorMsg '\s\+$'
 
     " filetype-specific options
-    " TODO #temp: only set in graphcore.vim
+    " TODO #temp: only set in local vimrc
     " au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
     au filetype haskell setlocal ts=4 sw=4 sts=4 et
     au filetype markdown,pandoc setlocal ts=4 sts=4 sw=4 et spellcapcheck=
