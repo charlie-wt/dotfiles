@@ -28,9 +28,7 @@ Plug 'tpope/vim-surround'
 Plug 'https://git.sr.ht/~ackyshake/VimCompletesMe.vim'
 Plug 'junegunn/fzf', { 'dir': '~/src/bin/fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
-Plug 'prabirshrestha/vim-lsp'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'yegappan/lsp'
 Plug 'preservim/tagbar'
 Plug 'puremourning/vimspector'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
@@ -589,58 +587,45 @@ let g:goyo_width = 89
 " vim-tmux-navigator
 let g:tmux_navigator_disable_when_zoomed = 1
 
-" vim-lsp
-function! s:on_lsp_buffer_enabled() abort
-    setlocal omnifunc=lsp#complete
-    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
-    nmap <buffer> gd <plug>(lsp-definition)
-    nmap <buffer> gs <plug>(lsp-document-symbol-search)
-    nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
-    nmap <buffer> gr <plug>(lsp-references)
-    nmap <buffer> gI <plug>(lsp-implementation)
-    nmap <buffer> gR <plug>(lsp-rename)
-    nmap <buffer> <c-n> <plug>(lsp-next-reference)
-    nmap <buffer> <c-p> <plug>(lsp-previous-reference)
-    nmap <buffer> gm <plug>(lsp-signature-help)
-    nmap <buffer> K <plug>(lsp-hover)
-endfunction
-
-augroup lsp_install
+" lsp
+augroup lsp
     au!
-    " call s:on_lsp_buffer_enabled only for languages that have a server registered.
-    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+    function! s:on_lsp_enabled() abort
+        call LspOptionsSet(#{
+            \ autoHighlightDiags: v:false,
+            \ highlightDiagInline: v:false,
+            \ outlineOnRight: v:true,
+            \ outlineWinSize: 50,
+            \ showDiagInBalloon: v:false,
+            \ showDiagInPopup: v:false,
+            \ showDiagOnStatusLine: v:false,
+            \ showDiagWithSign: v:false,
+            \ showDiagWithVirutalText: v:false,
+        \ })
+        if executable('pylsp')
+            call LspAddServer([
+                \ #{ name: 'pylsp', filetype: 'python', path: 'pylsp', args: [] }
+            \ ])
+        endif
+    endfunction
+    autocmd User LspSetup call s:on_lsp_enabled()
+
+    function! s:on_lsp_buffer_enabled() abort
+        if exists('+tagfunc') | setlocal tagfunc=lsp#lsp#TagFunc | endif
+        setlocal formatexpr=lsp#lsp#FormatExpr()
+        nnoremap <buffer> K  :LspHover<cr>
+        nnoremap <buffer> gD :LspGotoDeclaration<cr>
+        nnoremap <buffer> gI :LspGotoImpl<cr>
+        nnoremap <buffer> gR :LspRename<cr>
+        nnoremap <buffer> gd :LspGotoDefinition<cr>
+        nnoremap <buffer> gh :LspSwitchSourceHeader<cr>
+        nnoremap <buffer> gr :LspShowReferences<cr>
+        nnoremap <buffer> gs :LspSymbolSearch<cr>
+        " nnoremap <buffer> <c-n> :lsp-next-reference<cr>
+        " nnoremap <buffer> <c-p> :lsp-previous-reference<cr>
+    endfunction
+    autocmd User LspAttached call s:on_lsp_buffer_enabled()
 augroup END
-
-if executable('pylsp')
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'pylsp',
-        \ 'cmd': {server_info->['pylsp']},
-        \ 'allowlist': ['python'],
-        \ })
-endif
-
-if executable('lua-language-server')
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'lua-language-server',
-        \ 'cmd': {server_info->['lua-language-server']},
-        \ 'allowlist': ['lua', 'p8'],
-        \ })
-endif
-
-if executable('haskell-language-server-wrapper')
-    au User lsp_setup call lsp#register_server({
-        \ 'name': 'haskell-language-server',
-        \ 'cmd': {server_info->['haskell-language-server-wrapper', '--lsp']},
-        \ 'allowlist': ['haskell', 'lhaskell'],
-        \ })
-endif
-
-let g:lsp_diagnostics_enabled = 0
-let g:lsp_diagnostics_signs_enabled = 0
-let g:lsp_diagnostics_signs_insert_mode_enabled = 0
-let g:lsp_diagnostics_virtual_text_enabled = 0
-let g:lsp_document_code_action_signs_enabled = 0
-let g:lsp_async_completion = 1
 
 " i already highlight trailing whitespace, & this messes it up
 " (for the 'vim-python/python-syntax' plugin used by vim-polyglot)
