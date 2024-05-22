@@ -190,8 +190,8 @@ dumploc () {
     case "$handler" in
         \|*apport) echo "/var/lib/apport/coredump"                  ;;
         \|*)       >&2 echo "piped to unknown program ${handler#|}" ;;
-        */*)      echo "$handler"                                   ;;
-        *)        pwd                                               ;;
+        */*)       echo "$handler"                                  ;;
+        *)         pwd                                              ;;
     esac
 }
 
