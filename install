@@ -150,7 +150,7 @@ echo
 # reminders for manual bits i've not automated yet
 echo
 echo "$(info-col DONE). remember to do these too:"
-echo "* run :PluginInstall in vim to install plugins"
+echo "* run :PlugInstall in vim to install plugins"
 echo "* run <prefix>+I in tmux to install plugins"
 echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
 echo "* set the user.name & user.email for this repo correctly"
