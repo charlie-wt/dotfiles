@@ -170,6 +170,14 @@ symlink () {
     local link_name="$2"
     local name="${3:-$(basename "$target")}"
 
+    # check if we need to apply sudo to our actions
+    local maybe_sudo=""
+    local existing_parent_dir="$(dirname "$link_name")"
+    while ! [ -d "$existing_parent_dir" ]; do
+        existing_parent_dir="$(dirname "$existing_parent_dir")"
+    done
+    [ "$(stat -c '%U' "$existing_parent_dir")" = root ] && maybe_sudo="sudo"
+
     if [ ! -e "$target" ]; then
         >&2 echo "$(error-col "$name"): can't find target $target to symlink"
         return 2
@@ -195,7 +203,7 @@ symlink () {
 
         if confirm-action "$prompt" "$def_msg" y; then
             echo "replacing $link_status link for $(info-col "$name")"
-            rm "$link_name"
+            $maybe_sudo rm "$link_name"
         else
             return 1
         fi
@@ -204,14 +212,15 @@ symlink () {
                           "$(warn "'$link_name' already exists, so did not make a link.")" \
                           n; then
             echo "replacing old $(info-col "$name")"
-            rm "$link_name"
+            $maybe_sudo rm "$link_name"
         else
             return 1
         fi
     fi
 
     # make a new symlink
-    mkdir -p $(dirname "$link_name") && ln -s "$target" "$link_name"
+    [ -n "$maybe_sudo" ] && info "$name: sudo needed to install symlink in '$existing_parent_dir'"
+    $maybe_sudo mkdir -p $(dirname "$link_name") && $maybe_sudo ln -s "$target" "$link_name"
 }
 
 # interactive function to mount a device, presenting prompts under various scenarios.
