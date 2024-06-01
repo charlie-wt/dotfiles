@@ -516,6 +516,16 @@ augroup end
 
 
 " === Plugin config ====================================================================
+" airline
+if !exists('g:airline_symbols')
+    let g:airline_symbols =
+        \ #{ branch: '', readonly: '', linenr: '☰', maxlinenr: '' }
+endif
+let g:airline_left_sep = ''
+let g:airline_left_alt_sep = ''
+let g:airline_right_sep = ''
+let g:airline_right_alt_sep = ''
+
 " vim-pandoc
 let g:pandoc#hypertext#create_if_no_alternates_exists = 1
 let g:pandoc#keyboard#display_motions = 0  " this messes with my j & k maps
