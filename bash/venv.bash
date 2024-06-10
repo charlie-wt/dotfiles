@@ -57,6 +57,7 @@ venv-ls () {
 }
 
 venv-new () {
+    # TODO #enhancement: all args after `--` are passed to `python3 -m venv`
     verify-name-supplied "$1" || return 1
 
     let num_made=0

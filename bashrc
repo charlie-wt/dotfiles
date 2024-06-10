@@ -167,14 +167,17 @@ todos () {
 # checkout a github pull request.
 # $1: pull request index.
 # $2: (optional) name of local branch to make. defaults to `pr-$1`.
+# $3: (optional) name of remote to pull from. defaults to `upstream`, if not `origin`.
 pr () {
     [ -z "$1" ] && >&2 error "please provide a pull request index." && return 1
 
     local idx="$1"
-    local branch_name="pr-$idx"
-    [ -n "$2" ] && branch_name="$2"
+    local branch_name="${2:-pr-$idx}"
+    local default_remote=upstream
+    [ -z "$(git remote | grep "$default_remote")" ] && default_remote=origin
+    local remote="${3:-$default_remote}"
 
-    git fetch upstream pull/"$idx"/head:"$branch_name" && git checkout "$branch_name"
+    git fetch $remote pull/"$idx"/head:"$branch_name" && git checkout "$branch_name"
 }
 
 # get the location of coredumps
