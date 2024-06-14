@@ -4,9 +4,7 @@
 
 
 # include-guard, since this'll be sourced in lots of places
-[ -n "${__utils_included+x}" ] && return 2
-__utils_included=1
-
+[ -n "${__utils_included+x}" ] && return || __utils_included=1
 
 
 # for printing with some colours

@@ -36,7 +36,7 @@ dotfile bashrc
 dotfile gdbinit
 dotfile gitconfig       "$(config-home)/git/config"
 dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
-dotfile profile
+dotfile bash_profile
 dotfile tmux.conf       "$(config-home)/tmux/tmux.conf"
 dotfile vimrc
 echo

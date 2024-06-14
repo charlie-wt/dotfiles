@@ -1,17 +1,17 @@
 # === Init =============================================================================
-# export dotfiles dir as directory ~/.bashrc is symlinked into
-export DOTFILES="$(dirname "$(readlink -f ~/.bashrc)")"
+# only run if in an interactive terminal
+[[ "$-" == *i* ]] || return
 
+export DOTFILES="$(dirname "$(readlink -e "$BASH_SOURCE")")"  # directory of this script
 source "$DOTFILES/bash/_utils.bash"
 
 
 # === Environment Variables ============================================================
-# xdg vars
+# xdg
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
-
 # add user bin dirs to PATH if they exist
 [ -d "$(bin-home)" ] && PATH="$(bin-home):$PATH"
 
@@ -24,10 +24,12 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
+# history
+export HISTSIZE=100000
+export HISTFILESIZE=$HISTSIZE
 # don't put duplicate lines or lines starting with space in the history.
 export HISTCONTROL=ignoreboth
 
-# other
 export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
 export COLORTERM=truecolor
 export VISUAL=vim EDITOR=vim
@@ -75,7 +77,6 @@ alias osc='printf "\033]52;c;$(printf "$(cat -)" | base64)\a"'
 # vim`.
 alias sv='sudo -E TERMINFO="$TERMINFO" vim'
 alias se='sudo -E TERMINFO="$TERMINFO"'
-
 
 
 # === Functions ========================================================================
@@ -200,7 +201,8 @@ dumploc () {
 
 
 # === Other ============================================================================
-if [[ $- == *i* ]]; then
+# TODO #test
+# if [[ $- == *i* ]]; then
     # when terminal is frozen by ^s, allow unfreezing with any key.
     stty ixany
 
@@ -220,7 +222,7 @@ if [[ $- == *i* ]]; then
         . /etc/bash_completion
       fi
     fi
-fi
+# fi
 
 
 # === End ==============================================================================
