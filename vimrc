@@ -610,5 +610,6 @@ let g:vimspector_enable_mappings = 'HUMAN'
 
 " === Local config =====================================================================
 " `personal{-local}` is a symlink to `dotfiles/{local/}vim`
+" TODO #enhancement: use ~/.vim/plugin, or packadd?
 runtime! personal/**/*.vim
 runtime! personal-local/**/*.vim

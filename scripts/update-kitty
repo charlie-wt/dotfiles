@@ -3,6 +3,7 @@
 set -e
 
 d="$HOME/Applications"
+mkdir -p "$d"
 
 curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh -s -- dest="$d" launch=n
 
