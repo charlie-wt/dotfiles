@@ -153,8 +153,8 @@ confirm-action () {
 #
 # will make any necessary directories that the symlink will sit in.
 #
-# $1: absolute path of file to link to.
-# $2: absolute path to symlink to be made.
+# $1: absolute path of file to link to (target).
+# $2: absolute path to symlink to be made (link name).
 # $3: (optional) human-friendly name of the thing being symlinked, for messages.
 #
 # returns:

@@ -44,8 +44,6 @@ Plug 'junegunn/goyo.vim'
 
 call plug#end()
 
-packadd termdebug
-
 
 " === General ==========================================================================
 syntax on

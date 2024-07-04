@@ -107,14 +107,25 @@ rustup_dir="$(data-home)/rustup"
 cargo_dir="$(data-home)/cargo"
 if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
     skip "rustup & cargo already exist in $rustup_dir & $cargo_dir"
-elif [ "$default_choice" != false ]; then
-    if [ "$default_choice" = true ] ||
-       yesno "do you want to install rust & cargo?"; then
-        export RUSTUP_HOME=$rustup_dir
-        export CARGO_HOME=$cargo_dir
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-    fi
+elif confirm-action "do you want to install rust & cargo?"; then
+    export RUSTUP_HOME=$rustup_dir
+    export CARGO_HOME=$cargo_dir
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 fi
+
+# if a cargo package isn't installed globally, ask to install it
+# $1: cargo package name
+cargo-install () {
+    if ! have-cmd cargo; then
+        skip "cargo not installed to install $1"
+    elif [ -n "$(cargo install --list | grep "^$1\s")" ]; then
+        skip "$1 already installed"
+    else
+        confirm-action "install $1 (via cargo)?" && cargo install "$1"
+    fi
+}
+cargo-install ripgrep
+cargo-install fd-find
 
 # python lsp
 if have-cmd pylsp; then
@@ -127,7 +138,7 @@ echo
 # kitty theme
 kitty_theme_dest="$(config-home)/kitty/theme.conf"
 if [ ! -e "$kitty_theme_dest" ]; then
-    ln -s "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest"
+    symlink "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest" "kitty theme"
 fi
 
 
@@ -158,7 +169,7 @@ echo "* set the user.name & user.email for this repo correctly"
 if [[ $(tmux -V) =~ ^tmux\ (0\.|1\.|2\.|3\.0) ]]; then
     echo
     warn "your tmux is too old to understand \$XDG_CONFIG_HOME."
-    echo "      best thing is to make bash/local/tmux.bash, with this line:"
+    echo "      best thing is to make local/bash/tmux.bash, with this line:"
     echo
     echo 'alias tmux="tmux -f ${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf"'
 fi
