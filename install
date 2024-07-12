@@ -124,22 +124,36 @@ cargo-install () {
         confirm-action "install $1 (via cargo)?" && cargo install "$1"
     fi
 }
-cargo-install ripgrep
 cargo-install fd-find
+cargo-install ripgrep
 
-# python lsp
-if have-cmd pylsp; then
-    skip "pylsp already installed"
-elif have-cmd pip; then
-    confirm-action "install pylsp?" && pip install --user python-lsp-server
+# pipx
+if have-cmd pipx; then
+    skip "pipx already installed"
+elif have-cmd pip && confirm-action "install pipx?"; then
+    pip install --user pipx
 fi
-echo
+
+# if a pipx package isn't installed globally, ask to install it
+# $1: pypi package name
+pipx-install () {
+    if ! have-cmd pipx; then
+        skip "pipx not installed to install $1"
+    elif [ -n "$(pipx list --short | grep "^$1\s")" ]; then
+        skip "$1 already installed"
+    else
+        confirm-action "install $1 (via pipx)?" && pipx install "$1"
+    fi
+}
+pipx-install python-lsp-server
+pipx-install ranger-fm
 
 # kitty theme
 kitty_theme_dest="$(config-home)/kitty/theme.conf"
 if [ ! -e "$kitty_theme_dest" ]; then
     symlink "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest" "kitty theme"
 fi
+echo
 
 
 # === Local ============================================================================
