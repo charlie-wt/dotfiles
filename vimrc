@@ -184,6 +184,8 @@ else
     " (<c-u> removes the automatically added '<,'> that'd make the `echo` error)
     vnoremap <c-c> :<c-u>echo 'no known system clipboard access'<cr>
 endif
+" search for merge conflict markers
+nnoremap <leader>mc /^\(<<<<<<<\\|=======\\|>>>>>>>\)\( \\|$\)<cr>
 
 " == Functions
 " insert TODO comments above the current line, with tags defined by a:tag. NOTE: relies
