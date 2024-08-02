@@ -8,4 +8,4 @@ ulimit -c unlimited
 
 
 # === End ==============================================================================
-[ -r "$DOTFILES/local/.bash_profile" ] && . "$DOTFILES/local/.bash_profile"
+[ -r "$DOTFILES/local/bash_profile" ] && . "$DOTFILES/local/bash_profile"

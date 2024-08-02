@@ -79,7 +79,7 @@ exit-code () {
 
 # yes/no prompt
 # $1: the prompt string
-# $2: default value (optional) -- should be `y`, `n` or empty
+# $2: (optional) default value -- should be `y`, `n` or empty
 # returns: 0 if `yes` chosen; 1 if `no` chosen; if no default was given, will loop
 # usage: `if yesno "wanna do the thing?" y; then
 #             echo did the thing!
@@ -120,8 +120,8 @@ yesno () {
 # not presented.
 #
 # $1: yesno prompt
-# $2: a message to print if $default_choice is `false`.
-# $3: yesno default (ie. [Yn] vs. [yN] vs. [yn])
+# $2: (optional) a message to print if $default_choice is `false`.
+# $3: (optional) yesno default (ie. [Yn] vs. [yN] vs. [yn])
 confirm-action () {
     local prompt="$1"
     local default_false_message="$2"
@@ -293,22 +293,20 @@ do-mount () {
 }
 
 
-# prints a list (line-separated string), but concat onto one line & pad with spaces if
-# running interactively
+# prints a list (line-separated string), but concat onto one line & pad if running
+# interactively & could fit
 # $1: list to print
 # $2: (optional) single-line padding string to use; defaults to four spaces
-# $3: (optional) label for the list, to print as a prefix
+# $3: (optional) prefix for the list
 print-list () {
-    str="$1"
-    padding="${2:-"    "}"
+    local str="$1"
+    local padding="${2:-"    "}"
 
-    [ -n "$3" ] && str="$3:  $str"
+    [ -n "$3" ] && local oneline_prefix="$3:  "
+    local oneline="$oneline_prefix${str//$"\n"/$padding}"
 
-    if [ -t 1 ]; then
-        local oneline="${str//$"\n"/$padding}"
-        oneline="${oneline//$'\n'/$padding}"
-        [ "$(printf "$oneline" | wc -c)" -lt "$(tput cols)" ] && str="$oneline"
-    fi
+    [ -n "$3" ] && str="$3:\n$str"
+    [ -t 1 ] && [ "$(printf "$oneline" | wc -c)" -lt "$(tput cols)" ] && str="$oneline"
 
     printf "$str\n"
 }
@@ -323,12 +321,9 @@ print-list () {
 get-any-name-match () {
     local options="$1"
     local query="$2"
-    local label="${3:-name}"
+    local label="${3:-option}"
 
-    if [ -z "$2" ]; then
-        >&2 echo "please specify a $label."
-        return 1
-    fi
+    [ -z "$2" ] && >&2 echo "please specify a $label." && return 1
 
     # check for an inexact regex match
     local match=$(printf "$options" | grep "$query")
@@ -350,7 +345,7 @@ get-any-name-match () {
 get-unique-name-match () {
     local options="$1"
     local query="$2"
-    local label="${3:-name}"
+    local label="${3:-option}"
 
     # if given an exact match, go with it -- otherwise, if you've got an option with a
     # name that's a subset of another option's name, it's inconvenient to refer to it.
@@ -410,10 +405,10 @@ bin-home () {
 
 # is the first given version number at least that of the second? returns 0 if true.
 #
-# strips out any bad chars from the inputs, so you can pipe in eg. $(tmux -V).
+# strips out any non-numerals/dots from the inputs, so you can pipe in eg. $(tmux -V).
 #
-# $1: version number to compare.
-# $2: version number to compare against.
+# $1: primary version number.
+# $2: version number to compare to `$1`.
 at-least-version () {
     fst="$(echo "$1" | sed 's/[^0-9\.]//g')"
     snd="$(echo "$2" | sed 's/[^0-9\.]//g')"

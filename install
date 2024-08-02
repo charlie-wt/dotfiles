@@ -50,7 +50,7 @@ echo
 install-script () {
     # params
     local script_path="$1"
-    local script_name="${2:-$(basename $script_path)}"
+    local script_name="${2:-$(basename "$script_path")}"
 
     local target="$root/scripts/$script_path"
     local link_name="$(bin-home)/$script_name"
@@ -157,7 +157,7 @@ echo
 
 
 # === Local ============================================================================
-title "doing local install"
+title "doing local install..."
 
 if [ -x "$root/local/install" ]; then
     root="$d/local"

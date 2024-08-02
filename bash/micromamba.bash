@@ -17,7 +17,7 @@ unset __setup_file
 
 # MINE: allow directly running bins from the `global` environment, & register manpages
 global_env="$MAMBA_ROOT_PREFIX/envs/global"
-for b in $(find "$global_env/bin" -maxdepth 1 -type f 2>/dev/null | xargs -r basename); do
+for b in $(find "$global_env/bin" -maxdepth 1 -type f -exec basename {} \;); do
     alias "$b"="micromamba run -n global $b"
 done
 [ -d "$global_env/share/man" ] && export MANPATH="$MANPATH:$global_env/share/man"
