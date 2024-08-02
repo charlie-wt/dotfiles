@@ -606,8 +606,8 @@ augroup lsp
         " add servers
         let l:expect_servers = [
             \ #{ name: 'pylsp', filetype: 'python' },
-            \ #{ name: 'lua-language-server', filetype: 'lua-language-server' },
-            \ #{ name: 'haskell-language-server', filetype: 'haskell-language-server' },
+            \ #{ name: 'lua-language-server', filetype: 'lua' },
+            \ #{ name: 'haskell-language-server', filetype: 'haskell' },
         \ ]
         let l:servers = []
         for s in l:expect_servers
