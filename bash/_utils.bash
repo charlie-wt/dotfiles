@@ -302,8 +302,10 @@ print-list () {
     local str="$1"
     local padding="${2:-"    "}"
 
+    local oneline_str="${str//$"\n"/$padding}"
+    local oneline_str="${oneline_str//$'\n'/$padding}"
     [ -n "$3" ] && local oneline_prefix="$3:  "
-    local oneline="$oneline_prefix${str//$"\n"/$padding}"
+    local oneline="$oneline_prefix$oneline_str"
 
     [ -n "$3" ] && str="$3:\n$str"
     [ -t 1 ] && [ "$(printf "$oneline" | wc -c)" -lt "$(tput cols)" ] && str="$oneline"
