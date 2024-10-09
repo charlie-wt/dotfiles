@@ -5,6 +5,7 @@ set nocompatible
 call plug#begin('~/.vim/bundle')
 
 " appearance
+Plug 'Bakudankun/PICO-8.vim'
 Plug 'gruvbox-community/gruvbox'
 Plug 'vim-airline/vim-airline'
 " languages
@@ -84,13 +85,20 @@ silent! colo gruvbox
 " highlight visual selections with only a slightly lighter background
 " TODO #bug: gruvbox hard-coded
 hi Visual term=none cterm=none gui=none ctermbg=239 guibg=#3c3836
-" centralize backups, swapfiles & undo history
-set backupdir=$XDG_STATE_HOME/vim/backups directory=$XDG_STATE_HOME/vim/swaps
+" centralize backups, swapfiles & undo history.
+" can't always rely on $XDG_STATE_HOME since eg. gvim, or launching vim from a file
+" browser doesn't source bashrc.
+let vim_state_home = $HOME . "/.local/state/vim"
+if $XDG_STATE_HOME != ""
+    let vim_state_home = $XDG_STATE_HOME . "/vim"
+end
+let &backupdir=vim_state_home.'/backups'
+let &directory=vim_state_home.'/swaps'
 if exists("&undodir")
     set undofile
-    set undodir=$XDG_STATE_HOME/vim/undo
+    let &undodir=vim_state_home.'/undo'
 endif
-set viminfofile=$XDG_STATE_HOME/vim/viminfo
+let &viminfofile=vim_state_home.'/viminfo'
 " set switchbuf+=usetab,newtab  " testing out, mostly for quickfix window (lsc 'FindReferences')
 set nrformats-=octal
 set sidescrolloff=5
@@ -461,7 +469,6 @@ augroup my_autocmds
     au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
     au vimenter,bufenter,winenter *.gdb setlocal filetype=gdb
-    au vimenter,bufenter,winenter *.p8 setlocal filetype=lua
 
     " TODO #test: keep the viewport when reloading a file
     " https://stackoverflow.com/a/4255960
@@ -502,6 +509,8 @@ augroup my_autocmds
     " au filetype markdown,pandoc noremap <f7> :!mdrep "%"<cr><cr>
     " leader+o to open the corresponding pdf to this file
     au filetype markdown,tex,latex,pandoc noremap <silent> <leader>o :call OpenPDF()<cr>
+    au filetype lua setlocal ts=4 sts=4 sw=4 noet
+    au filetype pico8 setlocal ts=4 sts=4 sw=4 noet
 
     " vim-fswitch for shaders
     au bufenter,winenter *.vert let b:fswitchdst = 'frag'
@@ -577,7 +586,7 @@ if executable('lua-language-server')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'lua-language-server',
         \ 'cmd': {server_info->['lua-language-server']},
-        \ 'allowlist': ['lua'],
+        \ 'allowlist': ['lua', 'p8'],
         \ })
 endif
 
