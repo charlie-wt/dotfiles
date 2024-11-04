@@ -65,6 +65,7 @@ venv-new () {
 
     for name in "$@"; do
         if is-a-known-venv "$name"; then
+            # TODO #enhancement: `-y` to always pick yes
             if yesno "venv $name already exists; replace it?" n; then
                 venv-rm "$name"
                 echo "making new $name"

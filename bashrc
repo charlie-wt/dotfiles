@@ -82,8 +82,14 @@ alias se='sudo -E TERMINFO="$TERMINFO"'
 # === Functions ========================================================================
 mkcd () { mkdir -p "$@" && cd "$@"; }
 
-# TODO #enhancement: tab completion
 cdc () { cd "$(config-home)/$1"; }
+
+__cdc_completion () {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local dirs="$(find "$(config-home)" -maxdepth 1 -mindepth 1 -type d -printf "%f\n")"
+    COMPREPLY=($(compgen -W "$dirs" -- ${cur}))
+}
+complete -F __cdc_completion cdc
 
 # go to dotfiles dir, or install them
 dots () {

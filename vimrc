@@ -145,8 +145,9 @@ nnoremap <leader>u :Unsaved<cr>
 " for if you copy something in written in windows, adding an extra empty line for every
 " real one
 command! UnWindows execute ':g/^/+d'
-" format json into a human-readable form
+" format json/xml into a human-readable form
 command! Json execute ':%!python -m json.tool'
+command! Xml execute ':%!python -c "import sys, xml.dom.minidom; print(xml.dom.minidom.parseString(sys.stdin.read()).toprettyxml())"'
 " replace all instances of the keyword under the cursor.
 nnoremap <leader>s :%s/\<<c-r><c-w>\>//g<left><left>
 nnoremap <leader>S :%s/<c-r><c-a>//g<left><left>
@@ -475,6 +476,8 @@ augroup my_autocmds
     au filechangedshell     * let b:wpos = winsaveview()
     au filechangedshellpost * if(exists('b:wpos')) | call winrestview(b:wpos) | endif
 
+    au vimresized * wincmd =
+
     " temporarily clear search highlighting when in insert mode.
     au insertenter * :set nohlsearch
     au insertleave * :set hlsearch
@@ -527,8 +530,7 @@ augroup end
 " === Plugin config ====================================================================
 " airline
 if !exists('g:airline_symbols')
-    let g:airline_symbols =
-        \ #{ branch: '', readonly: '', linenr: '☰', maxlinenr: '' }
+    let g:airline_symbols = #{ branch: '', readonly: '', linenr: '☰', maxlinenr: '' }
 endif
 let g:airline_left_sep = ''
 let g:airline_left_alt_sep = ''
