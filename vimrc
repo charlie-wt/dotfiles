@@ -623,7 +623,7 @@ augroup lsp
 
     function! s:on_lsp_buffer_enabled() abort
         if exists('+tagfunc') | setlocal tagfunc=lsp#lsp#TagFunc | endif
-        setlocal formatexpr=lsp#lsp#FormatExpr()
+        " setlocal formatexpr=lsp#lsp#FormatExpr()
         nnoremap <buffer> K  :LspHover<cr>
         nnoremap <buffer> gD :LspGotoDeclaration<cr>
         nnoremap <buffer> gI :LspGotoImpl<cr>
