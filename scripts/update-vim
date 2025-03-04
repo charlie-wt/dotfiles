@@ -8,6 +8,26 @@ makefile_changed=0
 compile_needed=1
 reconfig_needed=0
 
+# cli
+print-usage () {
+    echo "usage:"
+    echo "  -h   print help."
+    echo "  -f   force reconfig & recompile."
+}
+
+force_reconfig=0
+
+while getopts 'fh' flag; do
+    case "${flag}" in
+        f) force_reconfig=1 ;;
+        h) echo "update locally-compiled vim; will try to only compile/reconfig if needed." &&
+           echo &&
+           print-usage &&
+           exit 0 ;;
+        *) >&2 echo "" && >&2 print-usage && exit 1 ;;
+    esac
+done
+
 # get sources up-to-date
 if [ ! -d "$d" ]; then
     # clone repo if not present
@@ -70,7 +90,7 @@ if [ -f "$to_apply" ]; then
 fi
 
 # rebuild if needed
-if [ "$reconfig_needed" == 1 ]; then
+if [[ "$reconfig_needed" == 1 || "$force_reconfig" == 1 ]]; then
     make reconfig && make
 elif [ "$compile_needed" == 1 ]; then
     make

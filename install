@@ -137,9 +137,12 @@ fi
 # if a pipx package isn't installed globally, ask to install it
 # $1: pypi package name
 pipx-install () {
+    # TODO #bug: i think if pip was installed in this terminal session, `pip.bash` won't
+    # have run to update the $PATH so `have-cmd pipx` will continue to fail. maybe
+    # should put all the $PATH-updating stuff in `bash/` before the various guards...
     if ! have-cmd pipx; then
         skip "pipx not installed to install $1"
-    elif [ -n "$(pipx list --short | grep "^$1\s")" ]; then
+    elif [ -n "$(pipx list --short 2>/dev/null | grep "^$1\s")" ]; then
         skip "$1 already installed"
     else
         confirm-action "install $1 (via pipx)?" && pipx install "$1"

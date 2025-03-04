@@ -2,6 +2,12 @@
 
 source "$DOTFILES/bash/_utils.bash"
 
+required_arch="x86_64"
+if [ "$(uname -p)" != "$required_arch" ]; then
+    >&2 error "this method only supports "$required_arch", but you're running $(uname -p)"
+    exit 1
+fi
+
 github_repo="clangd/clangd"
 destination="$HOME/src/bin"
 
