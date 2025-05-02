@@ -92,6 +92,7 @@ if [ -e "$vim_plug_loc" ]; then
 else
     curl -fLo "$vim_plug_loc" --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    vim -c 'PlugInstall' -c 'qa!'
 fi
 
 # setup tmux plugin manager
@@ -100,6 +101,7 @@ if [ -e "$tpm_dir" ]; then
     skip "tpm already exists in $tpm_dir"
 else
     git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
+    . "$tpm_dir"/bin/install_plugins
 fi
 
 # basic rust setup
@@ -107,11 +109,50 @@ rustup_dir="$(data-home)/rustup"
 cargo_dir="$(data-home)/cargo"
 if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
     skip "rustup & cargo already exist in $rustup_dir & $cargo_dir"
-elif confirm-action "do you want to install rust & cargo?"; then
+elif confirm-action "do you want to install rust & cargo, via rustup?"; then
     export RUSTUP_HOME=$rustup_dir
     export CARGO_HOME=$cargo_dir
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 fi
+
+# return 0 if an apt package is installed, else 1. will return 2 if apt isn't installed.
+# $1: name of apt package to check.
+is-apt-installed () {
+    if ! have-cmd apt ; then
+        return 2  # error
+    fi
+    local installed="$(apt list --installed "$1" 2>/dev/null | grep -v "^Listing" | wc -l)"
+    if [ "$installed" -ge 1 ]; then
+        return 0  # yes
+    fi
+    return 1  # no
+}
+if is-apt-installed rustc; then
+    if confirm-action "$(warn-col rustc installed via apt): uninstall, to get via rustup instead?"; then
+        sudo apt remove rustc
+    fi
+fi
+
+# maybe install apt package
+# $1: name of package to install
+apt-install () {
+    local installed="$(exit-code is-apt-installed "$1")"
+    if [ "$installed" = 2 ]; then
+        skip "apt not installed to install $1"
+    elif [ "$installed" = 0 ]; then
+        skip "$1 already installed"
+    elif [ "$installed" = 1 ]; then
+        if confirm-action "install $(info-col "$1") (via apt)?"; then
+            sudo apt install "$1"
+        fi
+    else
+        error "unknown error when apt installing $1 (is-apt-installed returned $installed)"
+        return 1
+    fi
+}
+apt-install python-is-python3
+apt-install python3-pip  # note: needed for the later pipx stuff
+apt-install python3-venv
 
 # if a cargo package isn't installed globally, ask to install it
 # $1: cargo package name
@@ -121,7 +162,7 @@ cargo-install () {
     elif [ -n "$(cargo install --list | grep "^$1\s")" ]; then
         skip "$1 already installed"
     else
-        confirm-action "install $1 (via cargo)?" && cargo install "$1"
+        confirm-action "install $(info-col "$1") (via cargo)?" && cargo install "$1"
     fi
 }
 cargo-install fd-find
@@ -145,7 +186,7 @@ pipx-install () {
     elif [ -n "$(pipx list --short 2>/dev/null | grep "^$1\s")" ]; then
         skip "$1 already installed"
     else
-        confirm-action "install $1 (via pipx)?" && pipx install "$1"
+        confirm-action "install $(info-col "$1") (via pipx)?" && pipx install "$1"
     fi
 }
 pipx-install python-lsp-server
@@ -178,8 +219,6 @@ echo
 # reminders for manual bits i've not automated yet
 echo
 echo "$(info-col DONE). remember to do these too:"
-echo "* run :PlugInstall in vim to install plugins"
-echo "* run <prefix>+I in tmux to install plugins"
 echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
 echo "* set the user.name & user.email for this repo correctly"
 
