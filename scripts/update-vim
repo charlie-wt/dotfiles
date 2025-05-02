@@ -44,7 +44,7 @@ if [ ! -d "$d" ]; then
     cd "$parent"
 
     if ! git clone "https://github.com/vim/vim.git"; then
-        >&2 error "git pull failed; not building" && exit 1
+        >&2 error "git clone failed; not building" && exit 1
     fi
     cd "$d"
 else
