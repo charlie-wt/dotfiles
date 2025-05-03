@@ -30,7 +30,9 @@ export HISTFILESIZE=$HISTSIZE
 # don't put duplicate lines or lines starting with space in the history.
 export HISTCONTROL=ignoreboth
 
-export PS1="\[\e[m\]\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
+[ "$(whoami)" == root ] && pref="\[\e[31m\](\u) " || pref=""
+export PS1="\[\e[m\]$pref\[\e[33m\]\w\[\e[36m\] $\[\e[m\] "
+unset pref
 export COLORTERM=truecolor
 export VISUAL=vim EDITOR=vim
 

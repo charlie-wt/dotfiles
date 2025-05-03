@@ -199,6 +199,8 @@ if [ ! -e "$kitty_theme_dest" ]; then
 fi
 echo
 
+# TODO #enhancement: custom bash completions?
+
 
 # === Local ============================================================================
 title "doing local install..."
