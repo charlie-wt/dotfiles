@@ -38,6 +38,7 @@ Plug 'tpope/vim-rhubarb'
 " background
 Plug 'andymass/vim-matchup'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-repeat'
 Plug 'wellle/targets.vim'
 " other
@@ -279,6 +280,7 @@ function! RenameFile()
 endfunction
 map <leader>n :call RenameFile()<cr>
 
+" TODO #bug: just get `0------------------------------`
 " custom function to style folds
 function! CustomFoldText()
     " adapted from https://dhruvasagar.com/2013/03/28/vim-better-foldtext

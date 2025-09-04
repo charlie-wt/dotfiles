@@ -4,7 +4,7 @@ base_dir="$HOME/src/bin/fzf"
 # Setup fzf
 # ---------
 if [[ ! "$PATH" == *$base_dir/bin* ]]; then
-  export PATH="${PATH:+${PATH}:}$base_dir/bin"
+    export PATH="${PATH:+${PATH}:}$base_dir/bin"
 fi
 
 # Auto-completion
