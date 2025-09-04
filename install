@@ -81,8 +81,9 @@ echo
 # === Other bits =======================================================================
 title "doing other misc stuff..."
 
-# make directories for vim swapfiles & backups
+# make directories for vim swapfiles, backups etc.
 mkdir -p "$(state-home)/vim/backups"
+mkdir -p "$(state-home)/vim/sessions"
 mkdir -p "$(state-home)/vim/swaps"
 mkdir -p "$(state-home)/vim/undo"
 

@@ -207,6 +207,18 @@ dumploc () {
     esac
 }
 
+# 'vim session': launch a vim session stored in a standard location, or create the
+# session if it doesn't exist yet.
+# $1: session name
+# all other arguments: passed on to vim
+vims () {
+    [ -z "$1" ] && >&2 error "please provide a session name." && return 1
+
+    local session="$1"
+    local sessions_dir="$(state-home)/vim/sessions"
+    local session_file="$sessions_dir/$session.vim"
+    [ -f "$session_file" ] && vim -S "$session_file" || vim ${@:2} -c ":Obsess $session_file"
+}
 
 # === Other ============================================================================
 # TODO #test
