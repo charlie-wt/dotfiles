@@ -39,6 +39,7 @@ dotfile kitty.conf      "$(config-home)/kitty/kitty.conf"
 dotfile bash_profile
 dotfile tmux.conf       "$(config-home)/tmux/tmux.conf"
 dotfile vimrc
+dotfile inputrc         "$(config-home)/readline/inputrc"
 echo
 
 

@@ -1,0 +1,2 @@
+# default ctrl+k clashes with vim-tmux-navigator
+Control-i: kill-line

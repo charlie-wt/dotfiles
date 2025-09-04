@@ -28,3 +28,6 @@ export TERMINFO_DIRS="$(data-home)/terminfo:/usr/share/terminfo"
 export TEXMFHOME="$(data-home)/texmf"
 export TEXMFVAR="$(cache-home)/texlive/texmf-var"
 export TEXMFCONFIG="$(config-home)/texlive/texmf-config"
+
+# readline
+export INPUTRC="$(config-home)/readline/inputrc"

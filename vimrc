@@ -175,6 +175,8 @@ noremap <silent> <f3> :NERDTreeToggle<cr>
 noremap <silent> <leader>v :source $MYVIMRC<cr>:e!<cr>
 " get the url you'd go to with :GBrowse, and copy it to the clipboard instead. useful
 " when working on servers.
+" TODO #enhancement: errors if there's no `origin` remote. can do eg.
+" `GBrowse!  upstream`, so could try and automate that for these maps
 nnoremap <silent> <leader>gb :call OSCYank(execute("GBrowse!"))<cr>
 vnoremap <silent> <leader>gb :call OSCYank(execute("'<,'>GBrowse!"))<cr>
 " system clipboard access with Ctrl+C/P:
