@@ -107,17 +107,6 @@ else
     . "$tpm_dir"/bin/install_plugins
 fi
 
-# basic rust setup
-rustup_dir="$(data-home)/rustup"
-cargo_dir="$(data-home)/cargo"
-if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
-    skip "rustup & cargo already exist in $rustup_dir & $cargo_dir"
-elif confirm-action "do you want to install rust & cargo, via rustup?"; then
-    export RUSTUP_HOME=$rustup_dir
-    export CARGO_HOME=$cargo_dir
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-fi
-
 # return 0 if an apt package is installed, else 1. will return 2 if apt isn't installed.
 # $1: name of apt package to check.
 is-apt-installed () {
@@ -132,7 +121,7 @@ is-apt-installed () {
 }
 if is-apt-installed rustc; then
     if confirm-action "$(warn-col rustc installed via apt): uninstall, to get via rustup instead?"; then
-        sudo apt remove rustc
+        sudo apt remove -y rustc
     fi
 fi
 
@@ -145,9 +134,7 @@ apt-install () {
     elif [ "$installed" = 0 ]; then
         skip "$1 already installed"
     elif [ "$installed" = 1 ]; then
-        if confirm-action "install $(info-col "$1") (via apt)?"; then
-            sudo apt install "$1"
-        fi
+        confirm-action "install $(info-col "$1") (via apt)?" && sudo apt install -y "$1"
     else
         error "unknown error when apt installing $1 (is-apt-installed returned $installed)"
         return 1
@@ -156,6 +143,17 @@ apt-install () {
 apt-install python-is-python3
 apt-install python3-pip  # note: needed for the later pipx stuff
 apt-install python3-venv
+
+# basic rust setup
+rustup_dir="$(data-home)/rustup"
+cargo_dir="$(data-home)/cargo"
+if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
+    skip "rustup & cargo already exist in $rustup_dir & $cargo_dir"
+elif confirm-action "do you want to install rust & cargo, via rustup?"; then
+    export RUSTUP_HOME=$rustup_dir
+    export CARGO_HOME=$cargo_dir
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+fi
 
 # if a cargo package isn't installed globally, ask to install it
 # $1: cargo package name
@@ -172,6 +170,7 @@ cargo-install fd-find
 cargo-install ripgrep
 
 # pipx
+# TODO #bug: doesn't want to install somehow
 if have-cmd pipx; then
     skip "pipx already installed"
 elif have-cmd pip && confirm-action "install pipx?"; then
@@ -200,9 +199,9 @@ kitty_theme_dest="$(config-home)/kitty/theme.conf"
 if [ ! -e "$kitty_theme_dest" ]; then
     symlink "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest" "kitty theme"
 fi
-echo
 
 # TODO #enhancement: custom bash completions?
+echo
 
 
 # === Local ============================================================================

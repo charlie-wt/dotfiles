@@ -65,7 +65,7 @@ alias rgp="rg -g '*.py'"
 alias ra='. ranger'
 alias rf=rifle
 # update flatpaks
-alias fpu='flatpak update -y && flatpak uninstall --unused -y'
+alias fpu='flatpak update -y ; flatpak uninstall --unused -y'
 # update cargo packages
 alias cgu="cargo install \$(cargo install --list | awk '/:$/ { print \$1; }')"
 # push a new branch to `origin`

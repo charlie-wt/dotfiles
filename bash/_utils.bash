@@ -218,7 +218,8 @@ symlink () {
 
     # make a new symlink
     [ -n "$maybe_sudo" ] && info "$name: sudo needed to install symlink in '$existing_parent_dir'"
-    $maybe_sudo mkdir -p $(dirname "$link_name") && $maybe_sudo ln -s "$target" "$link_name"
+    $maybe_sudo mkdir -p $(dirname "$link_name") || return 2
+    $maybe_sudo ln -s "$target" "$link_name" || return 2
 }
 
 # interactive function to mount a device, presenting prompts under various scenarios.
