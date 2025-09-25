@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+print-usage () {
+    echo "usage:"
+    echo "  -h   print help."
+    echo "  -c   prepend \`--checkout\` to each line of the output, for pasting into "
+    echo "       \`git submodule update\`."
+    echo "  -l   print results on separate lines, instead of all on one."
+    echo "  -r   get paths relative to repo root, instead of cwd."
+}
+
+conf_checkout=0
+conf_oneline=1
+conf_root=0
+
+while getopts 'chlr' flag; do
+    case "${flag}" in
+        h) echo "Prints the directories of all checked-out submodules." &&
+           echo &&
+           print-usage &&
+           exit 0 ;;
+        c) conf_checkout=1 ;;
+        l) conf_oneline=0 ;;
+        r) conf_root=1 ;;
+        *) >&2 echo "" && >&2 print-usage && exit 1 ;;
+    esac
+done
+
+set -e
+
+[ "$conf_root" == 1 ] && pushd "$(git rev-parse --show-toplevel)" >/dev/null 2>&1
+
+submod_status="$(git submodule status)"
+only_checked_out="$(echo "$submod_status" | grep -v "^-")"
+just_names="$(echo "$only_checked_out" | awk '{print $2}')"
+[ "$conf_oneline" == 1 ] && just_names="$(echo $just_names)"
+
+[ "$conf_checkout" == 1 ] && [ -n "$just_names" ] && just_names="$(printf "$just_names" | sed 's/^/--checkout /')"
+
+printf -- "$just_names"
+
+[ "$conf_root" == 1 ] && popd >/dev/null 2>&1

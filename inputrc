@@ -1,2 +1,3 @@
 # default ctrl+k clashes with vim-tmux-navigator
-Control-i: kill-line
+# TODO #bug: blocks tab
+# Control-i: kill-line

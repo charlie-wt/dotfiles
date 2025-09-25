@@ -14,7 +14,7 @@
     ll = log --graph --decorate --all
     mg = merge
     s  = status
-    smu = !git submodule sync --recursive && git submodule update --init --recursive
+    smu = !git submodule sync --recursive && git submodule update --init --recursive $(submods -c)
     st = stash
     trunk = log --first-parent master
     unstage = reset @ --
