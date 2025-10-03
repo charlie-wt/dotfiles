@@ -455,6 +455,25 @@ nnoremap <silent> <leader><c-j> :call ShuntDown()<cr>
 nnoremap <silent> <leader><c-k> :call ShuntUp()<cr>
 nnoremap <silent> <leader><c-t> :call ShuntTab()<cr>
 
+" do a ^w= from the perspective of the top-left window.
+" (normally, ^w= is not deterministic; the currently-focused window will sometimes get
+" an extra character, over others. makes it always do the same thing.)
+function! Resize()
+    if winnr() == 1
+        wincmd =
+    else
+        exec "normal 1\<c-w>\<c-w>\<c-w>=\<c-w>p"
+    endif
+endfunction
+nnoremap <silent> <leader>= :call Resize()<cr>
+" Resize(), but in all tab pages (without changing the focused tab afterwards)
+function! ResizeAll()
+    let current_tab = tabpagenr()
+    tabdo call Resize()
+    exec 'tabnext ' current_tab
+endfunction
+nnoremap <silent> <leader>a= :call ResizeAll()<cr>
+
 " == Disabled commands
 " Ctrl+Z -> background the vim process
 nnoremap <c-z> <nop>
@@ -480,7 +499,8 @@ augroup my_autocmds
     au filechangedshell     * let b:wpos = winsaveview()
     au filechangedshellpost * if(exists('b:wpos')) | call winrestview(b:wpos) | endif
 
-    au vimresized * wincmd =
+    " TODO #test: ResizeAll()?
+    au vimresized * call Resize()
 
     " temporarily clear search highlighting when in insert mode.
     au insertenter * :set nohlsearch
