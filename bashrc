@@ -45,7 +45,6 @@ alias ll='ls -lhAGF'
 alias c=clear
 alias cl='c && l'
 alias cll='c && ll'
-alias xcl='xclip -sel clip'
 alias v=vim
 alias g=git
 alias gs='git status'
@@ -73,11 +72,9 @@ alias push-branch='git push --set-upstream origin "$(git branch --show-current)"
 # copy stdin to system clipboard using osc-52
 alias osc='printf "\033]52;c;$(printf "$(cat -)" | base64)\a"'
 
-# TODO #temp: need to explicitly tell sudo to keep $TERMINFO, to keep xterm-kitty;
-# without it, exiting vim won't clear the screen of it properly. doing `sudo visudo` and
-# adding `Defaults env_keep += "TERM TERMINFO"` works for `sudo vim`, but not `sudo -E
-# vim`.
-alias sv='sudo -E TERMINFO="$TERMINFO" vim'
+# need to explicitly tell sudo to keep $TERMINFO, to keep xterm-kitty; without it,
+# exiting vim won't clear the screen of it properly. doing `sudo visudo` and adding
+# `Defaults env_keep += "TERM TERMINFO"` works for `sudo vim`, but not `sudo -E vim`.
 alias se='sudo -E TERMINFO="$TERMINFO"'
 
 
@@ -219,6 +216,12 @@ vims () {
     local session_file="$sessions_dir/$session.vim"
     [ -f "$session_file" ] && vim -S "$session_file" || vim ${@:2} -c ":Obsess $session_file"
 }
+__vims_completion () {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local sessions="$(find "$(state-home)/vim/sessions" -maxdepth 1 -mindepth 1 -type f -printf "%f\n" | sed 's/\.vim$//')"
+    COMPREPLY=($(compgen -W "$sessions" -- ${cur}))
+}
+complete -F __vims_completion vims
 
 # === Other ============================================================================
 # TODO #test
