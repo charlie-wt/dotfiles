@@ -198,6 +198,9 @@ else
 endif
 " search for merge conflict markers
 nnoremap <leader>mc /^\(<<<<<<<\\|=======\\|>>>>>>>\)\( \\|$\)<cr>
+" maximise the size of the current split (like tmux <prefix>z); see `:Resize` below for
+" opposite map
+nnoremap <leader>z <c-w>_<c-w>\|
 
 " == Functions
 " insert TODO comments above the current line, with tags defined by a:tag. NOTE: relies
