@@ -497,8 +497,10 @@ augroup my_autocmds
     " set some filetypes
     au vimenter,bufenter,winenter *.bash setlocal filetype=bash " defaults to sh (which can break on `while <<<`)
     au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
-    au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
     au vimenter,bufenter,winenter *.gdb setlocal filetype=gdb
+    au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
+    au vimenter,bufenter,winenter *.td setlocal filetype=tablegen
+    au vimenter,bufenter,winenter requirements_*.txt setlocal filetype=requirements
     " blanket try to match mlir dialects, if no better match
     au vimenter,bufenter,winenter *.*ir if empty(&filetype) | setlocal filetype=mlir | endif
 
@@ -519,13 +521,12 @@ augroup my_autocmds
     au vimenter,bufenter,winenter * :match ErrorMsg '\s\+$'
 
     " filetype-specific options
-    " TODO #temp: only set in local vimrc
-    " au filetype cpp setlocal noet cinoptions=(0,u0,U0 comments^=:///
     au filetype haskell setlocal ts=4 sw=4 sts=4 et
+    au filetype log setlocal cursorline
     au filetype markdown,pandoc setlocal ts=4 sts=4 sw=4 et spellcapcheck=
+    au filetype mlir setlocal commentstring=//\ %s
     au filetype qmake setlocal commentstring=#%s
     au filetype typescript setlocal sw=2 sts=2 et
-    au filetype log setlocal cursorline
 
     " filetype-specific maps
     " fswitch for switching between header/source files
