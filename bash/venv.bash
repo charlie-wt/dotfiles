@@ -28,7 +28,7 @@ venv () {
             echo "Note: When adding or removing venvs, you can supply a list of names; if "
             echo "adding multiple venvs, you won't be put into any created venv."
             echo
-            echo "Note: When removing venvs, you can give a regex in the place of an name; if so,"
+            echo "Note: When removing venvs, you can give a regex in the place of a name; if so, "
             echo "you'll be prompted for each matching venv you're about to remove. You can pass "
             echo "a regex to 'set' too, but it must have a unique match."
             ;;
@@ -142,6 +142,7 @@ __venv_completion () {
             COMPREPLY=($(compgen -W "on ls list show new mk make add rm delete remove uninstall set workon go in unset deactivate out help" -- ${cur}))
             ;;
         2)
+            # one venv specified
             case ${cmd} in
                 rm|del*|remove|uninstall|set|workon|go|in)        ;;
                 *)                                         return ;;
@@ -149,6 +150,7 @@ __venv_completion () {
             COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
             ;;
         *)
+            # more than one venv specified
             case ${cmd} in
                 rm|del*|remove|uninstall)        ;;
                 *)                        return ;;
