@@ -44,6 +44,9 @@ Plug 'wellle/targets.vim'
 " other
 Plug 'junegunn/goyo.vim'
 
+" local plugins, if they exist (`runtime` doesn't fail if not present)
+runtime local-plugins.vim
+
 call plug#end()
 
 
@@ -496,6 +499,8 @@ augroup my_autocmds
     au vimenter,bufenter,winenter *.cls setlocal filetype=tex commentstring=\%\ %s
     au vimenter,bufenter,winenter *.inc setlocal filetype=cpp
     au vimenter,bufenter,winenter *.gdb setlocal filetype=gdb
+    " blanket try to match mlir dialects, if no better match
+    au vimenter,bufenter,winenter *.*ir if empty(&filetype) | setlocal filetype=mlir | endif
 
     " TODO #test: keep the viewport when reloading a file
     " https://stackoverflow.com/a/4255960
