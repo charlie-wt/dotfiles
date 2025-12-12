@@ -161,7 +161,7 @@ size () {
 }
 
 # quickly list tagged todo comments as made by the corresponding vimrc functions.
-# $1 : (optional) specific tag to search for. defaults to all tags.
+# $1: (optional) specific tag to search for. defaults to all tags.
 todos () {
     [ $# -ge 1 ] && local tag="$1" || local tag="\w+"
 

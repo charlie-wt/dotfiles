@@ -195,18 +195,32 @@ pipx-install () {
 pipx-install python-lsp-server
 pipx-install ranger-fm
 
-# install micromamba
+# micromamba
 micromamba="$(data-home)/micromamba/micromamba"
-if [ -x "$micromamba" ]; then
-    skip "micromamba already installed"
-elif confirm-action "install micromamba?"; then
-    mkdir -p "$(dirname "$micromamba")"
-    echo "about to install micromamba; use the following options $(warn-col "(but choose a real, explicit home path!)"):"
-    echo "Micromamba binary folder? [~/.local/bin] $(info-col "/path/to/personal/home/.local/share/micromamba")"
-    echo "Init shell (bash)? [Y/n] $(info-col "n")"
-    echo "Configure conda-forge? [Y/n] $(info-col "y")"
-    "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
-fi
+chosen_not_to_install_micromamba=0
+# install micromamba if desired.
+# NOTE: if not installed, and user chose not to install, will set
+# `chosen_not_to_install_micromamba` to 1.
+# $1: (optional) reason
+verify-micromamba-installed () {
+    [ -x "$micromamba" ] && return 0  # don't print, since this may run many times
+    [ $chosen_not_to_install_micromamba = 1 ] && return 1
+
+    local reason_str="$1"
+    [ -n "$reason_str" ] && reason_str=" (for $(info-col "$reason_str"))"
+
+    if confirm-action "install micromamba$reason_str?"; then
+        mkdir -p "$(dirname "$micromamba")"
+        echo "about to install micromamba; use the following options $(warn-col "(but choose a real, explicit home path!)"):"
+        echo "Micromamba binary folder? [~/.local/bin] $(info-col "/path/to/personal/home/.local/share/micromamba")"
+        echo "Init shell (bash)? [Y/n] $(info-col "n")"
+        echo "Configure conda-forge? [Y/n] $(info-col "y")"
+        "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
+    else
+        chosen_not_to_install_micromamba=1
+        return 1
+    fi
+}
 
 # standardised directory for micromamba wrapper scripts. is a function to be responsive
 # to changes to $root.
@@ -241,7 +255,9 @@ micromamba-wrap () {
 # $1: conda-forge package name
 # all args after `--`: binaries to wrap up (if no `--`, try one matching package name)
 micromamba-install () {
-    if ! [ -x "$micromamba" ]; then
+    verify-micromamba-installed "$1"  # (don't exit here, to pick up the `skip` msg below)
+
+    if ! [ -x "$micromamba" ] && [ $chosen_not_to_install_micromamba = 1 ] ; then
         skip "micromamba not installed to install $1"
         return 0
     fi
