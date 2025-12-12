@@ -463,7 +463,7 @@ nnoremap <silent> <leader><c-t> :call ShuntTab()<cr>
 
 " do a ^w= from the perspective of the top-left window.
 " (normally, ^w= is not deterministic; the currently-focused window will sometimes get
-" an extra character, over others. makes it always do the same thing.)
+" an extra character, over others. this function makes it always do the same thing.)
 function! Resize()
     if winnr() == 1
         wincmd =

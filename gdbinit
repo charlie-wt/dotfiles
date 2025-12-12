@@ -11,6 +11,25 @@ skip -gfi /usr/include/c++/*/*/*
 skip -gfi /usr/include/c++/*/*
 skip -gfi /usr/include/c++/*
 
+
+# these should hopefully stop prints in tui mode from messing up the ui
+define hookpost-run
+    refresh
+end
+define hookpost-continue
+    refresh
+end
+define hookpost-next
+    refresh
+end
+define hookpost-step
+    refresh
+end
+define hook-stop
+    refresh
+end
+
+
 # source local config
 python
 import gdb, os
