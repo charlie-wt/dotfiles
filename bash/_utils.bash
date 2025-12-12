@@ -240,7 +240,7 @@ symlink () {
 #    and the user cancelled)
 # 2: on error
 #
-# example: `do-mount "/dev/vde" "/work" "work block device"
+# example: `do-mount "/dev/asdf" "~/place-to-mount-to" "my device"
 do-mount () {
     local device="$1"
     local mountpoint="$2"
@@ -288,7 +288,7 @@ do-mount () {
         fi
     fi
 
-    # make a new symlink
+    # perform the mount
     sudo mkdir -p "$mountpoint"
     sudo mount "$device" "$mountpoint"
 }

@@ -195,6 +195,92 @@ pipx-install () {
 pipx-install python-lsp-server
 pipx-install ranger-fm
 
+# install micromamba
+micromamba="$(data-home)/micromamba/micromamba"
+if [ -x "$micromamba" ]; then
+    skip "micromamba already installed"
+elif confirm-action "install micromamba?"; then
+    mkdir -p "$(dirname "$micromamba")"
+    echo "about to install micromamba; use the following options $(warn-col "(but choose a real, explicit home path!)"):"
+    echo "Micromamba binary folder? [~/.local/bin] $(info-col "/path/to/personal/home/.local/share/micromamba")"
+    echo "Init shell (bash)? [Y/n] $(info-col "n")"
+    echo "Configure conda-forge? [Y/n] $(info-col "y")"
+    "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
+fi
+
+# standardised directory for micromamba wrapper scripts. is a function to be responsive
+# to changes to $root.
+mamba-wrappers-dir () {
+    echo "$root/.mamba-wrappers"
+}
+
+# make a wrapper script for a micromamba bin in a specified directory.
+# $1: binary name
+micromamba-wrap () {
+    # check we have the chosen binary (fail silently if not)
+    local env_dir="$("$micromamba" env list | grep -w global | awk '{print $2}')"
+    [ -f "$env_dir/bin/$1" ] || return 1
+
+    # ensure we have the wrapper script dir
+    [ -d "$(mamba-wrappers-dir)" ] || mkdir -p "$(mamba-wrappers-dir)"
+
+    # make the wrapper script, if needed (assume if the file exists, it's correct)
+    if ! [ -f "$(mamba-wrappers-dir)/$1" ]; then
+        printf "#!/usr/bin/env bash
+[ -z \"\$MAMBA_EXE\" ] && >&2 echo \"\\\$MAMBA_EXE not set\" && exit 1
+\"\$MAMBA_EXE\" run -n global $1 \$@
+" > "$(mamba-wrappers-dir)/$1"
+    fi
+    chmod u+x "$(mamba-wrappers-dir)/$1"
+
+    symlink "$(mamba-wrappers-dir)/$1" "$(bin-home)/$1" "$1 micromamba wrapper script"
+}
+
+# if a micromamba package isn't installed 'globally', ask to install it (& create a
+# wrapper script to put directly in $PATH)
+# $1: conda-forge package name
+# all args after `--`: binaries to wrap up (if no `--`, try one matching package name)
+micromamba-install () {
+    if ! [ -x "$micromamba" ]; then
+        skip "micromamba not installed to install $1"
+        return 0
+    fi
+
+    # get list of binaries to wrap (handle `--`)
+    local to_wrap=("$1")
+    local seen=0
+    local before_args=()
+    local after_args=()
+    for arg in "$@"; do
+        if [ "$seen" = 0 ]; then
+            if [ "$arg" = "--" ]; then
+                seen=1
+            else
+                before_args+=("$arg")
+            fi
+        else
+            after_args+=("$arg")
+        fi
+    done
+    [ "${#after_args[@]}" -gt 0 ] && local to_wrap="${after_args[@]}"
+
+    # install package
+    "$micromamba" env list | grep "^\s*global\s" -q
+    local have_global_env="$?"
+    if [ "$have_global_env" = 0 ] && "$micromamba" list -n global | grep "^\s*$1\s" -q; then
+        skip "$1 already installed"
+    elif confirm-action "install $(info-col "$1") (via micromamba)?"; then
+        [ "$have_global_env" = 1 ] && "$micromamba" create -n global
+        "$micromamba" install -n global "$1"
+    fi
+
+    # make any necessary wrapper scripts
+    for b in ${to_wrap[@]} ; do micromamba-wrap "$b" ; done
+}
+
+# (don't need to `micromamba install` anything here, but make functions available for
+# local installs)
+
 # kitty theme
 kitty_theme_dest="$(config-home)/kitty/theme.conf"
 if [ ! -e "$kitty_theme_dest" ]; then
