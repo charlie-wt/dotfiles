@@ -560,15 +560,12 @@ augroup my_autocmds
 augroup end
 
 
-" === Plugin config ====================================================================
+" " === Plugin config ====================================================================
 " airline
 if !exists('g:airline_symbols')
-    let g:airline_symbols = #{ branch: '', readonly: '', linenr: '☰', maxlinenr: '' }
+    let g:airline_symbols = #{ dirty: '' }  " not a fan of the default lightning bolt
 endif
-let g:airline_left_sep = ''
-let g:airline_left_alt_sep = ''
-let g:airline_right_sep = ''
-let g:airline_right_alt_sep = ''
+let g:airline_powerline_fonts = 1
 
 " vim-pandoc
 let g:pandoc#hypertext#create_if_no_alternates_exists = 1
