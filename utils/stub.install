@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+
+# === Basic setup ======================================================================
+if [ -z "$(type -t install-script)" ]; then
+     >&2 echo 'please run `local/install` via the base-level `install`'
+     exit 2
+fi
