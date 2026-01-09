@@ -303,6 +303,18 @@ if [ ! -e "$kitty_theme_dest" ]; then
     symlink "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest" "kitty theme"
 fi
 
+# pre-commit hooks for this repo
+install-hooks () {
+    local hook_script="$root/.git/hooks/pre-commit"
+    local contents=(
+        '#!/usr/bin/env bash'
+        'for f in $(find "hooks/pre-commit" -maxdepth 1 -type f) ; do . "$f" ; done'
+    )
+    printf "%s\n" "${contents[@]}" > "$hook_script"
+    chmod u+x "$hook_script"
+}
+install-hooks
+
 # TODO #enhancement: custom bash completions?
 echo
 
@@ -327,7 +339,6 @@ echo
 echo
 echo "$(info-col DONE). remember to do these too:"
 echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
-echo "* set the user.name & user.email for this repo correctly"
 
 if [[ $(tmux -V) =~ ^tmux\ (0\.|1\.|2\.|3\.0) ]]; then
     echo
