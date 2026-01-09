@@ -50,8 +50,7 @@ local-install () {
 }
 
 local-vim-plugins () {
-    local dest="$DOTFILES/local/plugins.vim"
-    from-stub-file "stub.plugins.vim" "$dest" || return 1
+    from-stub-file "stub.plugins.vim" "$DOTFILES/local/plugins.vim" || return 1
 
     echo "$(info-col DONE). remember to also add this to your local/install:"
     echo 'symlink "$root/plugins.vim" "$HOME/.vim/local-plugins.vim" "vim local plugins"'
