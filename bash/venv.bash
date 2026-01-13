@@ -147,7 +147,7 @@ __venv_completion () {
                 rm|del*|remove|uninstall|set|workon|go|in)        ;;
                 *)                                         return ;;
             esac
-            COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
+            COMPREPLY=($(compgen -W "$(venv ls)" -- "${cur}"))
             ;;
         *)
             # more than one venv specified
@@ -155,7 +155,7 @@ __venv_completion () {
                 rm|del*|remove|uninstall)        ;;
                 *)                        return ;;
             esac
-            COMPREPLY=($(compgen -W "$(venv ls)" -- ${cur}))
+            COMPREPLY=($(compgen -W "$(venv ls)" -- "${cur}"))
             ;;
     esac
 }

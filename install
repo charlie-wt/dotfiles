@@ -18,6 +18,7 @@ fi
 
 
 # === Symlinking dotfiles ==============================================================
+title "symlinking dotfiles..."
 # wrapper around `symlink`, specifically for dotfiles.
 #
 # $1: name of the file to link to (relative to $root).
@@ -31,7 +32,6 @@ dotfile () {
     return $?
 }
 
-title "symlinking dotfiles..."
 dotfile bashrc
 dotfile gdbinit
 dotfile gitconfig       "$(config-home)/git/config"
@@ -44,6 +44,7 @@ echo
 
 
 # === Install scripts ==================================================================
+title "symlinking scripts..."
 # wrapper around `symlink`, specifically for scripts.
 #
 # $1: name of file to link to (relative to $root/scripts).
@@ -63,7 +64,6 @@ install-script () {
     return $res
 }
 
-title "symlinking scripts..."
 install-script branched-from
 install-script lightdark
 install-script submods
@@ -75,38 +75,13 @@ echo
 
 # === Other symlinks ===================================================================
 title "making other symlinks..."
-[ -d "$root/vim" ] && symlink "$root/vim" "$HOME/.vim/personal" "vim personal dir"
+
+symlink "$root/other/gruvbox/kitty/dark.conf" "$(config-home)/kitty/theme.conf" "kitty theme"
 echo
 
 
-# === Other bits =======================================================================
-title "doing other misc stuff..."
-
-# make directories for vim swapfiles, backups etc.
-mkdir -p "$(state-home)/vim/backups"
-mkdir -p "$(state-home)/vim/sessions"
-mkdir -p "$(state-home)/vim/swaps"
-mkdir -p "$(state-home)/vim/undo"
-
-# basic setup for vim plugin manager
-vim_plug_loc="$HOME/.vim/autoload/plug.vim"
-if [ -e "$vim_plug_loc" ]; then
-    skip "plug.vim already exists in $vim_plug_loc"
-else
-    curl -fLo "$vim_plug_loc" --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    vim -c 'PlugInstall' -c 'qa!'
-fi
-
-# setup tmux plugin manager
-tpm_dir="$(config-home)/tmux/plugins/tpm"
-if [ -e "$tpm_dir" ]; then
-    skip "tpm already exists in $tpm_dir"
-else
-    git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
-    . "$tpm_dir"/bin/install_plugins
-fi
-
+# === Installing packages ==============================================================
+title "installing packages..."
 # return 0 if an apt package is installed, else 1. will return 2 if apt isn't installed.
 # $1: name of apt package to check.
 is-apt-installed () {
@@ -140,19 +115,15 @@ apt-install () {
         return 1
     fi
 }
-apt-install python-is-python3
-apt-install python3-pip  # note: needed for the later pipx stuff
-apt-install python3-venv
-apt-install tmuxinator
 
 # basic rust setup
 rustup_dir="$(data-home)/rustup"
 cargo_dir="$(data-home)/cargo"
 if [[ -e "$rustup_dir" && -e "$cargo_dir" ]]; then
     skip "rustup & cargo already exist in $rustup_dir & $cargo_dir"
-elif confirm-action "do you want to install rust & cargo, via rustup?"; then
-    export RUSTUP_HOME=$rustup_dir
-    export CARGO_HOME=$cargo_dir
+elif confirm-action "install rust & cargo, via rustup?"; then
+    export RUSTUP_HOME="$rustup_dir"
+    export CARGO_HOME="$cargo_dir"
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
 fi
 
@@ -167,8 +138,6 @@ cargo-install () {
         confirm-action "install $(info-col "$1") (via cargo)?" && cargo install "$1"
     fi
 }
-cargo-install fd-find
-cargo-install ripgrep
 
 # pipx
 # TODO #bug: doesn't want to install somehow
@@ -176,11 +145,13 @@ if have-cmd pipx; then
     skip "pipx already installed"
 elif have-cmd pip && confirm-action "install pipx?"; then
     PIP_BREAK_SYSTEM_PACKAGES=1 pip install --user pipx
+    . $root/bash/pipx.bash  # update things like $PATH to make pipx available
 fi
 
 # if a pipx package isn't installed globally, ask to install it
 # $1: pypi package name
 pipx-install () {
+    # TODO #test
     # TODO #bug: i think if pip was installed in this terminal session, `pip.bash` won't
     # have run to update the $PATH so `have-cmd pipx` will continue to fail. maybe
     # should put all the $PATH-updating stuff in `bash/` before the various guards...
@@ -192,8 +163,6 @@ pipx-install () {
         confirm-action "install $(info-col "$1") (via pipx)?" && pipx install "$1"
     fi
 }
-pipx-install python-lsp-server
-pipx-install ranger-fm
 
 # micromamba
 micromamba="$(data-home)/micromamba/micromamba"
@@ -294,13 +263,47 @@ micromamba-install () {
     for b in ${to_wrap[@]} ; do micromamba-wrap "$b" ; done
 }
 
+apt-install python-is-python3
+apt-install python3-pip  # note: needed for the later pipx stuff
+apt-install python3-venv
+apt-install tmuxinator
+
+cargo-install fd-find
+cargo-install ripgrep
+
+pipx-install python-lsp-server
+pipx-install ranger-fm
 # (don't need to `micromamba install` anything here, but make functions available for
 # local installs)
+echo
 
-# kitty theme
-kitty_theme_dest="$(config-home)/kitty/theme.conf"
-if [ ! -e "$kitty_theme_dest" ]; then
-    symlink "$root/other/gruvbox/kitty/dark.conf" "$kitty_theme_dest" "kitty theme"
+
+# === Other bits =======================================================================
+title "doing other misc stuff..."
+
+# make directories for vim swapfiles, backups etc.
+mkdir -p "$(state-home)/vim/backups"
+mkdir -p "$(state-home)/vim/sessions"
+mkdir -p "$(state-home)/vim/swaps"
+mkdir -p "$(state-home)/vim/undo"
+
+# basic setup for vim plugin manager
+vim_plug_loc="$HOME/.vim/autoload/plug.vim"
+if [ -e "$vim_plug_loc" ]; then
+    skip "plug.vim already exists in $vim_plug_loc"
+else
+    curl -fLo "$vim_plug_loc" --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    vim -c 'PlugInstall' -c 'qa!'
+fi
+
+# setup tmux plugin manager
+tpm_dir="$(config-home)/tmux/plugins/tpm"
+if [ -e "$tpm_dir" ]; then
+    skip "tpm already exists in $tpm_dir"
+else
+    git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
+    . "$tpm_dir"/bin/install_plugins
 fi
 
 # pre-commit hooks for this repo

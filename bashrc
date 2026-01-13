@@ -86,15 +86,15 @@ cdc () { cd "$(config-home)/$1"; }
 __cdc_completion () {
     local cur="${COMP_WORDS[COMP_CWORD]}"
     local dirs="$(find "$(config-home)" -maxdepth 1 -mindepth 1 -type d -printf "%f\n")"
-    COMPREPLY=($(compgen -W "$dirs" -- ${cur}))
+    COMPREPLY=($(compgen -W "$dirs" -- "${cur}"))
 }
 complete -F __cdc_completion cdc
 
 # go to dotfiles dir, or install them
 dots () {
     case $1 in
-        i|install) $DOTFILES/install "${@:2}" ;;
-        "")        cd $DOTFILES               ;;
+        i|install) "$DOTFILES/install" ${@:2} ;;
+        "")        cd "$DOTFILES"             ;;
         *)         >&2 echo ?                 ;;
     esac
 }
@@ -118,12 +118,12 @@ extract () {
     case "$1" in
         *.7z)        7z x "$1"        ;;
         *.Z)         uncompress "$1"  ;;
+        *.tar.bz2)   tar xvjf "$1"    ;;
+        *.tar.gz)    tar xvzf "$1"    ;;
         *.bz2)       bunzip2 "$1"     ;;
         *.gz)        gunzip "$1"      ;;
         *.rar)       unrar x "$1"     ;;
         *.tar)       tar xvf "$1"     ;;
-        *.tar.bz2)   tar xvjf "$1"    ;;
-        *.tar.gz)    tar xvzf "$1"    ;;
         *.tbz2)      tar xvjf "$1"    ;;
         *.tgz)       tar xvzf "$1"    ;;
         *.whl)       unzip "$1"       ;;
@@ -135,12 +135,12 @@ extract () {
 # quick way to do simple compilations & run, for small bits of (normally) test code.
 mkrn () {
     case ${1##*.} in
-       c)             gcc -Wall -ggdb3 -Og            -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
-       C|cc|cpp|cxx)  g++ -Wall -ggdb3 -Og -std=c++20 -o "${1%.*}" "${@:2}" "$1" && ./${1%.*} ;;
-       hs)            ghc -Wall --make ${1%.*} && ./${1%.*} "${@:2}"       ;;
-       js)            node "$@"                                            ;;
-       py)            python3 "$@"                                         ;;
-       rs)            rustc "$1" && ./${1%.*} "${@:2}"                     ;;
+       c)             gcc -Wall -ggdb3 -Og            -o "${1%.*}" ${@:2} "$1" && ./"${1%.*}" ;;
+       C|cc|cpp|cxx)  g++ -Wall -ggdb3 -Og -std=c++20 -o "${1%.*}" ${@:2} "$1" && ./"${1%.*}" ;;
+       hs)            ghc -Wall --make "${1%.*}" && ./"${1%.*}" ${@:2}  ;;
+       js)            node "$@"                                         ;;
+       py)            python3 "$@"                                      ;;
+       rs)            rustc "$1" && ./"${1%.*}" ${@:2}                  ;;
        *)
            [ -f "Cargo.toml" ] && cargo run || >&2 echo "unknown filetype '${1##*.}'." ;;
     esac
@@ -151,7 +151,7 @@ mkrn () {
 #     defaults to 25.
 # NOTE: suppresses error messages, since they're usually 'permission denied' clutter
 size () {
-    [ $# -ge 1 ] && local size=$1 || local size=25
+    [ $# -ge 1 ] && local size="$1" || local size=25
 
     if [ $size == "all" ] ; then
         du -ahd1 2>/dev/null | sort -hr
@@ -181,9 +181,11 @@ pr () {
     local branch_name="${2:-pr-$idx}"
     local default_remote=upstream
     [ -z "$(git remote | grep "$default_remote")" ] && default_remote=origin
+    # TODO #cleanup: is there a way to do this?
+    # git remote | grep -q "$default_remote" && default_remote=origin
     local remote="${3:-$default_remote}"
 
-    git fetch $remote pull/"$idx"/head:"$branch_name" && git checkout "$branch_name"
+    git fetch "$remote" pull/"$idx"/head:"$branch_name" && git checkout "$branch_name"
 }
 
 # get the location of coredumps
@@ -195,7 +197,7 @@ dumploc () {
     [ "$(ulimit -c)" = 0 ] || [ "$noname" = 0 ] && >&2 echo "(coredumps disabled)"
     # try and get a location
     local handler=core
-    [ -f "$corepat" ] && handler="$(cat "$corepat" | sed 's/\([^\]\) .*/\1/g')"
+    [ -f "$corepat" ] && handler="$(sed 's/\([^\]\) .*/\1/g' "$corepat")"
     case "$handler" in
         \|*apport) echo "/var/lib/apport/coredump"                  ;;
         \|*)       >&2 echo "piped to unknown program ${handler#|}" ;;
@@ -214,12 +216,16 @@ vims () {
     local session="$1"
     local sessions_dir="$(state-home)/vim/sessions"
     local session_file="$sessions_dir/$session.vim"
-    [ -f "$session_file" ] && vim -S "$session_file" || vim ${@:2} -c ":Obsess $session_file"
+    if [ -f "$session_file" ]; then
+        vim -S "$session_file"
+    else
+        vim ${@:2} -c ":Obsess $session_file"
+    fi
 }
 __vims_completion () {
     local cur="${COMP_WORDS[COMP_CWORD]}"
     local sessions="$(find "$(state-home)/vim/sessions" -maxdepth 1 -mindepth 1 -type f -printf "%f\n" | sed 's/\.vim$//')"
-    COMPREPLY=($(compgen -W "$sessions" -- ${cur}))
+    COMPREPLY=($(compgen -W "$sessions" -- "${cur}"))
 }
 complete -F __vims_completion vims
 
