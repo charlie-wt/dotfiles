@@ -18,6 +18,7 @@ Plug 'vim-pandoc/vim-pandoc-syntax'
 " commands
 Plug 'arp242/jumpy.vim'
 Plug 'bronson/vim-visual-star-search'
+Plug 'girishji/vimbits'
 Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
 Plug 'ojroques/vim-oscyank', { 'branch': 'main' }
@@ -107,6 +108,10 @@ let &viminfofile=vim_state_home.'/viminfo'
 set nrformats-=octal
 set sidescrolloff=5
 let &t_ut=''
+" TODO #test (no: breaks incsearch (always submits search even if you <esc>))
+" autocmd CmdlineChanged [:\/\?] call wildtrigger()
+" set wildmode=noselect:lastused,full
+" set wildoptions=pum
 
 
 " === Custom commands ==================================================================
@@ -647,6 +652,12 @@ let g:oscyank_term = 'default'
 
 " vimspector
 let g:vimspector_enable_mappings = 'HUMAN'
+
+" vimbits
+let g:easyjump_default_keymap = v:false
+nnoremap S <plug>EasyjumpJump;
+onoremap S <plug>EasyjumpJump;
+vnoremap S <plug>EasyjumpJump;
 
 
 " === Local config =====================================================================
