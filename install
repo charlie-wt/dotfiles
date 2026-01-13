@@ -16,6 +16,8 @@ elif [ "$1" = "-n" ]; then
     default_choice=false
 fi
 
+remember_to_do=()  # list of strings of stuff to remind user about at the end.
+
 
 # === Symlinking dotfiles ==============================================================
 title "symlinking dotfiles..."
@@ -330,8 +332,10 @@ if [ -x "$root/local/install" ]; then
     . "$root/install"
     root="$d"
 elif [ -f "$root/local/install" ]; then
+    remember_to_do+=("mark local/install as executable if desired (then run again)")
     warn "found a local/install, but it wasn't marked as executable; skipping"
 else
+    remember_to_do+=("do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)")
     skip "didn't find a local/install"
 fi
 echo
@@ -340,8 +344,10 @@ echo
 # === Finish ===========================================================================
 # reminders for manual bits i've not automated yet
 echo
-echo "$(info-col DONE). remember to do these too:"
-echo "* do any machine-specific setup in local/{gitconfig,bash/*,vim/*} (then run again)"
+[ "${#remember_to_do[@]}" -gt 0 ] && remember_prefix=". remember to do these too:"
+
+echo "$(info-col DONE)$remember_prefix"
+for r in "${remember_to_do[@]}" ; do echo "* $r" ; done
 
 if [[ $(tmux -V) =~ ^tmux\ (0\.|1\.|2\.|3\.0) ]]; then
     echo
