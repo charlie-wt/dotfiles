@@ -21,7 +21,7 @@ Plug 'bronson/vim-visual-star-search'
 Plug 'girishji/vimbits'
 Plug 'machakann/vim-swap'
 Plug 'michaeljsmith/vim-indent-object'
-Plug 'ojroques/vim-oscyank', { 'branch': 'main' }
+Plug 'ojroques/vim-oscyank'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 " ide
@@ -565,7 +565,7 @@ augroup my_autocmds
 augroup end
 
 
-" " === Plugin config ====================================================================
+" === Plugin config ====================================================================
 " airline
 if !exists('g:airline_symbols')
     let g:airline_symbols = #{ dirty: '' }  " not a fan of the default lightning bolt
