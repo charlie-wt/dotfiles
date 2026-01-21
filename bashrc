@@ -210,12 +210,12 @@ dumploc () {
 # session if it doesn't exist yet.
 # $1: session name
 # all other arguments: passed on to vim
+VIM_SESSIONS_DIR="$(state-home)/vim/sessions"
 vims () {
     [ -z "$1" ] && >&2 error "please provide a session name." && return 1
 
     local session="$1"
-    local sessions_dir="$(state-home)/vim/sessions"
-    local session_file="$sessions_dir/$session.vim"
+    local session_file="$VIM_SESSIONS_DIR/$session.vim"
     if [ -f "$session_file" ]; then
         vim -S "$session_file"
     else
