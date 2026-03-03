@@ -313,7 +313,7 @@ install-hooks () {
     local hook_script="$root/.git/hooks/pre-commit"
     local contents=(
         '#!/usr/bin/env bash'
-        'for f in $(find "hooks/pre-commit" -maxdepth 1 -type f) ; do . "$f" ; done'
+        'for f in hooks/pre-commit/* ; do . "$f" ; done'
     )
     printf "%s\n" "${contents[@]}" > "$hook_script"
     chmod u+x "$hook_script"

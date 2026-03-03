@@ -8,7 +8,7 @@ bad_words_list="$DOTFILES/local/bad-words.conf"
 
 [ -f "$bad_words_list" ] || exit 0
 
-changed_files="$(git diff --name-only)"
+changed_files="$(git diff --name-only --cached)"
 
 exit_code=0
 
@@ -19,7 +19,7 @@ for term in $(cat "$bad_words_list") ; do
     matches="$(grep "$term" $changed_files -Ei --color=always -n -C 1)"
     if [ -n "$matches" ] ; then
         >&2 error "found bad word matches for term "$(warn-col "$term")":"
-        printf "$matches\n\n"
+        >&2 printf "$matches\n\n"
         exit_code=1
     fi
 done
