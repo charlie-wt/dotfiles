@@ -553,6 +553,8 @@ augroup my_autocmds
     au filetype lua setlocal ts=4 sts=4 sw=4 noet
     au filetype pico8 setlocal ts=4 sts=4 sw=4 noet
 
+    au filetype pandoc nnoremap <buffer> gd <Plug>(pandoc-keyboard-links-open)
+
     " vim-fswitch for shaders
     au bufenter,winenter *.vert let b:fswitchdst = 'frag'
     au bufenter,winenter *.vert let b:fswitchlocs = './'
