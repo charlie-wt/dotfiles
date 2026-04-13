@@ -637,6 +637,14 @@ if executable('haskell-language-server-wrapper')
         \ })
 endif
 
+if executable('rust-analyzer')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'rust-analyzer',
+        \ 'cmd': {server_info->['rust-analyzer']},
+        \ 'allowlist': ['rust'],
+        \ })
+endif
+
 let g:lsp_diagnostics_enabled = 0
 let g:lsp_diagnostics_signs_enabled = 0
 let g:lsp_diagnostics_signs_insert_mode_enabled = 0
