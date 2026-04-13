@@ -2,6 +2,7 @@ deno_base_dir="$(data-home)/deno"
 
 register-deno () {
     export DENO_DIR="$(cache-home)/deno"
+    export DENO_INSTALL_ROOT="$deno_base_dir"
     maybe-prepend-to-path "$deno_base_dir/bin"
 }
 
