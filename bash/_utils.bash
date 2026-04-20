@@ -419,7 +419,7 @@ at-least-version () {
     [ $(printf "$fst\n$snd" | sort -Vr | head -n 1) = "$fst" ] && return 0 || return 1
 }
 
-# add the given input to the beginning of $PATH, if it's no already there.
+# add the given input to the beginning of $PATH, if it's not already there.
 maybe-prepend-to-path () {
     to_add="$1"
 
@@ -429,7 +429,7 @@ maybe-prepend-to-path () {
     esac
 }
 
-# add the given input to the end of $PATH, if it's no already there.
+# add the given input to the end of $PATH, if it's not already there.
 maybe-append-to-path () {
     to_add="$1"
 
