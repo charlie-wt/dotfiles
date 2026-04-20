@@ -130,7 +130,8 @@ elif confirm-action "install rust & cargo, via rustup?"; then
 fi
 
 # micromamba
-micromamba="$(data-home)/micromamba/micromamba"
+micromamba_dir="$(data-home)/micromamba"
+micromamba="$micromamba_dir/micromamba"
 chosen_not_to_install_micromamba=0
 # install micromamba if desired.
 # NOTE: if not installed, and user chose not to install, will set
@@ -156,7 +157,27 @@ verify-micromamba-installed () {
     fi
 }
 
-[ -x "$micromamba" ] && symlink "$root/mambarc" "$(dirname "$micromamba")/.mambarc" "micromamba config file"
+# extra micromamba setup, if we have the program
+micromamba_extra_data_dir="$micromamba_dir/global-xdg-data-dir"
+if [ -x "$micromamba" ]; then
+    # install config file
+    symlink "$root/mambarc" "$micromamba_dir/.mambarc" "micromamba config file"
+
+    # add global env's bash completion.
+    # unfortunately the only way to add an *extra* bash-completion directory is to make
+    # an enty to $XDG_DATA_DIRS with a `bash-completion/completions` subdir.  also
+    # unfortunately, not all installed packages export completion scripts in the same
+    # way: some (eg. `gh`) are nice & use the `share/` subdir with the right
+    # substructure. others (eg. `rg`) use `etc/bash_completion.d/`, which isn't the
+    # right structure to be read by bash-completion so we need to re-create the right
+    # structure elsewhere...
+    other_comp_dir="$micromamba_dir/envs/global/etc/bash_completion.d"
+    if [ -d "$other_comp_dir" ]; then
+        xdg_data_comps="$micromamba_extra_data_dir/bash-completion"
+        mkdir -p "$xdg_data_comps"
+        ln -s "$other_comp_dir" "$xdg_data_comps/completions"
+    fi
+fi
 
 # standardised directory for micromamba wrapper scripts. is a function to be responsive
 # to changes to $root.
