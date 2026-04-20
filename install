@@ -175,7 +175,7 @@ if [ -x "$micromamba" ]; then
     if [ -d "$other_comp_dir" ]; then
         xdg_data_comps="$micromamba_extra_data_dir/bash-completion"
         mkdir -p "$xdg_data_comps"
-        ln -s "$other_comp_dir" "$xdg_data_comps/completions"
+        symlink "$other_comp_dir" "$xdg_data_comps/completions" "micromamba completions"
     fi
 fi
 
