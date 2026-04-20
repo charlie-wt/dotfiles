@@ -1,0 +1,4 @@
+# vim:fileencoding=utf-8:filetype=yaml
+
+# needed so that you can eg. pipe one micromamba program into another
+use_lockfiles: false

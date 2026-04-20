@@ -156,6 +156,8 @@ verify-micromamba-installed () {
     fi
 }
 
+[ -x "$micromamba" ] && symlink "$root/mambarc" "$(dirname "$micromamba")/.mambarc" "micromamba config file"
+
 # standardised directory for micromamba wrapper scripts. is a function to be responsive
 # to changes to $root.
 mamba-wrappers-dir () {
