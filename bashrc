@@ -53,20 +53,14 @@ alias gdc='git dc'
 alias gdb='gdb -q'
 alias grep='grep --color=auto'
 
-alias qm='qmake -spec linux-g++ CONFIG+=debug CONFIG+=qml_debug'
 alias tma="tmux attach -t"
-# there's already a fd in apt
-have-cmd fdfind && alias fd='fdfind'
 # rg for certain filetypes
 alias rgc="rg -g '*.{c,cpp,cc,C,cxx,h,hpp,hh,H,hxx}'"
 alias rgp="rg -g '*.py'"
-# quick name for ranger (and when it exits, bash gets put into wherever ranger was)
-alias ra='. ranger'
-alias rf=rifle
 # update flatpaks
 alias fpu='flatpak update -y ; flatpak uninstall --unused -y'
-# update cargo packages
-alias cgu="cargo install \$(cargo install --list | awk '/:$/ { print \$1; }')"
+# update micromamba (conda) packages
+alias mmu="micromamba update -n global --all"
 # push a new branch to `origin`
 alias push-branch='git push --set-upstream origin "$(git branch --show-current)"'
 # copy stdin to system clipboard using osc-52

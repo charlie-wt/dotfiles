@@ -4,7 +4,7 @@
 # setup
 max_length=16  # maximum length of result before ellipsising
 cd "$1"
-trunc() {
+ellipsise () {
     if [ "${#1}" -le "$max_length" ]; then
         echo "$1"
     else
@@ -22,4 +22,4 @@ res="$(git rev-parse --show-toplevel 2>/dev/null)"
 [ -z "$res" ] && res="$1"
 
 # take final portion of dir, then ellipsise
-trunc "$(basename "$res")"
+ellipsise "$(basename "$res")"

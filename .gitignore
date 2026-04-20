@@ -1,3 +1,4 @@
 # local-setup-specific config (ie. mostly for work)
 local
 
+.mamba-wrappers
