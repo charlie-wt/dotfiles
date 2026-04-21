@@ -199,7 +199,7 @@ micromamba-wrap () {
     if ! [ -f "$(mamba-wrappers-dir)/$1" ]; then
         printf "#!/usr/bin/env bash
 [ -z \"\$MAMBA_EXE\" ] && >&2 echo \"\\\$MAMBA_EXE not set\" && exit 1
-\"\$MAMBA_EXE\" run -n global $1 \$@
+\"\$MAMBA_EXE\" run -n global $1 \"\$@\"
 " > "$(mamba-wrappers-dir)/$1"
     fi
     chmod u+x "$(mamba-wrappers-dir)/$1"
