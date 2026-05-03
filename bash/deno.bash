@@ -7,6 +7,10 @@ register-deno () {
 }
 
 install-deno () {
+    >&2 echo "TRY RUNNING utils/get-deno FIRST!"
+    >&2 echo "IF THAT WORKS, GET RID OF THIS FUNCTION (THE SCRIPT IS SIMPLER)"
+    return
+
     # unfortunately there's no way to modify the behaviour of their install script
     # (https://deno.land/install.sh) to do the right thing without interactive prompts,
     # so instead just paste the important bits manually lol

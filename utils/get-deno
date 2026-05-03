@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# note: untested
+
+# setup
+source "$DOTFILES/bash/_utils.bash"
+
+default_loc="$HOME/.deno"
+desired_loc="$(data-home)/deno"
+
+# get
+curl -fsSL https://deno.land/install.sh | sh
+
+# move to correct location
+mv "$default_loc" "$desired_loc"
+
+# fix env script
+sed -i "/$default_loc/$desired_loc/g" "$desired_loc/env"
+
+# fix bash completions
+# (doesn't seem to be needed; on ubuntu at least, the default
+# `/usr/share/bash-completion/completions` has a fallback entry for deno that runs
+# `deno completions bash`.)
+# deno completions bash > "$desired_loc"
