@@ -258,6 +258,7 @@ micromamba-install fd-find -- fd
 micromamba-install python -- python python3 pip pip3
 micromamba-install python-lsp-server -- pylsp
 micromamba-install ripgrep -- rg
+micromamba-install tokei
 micromamba-install yazi
 echo
 
