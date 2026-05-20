@@ -662,6 +662,10 @@ let g:oscyank_term = 'default'
 
 " vimspector
 let g:vimspector_enable_mappings = 'HUMAN'
+nnoremap <localleader><f11> <plug>VimspectorUpFrame
+nnoremap <localleader><f12> <plug>VimspectorDownFrame
+nnoremap <localleader>B     <plug>VimspectorBreakpoints
+
 
 " vimbits
 let g:easyjump_default_keymap = v:false
