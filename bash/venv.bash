@@ -18,9 +18,9 @@ venv () {
         help|-h)
             echo "Commands:"
             echo " ls | list | show:                      list venvs"
-            echo " new | mk | make | add \$ENV:            make a new venv or list of venvs"
-            echo " rm | del* | remove | uninstall \$ENV:   remove a venv or list of venvs"
-            echo " set | workon | go | in \$ENV:           enter a venv"
+            echo " new | mk | make | add <env>:           make a new venv or list of venvs"
+            echo " rm | del* | remove | uninstall <env>:  remove a venv or list of venvs"
+            echo " set | workon | go | in <env>:          enter a venv"
             echo " unset | deac* | out:                   leave current venv"
             echo " [nothing] | on:                        print current venv"
             echo " help | -h:                             print this message"
