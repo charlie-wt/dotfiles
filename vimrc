@@ -493,6 +493,11 @@ nnoremap <c-z> <nop>
 " Ctrl+\ -> evaluate expression, replace the whole command line with the result
 "           (i currently use this as my tmux prefix)
 nnoremap <c-\> <nop>
+" middle-click -> paste
+noremap <middlemouse> <nop>
+noremap <2-middlemouse> <nop>
+noremap <3-middlemouse> <nop>
+noremap <4-middlemouse> <nop>
 
 
 " === Autocommands =====================================================================
