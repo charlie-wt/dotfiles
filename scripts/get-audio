@@ -1,0 +1,43 @@
+#!/bin/env sh
+
+# args
+video_name=$1
+flags=""
+
+if [ "$1" = "-p" ]; then
+    # tag as a podcast
+    video_name=$2
+    flags="-metadata genre=podcast"
+fi
+
+# get info
+extension=$(ffmpeg -i "$video_name" 2>&1 | grep "Stream\s\+#.*Audio" | sed -rn 's/.*Audio:\s+(\w+).*/\1/p')
+audio_name="${video_name%.*}.$extension"
+
+# convert
+ffmpeg -i "$video_name" -vn $flags -acodec copy "$audio_name"
+
+
+
+
+
+
+
+# flags:
+# -i           : input
+# -vn          : no video
+# -acodec copy : use existing audio stream in input file.
+
+
+
+
+
+
+# (in general) why .aac:
+# * aac is a lossy audio encoding scheme, but better than mp3.
+# * aac is the audio encoding scheme used by mp4 videos (lossy).
+# * you can have a .mp4 file with only audio (which uses aac).
+# * in order to disambiguate video & audio mp4s from just audio mp4s, the .m4a extension
+#   is sometimes used.
+#
+# so .aac, .m4a and .mp4 are all equivalent; is lossy, but better than mp3.

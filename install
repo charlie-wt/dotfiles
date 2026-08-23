@@ -67,6 +67,7 @@ install-script () {
 }
 
 install-script branched-from
+install-script get-audio
 install-script lightdark
 install-script submods
 install-script update-clangd
