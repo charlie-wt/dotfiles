@@ -190,7 +190,7 @@ mamba-wrappers-dir () {
 # $1: binary name
 micromamba-wrap () {
     # check we have the chosen binary (fail silently if not)
-    local env_dir="$("$micromamba" env list | grep -w global | awk '{print $2}')"
+    local env_dir="$("$micromamba" env list | grep -w "^ *global" | awk '{print $2}')"
     [ -f "$env_dir/bin/$1" ] || return 1
 
     # ensure we have the wrapper script dir
